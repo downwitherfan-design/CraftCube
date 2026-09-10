@@ -234,7 +234,7 @@
       "status": "draft"
     },
     {
-      "cueId": "audio.item.acquired",
+      "cueId": "audio.item.equipment.acquired",
       "priorityClass": "P3_COMPANION_ITEM",
       "bus": "Item",
       "layerRole": "stinger",
@@ -247,7 +247,7 @@
       "status": "draft"
     },
     {
-      "cueId": "audio.item.equipped",
+      "cueId": "audio.item.equipment.equipped",
       "priorityClass": "P3_COMPANION_ITEM",
       "bus": "Item",
       "layerRole": "one_shot",
@@ -260,7 +260,7 @@
       "status": "draft"
     },
     {
-      "cueId": "audio.item.used",
+      "cueId": "audio.item.equipment.used",
       "priorityClass": "P3_COMPANION_ITEM",
       "bus": "Item",
       "layerRole": "one_shot",
