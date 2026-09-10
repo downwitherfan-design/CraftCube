@@ -1,0 +1,5 @@
+DeviceTier,Screen,AndroidVersion,RefreshRate,CPU/GPUClass,TargetFPS,TestScenes,PassCriteria,Owner
+Low,small/compact,latest-2,60,low,30,boot/home/chapter/gameplay/save,no-crash+stable-input,AI-07
+Mid,6-7in,latest-1,60-120,mid,60,all-core-flows,no-critical-spikes,AI-07
+High,6-7in,latest,120,high,60+,all-core-flows+effects,visual+thermal-pass,AI-07
+Tablet,large,latest-1,60,mid,60,UI+gameplay,layout-safe,AI-05

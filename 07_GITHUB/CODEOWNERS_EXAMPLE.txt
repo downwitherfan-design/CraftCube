@@ -1,0 +1,14 @@
+# Example ownership model (adapt names to actual GitHub usernames)
+/src/Domain/                 @AI-02
+/tests/Domain/               @AI-02 @AI-07
+/src/Presentation/           @AI-03
+/Assets/Art/                 @AI-04
+/Assets/VFX/                 @AI-04
+/src/UI/                     @AI-05
+/Assets/UI/                  @AI-05
+/Assets/Audio/               @AI-06
+/tests/                       @AI-07
+/QA/                          @AI-07
+.github/                      @AI-08
+/Release/                     @AI-08
+/Contracts/                   @PRODUCT @AI-02 @AI-08
