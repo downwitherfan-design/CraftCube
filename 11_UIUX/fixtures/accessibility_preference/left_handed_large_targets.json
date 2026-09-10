@@ -1,0 +1,17 @@
+{
+  "schema": "AccessibilityPreference",
+  "schema_version": "0.1.0",
+  "reduce_motion": false,
+  "camera_comfort": "steady",
+  "screen_shake_intensity": 0.25,
+  "haptic_intensity": 0.75,
+  "audio_cue_redundancy": true,
+  "color_assist_indicators": false,
+  "large_touch_targets": true,
+  "handedness": "left",
+  "safe_area_mode": "system",
+  "dialogue_text_speed": "fast",
+  "text_scale": 1.15,
+  "high_contrast_ui": false,
+  "hold_to_confirm_destructive": true
+}
