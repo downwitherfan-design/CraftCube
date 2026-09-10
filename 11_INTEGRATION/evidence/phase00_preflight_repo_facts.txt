@@ -1,0 +1,375 @@
+# Phase 00 AI-13 preflight repository facts
+# Generated: 2026-09-10T18:22:34Z
+# Baseline: 584141c
+
+## git remote -v
+origin	https://github.com/downwitherfan-design/CraftCube.git (fetch)
+origin	https://github.com/downwitherfan-design/CraftCube.git (push)
+
+## git log --oneline main
+584141c Initial CraftCube v7 WORLDCLASS baseline
+
+## git branch -r (as observed after integration branch creation)
+  origin/HEAD -> origin/main
+  origin/ai-01-product
+  origin/ai-02-core
+  origin/ai-03-puzzle
+  origin/ai-04-gameplay
+  origin/ai-05-world
+  origin/ai-06-creatures
+  origin/ai-07-uiux
+  origin/ai-08-audio
+  origin/ai-09-narrative
+  origin/ai-10-qa
+  origin/ai-11-performance
+  origin/ai-12-build
+  origin/ai-13-integration
+  origin/integration
+  origin/main
+
+## tracked file count on baseline
+322
+
+## file types on baseline
+      1 csv
+      1 json
+    318 md
+      1 py
+      1 txt
+
+## code/CI presence check on baseline (expected: none)
+NONE FOUND
+
+## grep -rni minecraft (baseline docs)
+00_CONTROL/CRAFTCUBE_GAME_MASTER_BIBLE.md:7:The game may evoke the freedom and wonder of a block-building sandbox, but it is **not** a Minecraft clone and it must not depend on copying Minecraft's art, creatures, terminology, UI or progression patterns.
+05_PROMPTS/00_MASTER_CONTROL_PROMPT.md:148:CraftCube is a living puzzle-world, not a Minecraft clone and not a generic RPG. Puzzle mastery remains the central skill. Story, world, companions, equipment and discovery exist to deepen that identity.
+05_PROMPTS/phase_00/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_00/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_01/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_02/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_03/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_04/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_05/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_06/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_07/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_08/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_09/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_10/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_11/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_12/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_13/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_14/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_15/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_16/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_01.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_02.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_03.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_04.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_05.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_06.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_07.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_08.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_09.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_10.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_11.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_12.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+05_PROMPTS/phase_17/ai_13.md:71:- Story, world, companions, items and equipment deepen the puzzle/world identity; they do not turn the game into a generic RPG or Minecraft clone.
+10_SOURCE_REFERENCE/SOURCE_GDD_NOTES.md:18:The source also uses Minecraft-specific names, creatures and presentation. For an independent commercial game, keep the **mechanical design ideas** but separate them from proprietary Minecraft branding/assets unless a licensed path is explicitly chosen.
+
+## grep for pre-existing RISK-/CR-/OD- IDs on baseline (expected 0)
+0
+
+## contract vocabularies
+--- V7_MASTER_CONTRACT_REGISTER.md rows
+| Contract | Primary owner | Consumers |
+| PuzzleState | AI-02 | AI-03/04/05/06/10/13 |
+| WorldState | AI-02 | AI-05/06/09/10/13 |
+| WorldStateEvent | AI-13 governance + AI-02 domain | AI-03/05/06/08/09/10 |
+| ItemDefinition | AI-02 | AI-03/07/09/10/11/12 |
+| EquipmentDefinition | AI-02 | AI-03/04/07/09/10/11/12 |
+| EquipmentEffect | AI-02 | AI-03/04/05/06/07/10 |
+| NarrativeEvent | AI-09 | AI-04/07/08/10/13 |
+| DiscoveryDefinition | AI-03 | AI-04/07/09/10/12 |
+| CompanionReaction | AI-06 | AI-04/08/09/10 |
+| RewardDefinition | AI-03 | AI-02/07/09/10/12 |
+| SaveSchema | AI-02 | AI-07/10/11/12/13 |
+| LocalizationKey | AI-09 | AI-07/08/12 |
+| PerformanceBudget | AI-11 | all runtime tracks |
+--- WORLDCLASS_CONTRACTS_V7_1.md rows
+| Contract | Primary owner | Consumers |
+| QuestState | AI-03 | AI-02/07/09/10/13 |
+| CharacterMemory | AI-09 | AI-02/06/07/08/10 |
+| ItemIdentity | AI-02 | AI-03/07/09/10/11/12 |
+| UpgradeDefinition | AI-02 | AI-03/07/10/11 |
+| ResourceLedger | AI-02 | AI-03/07/10/11/12 |
+| TelemetryEvent | AI-12 | AI-01/10/11/13 |
+| CompetitiveResult | AI-13 | AI-10/12/13 |
+| RemoteContentManifest | AI-12 | AI-02/10/11/13 |
+| AccessibilityPreference | AI-07 | AI-04/08/10/11 |
+| NarrativeMemoryFlag | AI-09 | AI-02/07/09/10 |
+--- NARRATIVE_ITEM_CONTRACTS.md CC.* IDs
+CC.NARRATIVE.CHAPTER
+CC.NARRATIVE.EVENT
+CC.WORLD.STATE
+CC.BIOME.STATE
+CC.ITEM.DEFINITION
+CC.EQUIPMENT.DEFINITION
+CC.EQUIPMENT.EFFECT
+CC.ITEM.ACQUISITION
+CC.ITEM.UPGRADE
+CC.PUZZLE.AFFINITY
+CC.DISCOVERY.EVENT
+CC.COMPANION.REACTION
+CC.REWARD.DEFINITION
+--- PROGRESS.md baseline
+- Simulation: TBD 1.0.0
+- Content schema: TBD 1.0.0
+- Save schema: TBD 1.0.0
+- Event IDs: TBD 1.0.0
+- Asset manifest: TBD 1.0.0
+
+## GITHUB_MODEL.md branch names vs actual
+ai-01/product
+ai-02/core
+ai-03/puzzle-content
+ai-04/gameplay-mobile
+ai-05/environment-art
+ai-06/characters-vfx
+ai-07/uiux
+ai-08/audio
+ai-09/narrative-localization
+ai-10/qa
+ai-11/performance-android
+ai-12/release
+ai-13/integration
+
+## CODEOWNERS_EXAMPLE owner mapping
+# Example ownership model (adapt names to actual GitHub usernames)
+/src/Domain/                 @AI-02
+/tests/Domain/               @AI-02 @AI-07
+/src/Presentation/           @AI-03
+/Assets/Art/                 @AI-04
+/Assets/VFX/                 @AI-04
+/src/UI/                     @AI-05
+/Assets/UI/                  @AI-05
+/Assets/Audio/               @AI-06
+/tests/                       @AI-07
+/QA/                          @AI-07
+.github/                      @AI-08
+/Release/                     @AI-08
+/Contracts/                   @PRODUCT @AI-02 @AI-08
+
+## PHASE_KICKOFF_PROCEDURE stale count
+5:2. هشت branch مستقل را از integration baseline بگیرید.
+
+## Engine statement
+4:Unity 6 + URP + Android target configured for current Google Play policy at release time.
+10:Pure C#; no UnityEngine references.
+50:Domain must know nothing about Unity, Android, networking, input devices or UI.
+
+## Sandbox toolchain (this session; NOT Unity)
+Flutter 3.35.4 • channel stable • https://github.com/flutter/flutter.git
+Python 3.13.14

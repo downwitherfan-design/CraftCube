@@ -13,7 +13,7 @@ Evidence for every VERIFIED item is in `11_INTEGRATION/evidence/phase00_prefligh
 | Commits on baseline | 1 (`584141c`) |
 | Branches at preflight start | `main` + `ai-01-product` … `ai-13-integration` (13 account branches), all pointing at `584141c` |
 | `integration` branch | **MISSING at preflight start.** Created by AI-13 from `584141c` and pushed (see §5). |
-| Tracked files | 273 markdown/json/csv/py files; **no Unity project, no C#, no `.github/workflows`, no `Contracts/` code directory, no tests** |
+| Tracked files | 322 files on baseline (318 `.md`, 1 `.json`, 1 `.csv`, 1 `.py`, 1 `.txt`); **no Unity project, no C#, no `.github/workflows`, no `Contracts/` code directory, no tests** |
 | Manifest | `00_CONTROL/manifest.json` → `version: v7.1`, `status: WORLDCLASS_START_READY_PRODUCTION_PACK`, 13 accounts, 18 phases, 234 phase prompts |
 | PROGRESS.md | Phase 0 / planning package; all contract baselines `TBD 1.0.0`; no account sections filled |
 
