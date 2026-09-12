@@ -51,7 +51,7 @@ Per `05_PROMPTS/ANTI_HALLUCINATION_ADDENDUM.md`: **VERIFIED** = read in the repo
 | `CompanionReaction` owner AI-06, consumers AI-04/08/09/10; `CharacterMemory` owner AI-09, consumer AI-06 | `06_CONTRACTS/V7_MASTER_CONTRACT_REGISTER.md`, `06_CONTRACTS/WORLDCLASS_CONTRACTS_V7_1.md` | VERIFIED |
 | Typed failure reasons incl. `ContentNotFound` | `06_CONTRACTS/INTERACTION_CONTRACTS.md` | VERIFIED |
 | Gate C "VFX readability on mobile", "animation transitions clean"; Gate B "reduced-motion option respected" | `08_QA_RELEASE/QUALITY_AND_RELEASE.md` | VERIFIED |
-| IP warning: keep mechanics, drop Minecraft-specific names/creatures/presentation | `10_SOURCE_REFERENCE/SOURCE_GDD_NOTES.md` | VERIFIED |
+| IP warning: keep the source GDD's mechanical ideas, drop its franchise-specific names/creatures/presentation | `10_SOURCE_REFERENCE/SOURCE_GDD_NOTES.md` | VERIFIED |
 | AI-01 Product Lock v1.0.0: one companion (CUT-004), no combat (CUT-005), no gift-grinding (CUT-011), PD-005 acceptance validators, PD-011 accessibility constraints, IGM-005c recall ≥ 50 % (owner AI-06/AI-09), earned cosmetics LATER (CUT-031) | branch `origin/ai-01-product`, `01_PREPRODUCTION/PRODUCT/*` | VERIFIED on that branch; **not merged**, status READY_FOR_REVIEW |
 | AI-02 boundary audit: `concept.companion_state.reaction_trigger` = SPLIT (state AI-02, meaning AI-06), decision D-04; U-05 no `integration` branch | branch `origin/ai-02-core`, `02_ARCHITECTURE/AI02_*` | VERIFIED on that branch; **not merged**, DRAFT |
 
@@ -65,7 +65,7 @@ Creatures, characters and VFX have exactly three jobs. Any asset or behavior tha
 | **Aliveness** | The world reads as living and remembering: creatures behave differently in dormant vs. restored places; transformations are witnessed, not just swapped. | §10 world philosophy; DD-004 |
 | **Attachment** | The player cares about at least one non-human presence (Nox) because it notices, reacts and remembers in a way that is consistent and readable. | §5 "attachment"; §11 companion progression; IGM-005c |
 
-**Non-goals for this domain** (restating Bible §12 for AI-06): no combat animation sets, no damage/health VFX, no "mob" ecology, no creature collection grid, no cosmetic shop, no VFX spectacle that hides puzzle state. Companion presence must never be required to progress the critical path (PD-005).
+**Non-goals for this domain** (restating Bible §12 for AI-06): no combat animation sets, no damage/health VFX, no hostile-creature ecology, no creature collection grid, no cosmetic shop, no VFX spectacle that hides puzzle state. Companion presence must never be required to progress the critical path (PD-005).
 
 ## 4. IP-safe presentation direction
 
