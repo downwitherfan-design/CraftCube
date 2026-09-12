@@ -1,0 +1,99 @@
+{
+  "schema_id": "CC.REWARD.DEFINITION",
+  "schema_version": "0.1.0",
+  "status": "DRAFT",
+  "owner": "AI-03",
+  "note": "Phase 00 DRAFT RewardDefinition fixture. payload_ref.ref values prefixed PLACEHOLDER: point to contracts owned by other tracks that are not RELEASED; they are stand-ins, not invented IDs. idempotent is a schema constant (must be true). protected_progression=true requires condition_id == challenge.standard (DD-006).",
+  "rewards": [
+    {
+      "reward_id": "reward.01.first_alignment",
+      "chapter_id": "chapter.01.first_light",
+      "level_id": "level.01.awaken",
+      "reward_class": "reward_class.world_change",
+      "reward_condition": { "condition_id": "challenge.standard", "params": {} },
+      "payload_ref": { "owner": "AI-02", "kind": "WorldStateEvent", "ref": "PLACEHOLDER:AI-02:WorldStateEvent:mechanism_awakens" },
+      "protected_progression": true,
+      "idempotent": true
+    },
+    {
+      "reward_id": "reward.01.seed_knowledge",
+      "chapter_id": "chapter.01.first_light",
+      "level_id": "level.01.seed_bed",
+      "reward_class": "reward_class.knowledge",
+      "reward_condition": { "condition_id": "challenge.standard", "params": { "require_tile_home": "tile.seed" } },
+      "payload_ref": { "owner": "AI-03", "kind": "PatternIndexEntry", "ref": "pattern.solid_face" },
+      "protected_progression": true,
+      "idempotent": true
+    },
+    {
+      "reward_id": "reward.01.nox_meets",
+      "chapter_id": "chapter.01.first_light",
+      "level_id": "level.01.hollow_stone",
+      "reward_class": "reward_class.narrative",
+      "reward_condition": { "condition_id": "challenge.standard", "params": {} },
+      "payload_ref": { "owner": "AI-09", "kind": "NarrativeEvent", "ref": "PLACEHOLDER:AI-09:NarrativeEvent:nox_appears" },
+      "protected_progression": true,
+      "idempotent": true
+    },
+    {
+      "reward_id": "reward.01.clean_hands",
+      "chapter_id": "chapter.01.first_light",
+      "level_id": "level.01.hollow_stone",
+      "reward_class": "reward_class.expression",
+      "reward_condition": { "condition_id": "challenge.limited_assist", "params": { "max_assists": 0 } },
+      "payload_ref": { "owner": "AI-07", "kind": "Cosmetic", "ref": "PLACEHOLDER:AI-07:Cosmetic:first_light_glow" },
+      "protected_progression": false,
+      "idempotent": true
+    },
+    {
+      "reward_id": "reward.02.anchor_knowledge",
+      "chapter_id": "chapter.02.broken_path",
+      "level_id": "level.02.first_anchor",
+      "reward_class": "reward_class.knowledge",
+      "reward_condition": { "condition_id": "challenge.standard", "params": {} },
+      "payload_ref": { "owner": "AI-03", "kind": "RuleIndexEntry", "ref": "rule.layer_lock" },
+      "protected_progression": true,
+      "idempotent": true
+    },
+    {
+      "reward_id": "reward.02.tuning_fork",
+      "chapter_id": "chapter.02.broken_path",
+      "level_id": "level.02.resonant_gap",
+      "reward_class": "reward_class.capability",
+      "reward_condition": { "condition_id": "challenge.standard", "params": {} },
+      "payload_ref": { "owner": "AI-02", "kind": "ItemDefinition", "ref": "PLACEHOLDER:AI-02:ItemDefinition:tuning_fork_candidate" },
+      "protected_progression": true,
+      "idempotent": true
+    },
+    {
+      "reward_id": "reward.02.path_restored",
+      "chapter_id": "chapter.02.broken_path",
+      "level_id": "level.02.span",
+      "reward_class": "reward_class.world_change",
+      "reward_condition": { "condition_id": "challenge.standard", "params": {} },
+      "payload_ref": { "owner": "AI-02", "kind": "WorldStateEvent", "ref": "PLACEHOLDER:AI-02:WorldStateEvent:route_reconnected" },
+      "protected_progression": true,
+      "idempotent": true
+    },
+    {
+      "reward_id": "reward.02.efficient_span",
+      "chapter_id": "chapter.02.broken_path",
+      "level_id": "level.02.span",
+      "reward_class": "reward_class.collection",
+      "reward_condition": { "condition_id": "challenge.move_efficiency", "params": { "tolerance": 2 } },
+      "payload_ref": { "owner": "AI-02", "kind": "ItemDefinition", "ref": "PLACEHOLDER:AI-02:ItemDefinition:archive_thread_candidate" },
+      "protected_progression": false,
+      "idempotent": true
+    },
+    {
+      "reward_id": "reward.02.echo_route",
+      "chapter_id": "chapter.02.broken_path",
+      "level_id": "level.02.span",
+      "reward_class": "reward_class.world_change",
+      "reward_condition": { "condition_id": "challenge.discovery", "params": { "discovery_id": "discovery.02.under_span" } },
+      "payload_ref": { "owner": "AI-02", "kind": "WorldStateEvent", "ref": "PLACEHOLDER:AI-02:WorldStateEvent:hidden_route_opens" },
+      "protected_progression": false,
+      "idempotent": true
+    }
+  ]
+}
