@@ -103,11 +103,11 @@ Consistent with Game Master Bible §12:
 
 ## 8. IP-safe direction (interaction layer)
 
-`10_SOURCE_REFERENCE/SOURCE_GDD_NOTES.md` records that the source GDD used Minecraft-specific presentation. In the interaction layer AI-04 commits to:
+`10_SOURCE_REFERENCE/SOURCE_GDD_NOTES.md` records that the source GDD used a third-party proprietary game's presentation and naming. In the interaction layer AI-04 commits to:
 
 - no block-placement/mining gesture vocabulary;
 - no crosshair-centered first-person interaction model;
-- no hotbar-slot-swipe as the equipment model — equipment use is a deliberate, named runtime action on the cube or world;
+- no quick-slot-bar swipe as the equipment model — equipment use is a deliberate, named runtime action on the cube or world;
 - terminology in `03_INTERACTION_TERMINOLOGY.md` is original; no proprietary product names appear in IDs or player-facing strings owned by AI-04.
 
 Player-facing *words* remain AI-09's to finalize; AI-04 supplies the internal semantic vocabulary and stable IDs.
