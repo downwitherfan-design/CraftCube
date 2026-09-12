@@ -142,6 +142,6 @@ Player-facing world names (Hearthwild, Glassroot, Sunken Grid, Ember Hollow, Ver
 | DEP-03 | CONFLICT | "Quiet Engine" vs "Silent Engine" naming | AI-09 |
 | DEP-04 | UNKNOWN | Screen orientation (portrait/landscape/both) | AI-01 / AI-04 / AI-07 |
 | DEP-05 | CONFLICT | Legacy ownership mapping (AI-05 → `Assets/UI`, `src/UI`, Tablet QA row) in `07_GITHUB/CODEOWNERS_EXAMPLE.txt`, `07_GITHUB/scripts/validate_ownership.py`, `08_QA_RELEASE/DEVICE_MATRIX_TEMPLATE.csv` | AI-13 governance |
-| DEP-06 | MISSING | `integration` branch does not exist on origin; PR target unavailable | AI-13 |
+| DEP-06 | RESOLVED | `integration` branch verified on origin at `584141c`; PR #2 opened `ai-05-world` → `integration` | AI-13 |
 | DEP-07 | PENDING | Ratification of `09_ART_AUDIO/environment/` as the AI-05 owned path | AI-13 |
 | DEP-08 | PENDING | Product ratification of §9 boundaries and cut list | AI-01 |
