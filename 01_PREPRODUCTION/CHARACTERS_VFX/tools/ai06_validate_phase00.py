@@ -78,14 +78,21 @@ def scan_forbidden_terms(text: str, terms: list[str]) -> list[str]:
 def strip_ip_policy_sections(text: str) -> str:
     """Remove the lines that *define* the forbidden-term policy so they do not self-trigger.
 
-    Only lines that explicitly quote the avoid-list are stripped (table rows whose 'Avoid'
-    column names franchise terms, and the JSON 'ipForbiddenTerms' block). Everything else
-    is scanned.
+    Stripped: (a) single lines that explicitly mention 'forbidden' or 'avoid'; (b) every row
+    of a markdown table whose header row declares an 'Avoid' column (an avoid-list table is
+    policy by definition). Table membership ends at the first non-table line. Everything
+    else is scanned.
     """
     kept = []
+    in_avoid_table = False
     for line in text.splitlines():
         low = line.lower()
-        if "forbidden" in low or "avoid" in low or "rejected / avoid" in low or "ipforbiddenterms" in low:
+        is_table_row = line.lstrip().startswith("|")
+        if not is_table_row:
+            in_avoid_table = False
+        elif "| avoid" in low or "avoid |" in low:
+            in_avoid_table = True
+        if in_avoid_table or "forbidden" in low or "avoid" in low:
             continue
         kept.append(line)
     return "\n".join(kept)
