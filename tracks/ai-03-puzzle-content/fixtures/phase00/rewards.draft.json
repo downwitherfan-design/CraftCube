@@ -10,8 +10,15 @@
       "chapter_id": "chapter.01.first_light",
       "level_id": "level.01.awaken",
       "reward_class": "reward_class.world_change",
-      "reward_condition": { "condition_id": "challenge.standard", "params": {} },
-      "payload_ref": { "owner": "AI-02", "kind": "WorldStateEvent", "ref": "PLACEHOLDER:AI-02:WorldStateEvent:mechanism_awakens" },
+      "reward_condition": {
+        "condition_id": "challenge.standard",
+        "params": {}
+      },
+      "payload_ref": {
+        "owner": "AI-02",
+        "kind": "WorldStateEvent",
+        "ref": "PLACEHOLDER:AI-02:WorldStateEvent:mechanism_awakens"
+      },
       "protected_progression": true,
       "idempotent": true
     },
@@ -20,8 +27,17 @@
       "chapter_id": "chapter.01.first_light",
       "level_id": "level.01.seed_bed",
       "reward_class": "reward_class.knowledge",
-      "reward_condition": { "condition_id": "challenge.standard", "params": { "require_tile_home": "tile.seed" } },
-      "payload_ref": { "owner": "AI-03", "kind": "PatternIndexEntry", "ref": "pattern.solid_face" },
+      "reward_condition": {
+        "condition_id": "challenge.standard",
+        "params": {
+          "require_tile_home": "tile.seed"
+        }
+      },
+      "payload_ref": {
+        "owner": "AI-03",
+        "kind": "PatternIndexEntry",
+        "ref": "pattern.solid_face"
+      },
       "protected_progression": true,
       "idempotent": true
     },
@@ -30,8 +46,15 @@
       "chapter_id": "chapter.01.first_light",
       "level_id": "level.01.hollow_stone",
       "reward_class": "reward_class.narrative",
-      "reward_condition": { "condition_id": "challenge.standard", "params": {} },
-      "payload_ref": { "owner": "AI-09", "kind": "NarrativeEvent", "ref": "PLACEHOLDER:AI-09:NarrativeEvent:nox_appears" },
+      "reward_condition": {
+        "condition_id": "challenge.standard",
+        "params": {}
+      },
+      "payload_ref": {
+        "owner": "AI-09",
+        "kind": "NarrativeEvent",
+        "ref": "PLACEHOLDER:AI-09:NarrativeEvent:nox_appears"
+      },
       "protected_progression": true,
       "idempotent": true
     },
@@ -40,8 +63,17 @@
       "chapter_id": "chapter.01.first_light",
       "level_id": "level.01.hollow_stone",
       "reward_class": "reward_class.expression",
-      "reward_condition": { "condition_id": "challenge.limited_assist", "params": { "max_assists": 0 } },
-      "payload_ref": { "owner": "AI-07", "kind": "Cosmetic", "ref": "PLACEHOLDER:AI-07:Cosmetic:first_light_glow" },
+      "reward_condition": {
+        "condition_id": "challenge.limited_assist",
+        "params": {
+          "max_assists": 0
+        }
+      },
+      "payload_ref": {
+        "owner": "AI-07",
+        "kind": "Cosmetic",
+        "ref": "PLACEHOLDER:AI-07:Cosmetic:first_light_glow"
+      },
       "protected_progression": false,
       "idempotent": true
     },
@@ -50,18 +82,32 @@
       "chapter_id": "chapter.02.broken_path",
       "level_id": "level.02.first_anchor",
       "reward_class": "reward_class.knowledge",
-      "reward_condition": { "condition_id": "challenge.standard", "params": {} },
-      "payload_ref": { "owner": "AI-03", "kind": "RuleIndexEntry", "ref": "rule.layer_lock" },
+      "reward_condition": {
+        "condition_id": "challenge.standard",
+        "params": {}
+      },
+      "payload_ref": {
+        "owner": "AI-03",
+        "kind": "RuleIndexEntry",
+        "ref": "rule.layer_lock"
+      },
       "protected_progression": true,
       "idempotent": true
     },
     {
-      "reward_id": "reward.02.tuning_fork",
+      "reward_id": "reward.02.rootweave_gauntlet",
       "chapter_id": "chapter.02.broken_path",
-      "level_id": "level.02.resonant_gap",
+      "level_id": "level.02.locked_gap",
       "reward_class": "reward_class.capability",
-      "reward_condition": { "condition_id": "challenge.standard", "params": {} },
-      "payload_ref": { "owner": "AI-02", "kind": "ItemDefinition", "ref": "PLACEHOLDER:AI-02:ItemDefinition:tuning_fork_candidate" },
+      "reward_condition": {
+        "condition_id": "challenge.standard",
+        "params": {}
+      },
+      "payload_ref": {
+        "owner": "AI-02",
+        "kind": "ItemDefinition",
+        "ref": "PLACEHOLDER:AI-02:ItemDefinition:rootweave_gauntlet_candidate"
+      },
       "protected_progression": true,
       "idempotent": true
     },
@@ -70,8 +116,15 @@
       "chapter_id": "chapter.02.broken_path",
       "level_id": "level.02.span",
       "reward_class": "reward_class.world_change",
-      "reward_condition": { "condition_id": "challenge.standard", "params": {} },
-      "payload_ref": { "owner": "AI-02", "kind": "WorldStateEvent", "ref": "PLACEHOLDER:AI-02:WorldStateEvent:route_reconnected" },
+      "reward_condition": {
+        "condition_id": "challenge.standard",
+        "params": {}
+      },
+      "payload_ref": {
+        "owner": "AI-02",
+        "kind": "WorldStateEvent",
+        "ref": "PLACEHOLDER:AI-02:WorldStateEvent:route_reconnected"
+      },
       "protected_progression": true,
       "idempotent": true
     },
@@ -80,8 +133,17 @@
       "chapter_id": "chapter.02.broken_path",
       "level_id": "level.02.span",
       "reward_class": "reward_class.collection",
-      "reward_condition": { "condition_id": "challenge.move_efficiency", "params": { "tolerance": 2 } },
-      "payload_ref": { "owner": "AI-02", "kind": "ItemDefinition", "ref": "PLACEHOLDER:AI-02:ItemDefinition:archive_thread_candidate" },
+      "reward_condition": {
+        "condition_id": "challenge.move_efficiency",
+        "params": {
+          "tolerance": 2
+        }
+      },
+      "payload_ref": {
+        "owner": "AI-02",
+        "kind": "ItemDefinition",
+        "ref": "PLACEHOLDER:AI-02:ItemDefinition:archive_thread_candidate"
+      },
       "protected_progression": false,
       "idempotent": true
     },
@@ -90,8 +152,17 @@
       "chapter_id": "chapter.02.broken_path",
       "level_id": "level.02.span",
       "reward_class": "reward_class.world_change",
-      "reward_condition": { "condition_id": "challenge.discovery", "params": { "discovery_id": "discovery.02.under_span" } },
-      "payload_ref": { "owner": "AI-02", "kind": "WorldStateEvent", "ref": "PLACEHOLDER:AI-02:WorldStateEvent:hidden_route_opens" },
+      "reward_condition": {
+        "condition_id": "challenge.discovery",
+        "params": {
+          "discovery_id": "discovery.02.under_span"
+        }
+      },
+      "payload_ref": {
+        "owner": "AI-02",
+        "kind": "WorldStateEvent",
+        "ref": "PLACEHOLDER:AI-02:WorldStateEvent:hidden_route_opens"
+      },
       "protected_progression": false,
       "idempotent": true
     }
