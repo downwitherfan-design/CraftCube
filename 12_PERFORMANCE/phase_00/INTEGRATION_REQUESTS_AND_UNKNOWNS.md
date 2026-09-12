@@ -42,7 +42,7 @@ exact file, required behaviour, contract impact and acceptance test, per the Own
 | ID | Conflict | Sources | Recommendation | Owner |
 |---|---|---|---|---|
 | C11-01 | Device matrix template `Owner` column says AI-07 (Low/Mid/High) and AI-05 (Tablet); v7 account matrix, execution manual and AI-11 track say AI-11 owns the Android device matrix. | `08_QA_RELEASE/DEVICE_MATRIX_TEMPLATE.csv` vs `04_AI_ACCOUNTS/ACCOUNT_MATRIX.md`, `00_CONTROL/13_AI_EXECUTION_MANUAL.md` §AI-11 | The CSV predates the v7 renumbering (its owners match the older 8-account `CODEOWNERS_EXAMPLE.txt` scheme). Treat the CSV `Owner` as stale; tier definitions live in AI-11's matrix; AI-07 keeps UI-layout pass criteria. | AI-13 (governance) via `IR-AI11-011`. |
-| C11-02 | `07_GITHUB/GITHUB_MODEL.md` says PRs target `integration`, but no `integration` branch exists on the remote (VERIFIED: `git ls-remote --heads origin integration` → empty). Remote branch names are `ai-11-performance`, not `ai-11/performance-android` as the model document shows. | `07_GITHUB/GITHUB_MODEL.md` vs `git ls-remote` | AI-11 pushes to `ai-11-performance` and reports; opening the PR is a stop condition until `integration` exists (AI-13). Also noted by AI-02 as `U-05` on its branch. | AI-13. |
+| C11-02 | `07_GITHUB/GITHUB_MODEL.md` says PRs target `integration`. At AI-11 preflight no `integration` branch existed on the remote (VERIFIED then: `git ls-remote --heads origin integration` → empty). **Update:** during Phase 00 work the branch appeared at `584141c`; PR #4 (`ai-11-performance` → `integration`) was opened. Residual mismatch: remote branch names are `ai-11-performance`, not `ai-11/performance-android` as the model document shows. | `07_GITHUB/GITHUB_MODEL.md` vs `git ls-remote` | Branch-name mismatch is documentation drift only; AI-13 may align the model doc with actual names. Also noted by AI-02 as `U-05` on its branch. | AI-13. |
 | C11-03 | The word **"tier"** is used for biome transformation (0–4, AI-05/World Bible) and for device/quality classes (AI-11). | `01_PREPRODUCTION/WORLD_BIOME_BIBLE_V7.md` vs `08_QA_RELEASE/DEVICE_MATRIX_TEMPLATE.csv` | Not a blocking conflict; AI-11 documents always qualify as *device tier* / *quality tier*. AI-09 (terminology owner) may want a canonical rule. | AI-09 (advisory). |
 
 ## 4. Decisions taken by AI-11 inside its ownership (`D-PERF-##`)
@@ -64,4 +64,4 @@ exact file, required behaviour, contract impact and acceptance test, per the Own
 - Did not edit `08_QA_RELEASE/DEVICE_MATRIX_TEMPLATE.csv`, `02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md`, or `06_CONTRACTS/*` — not AI-11's files; requests filed above.
 - Did not write engine code — no Unity project exists in the repository.
 - Did not pick tools, API levels or devices — UNKNOWN, owners named.
-- Did not open a PR — `integration` branch is missing (`C11-02`).
+- Opened PR #4 to `integration` once the branch appeared (see `C11-02` update); merge is AI-13's gate, not AI-11's.
