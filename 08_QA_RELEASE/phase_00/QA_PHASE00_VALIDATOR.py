@@ -352,11 +352,16 @@ def check_session_fixture(schema: dict, fixture: dict) -> list[str]:
 def check_schema_privacy(schema: dict) -> list[str]:
     fails: list[str] = []
 
+    def tokens(name: str) -> set[str]:
+        # split camelCase and snake_case into lower-case word tokens
+        parts = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", name).replace("_", " ").lower().split()
+        joined = {"".join(parts)}
+        return set(parts) | joined
+
     def walk(node, path):
         if isinstance(node, dict):
             for k, v in node.get("properties", {}).items():
-                low = k.lower()
-                if low not in PII_ALLOWED and any(h == low or low.endswith(h) for h in PII_HINTS):
+                if k.lower() not in PII_ALLOWED and tokens(k) & set(PII_HINTS):
                     fails.append(f"D3 schema: field '{path}.{k}' looks like personal data")
                 walk(v, f"{path}.{k}")
             for sub in ("items",):
