@@ -1,0 +1,35 @@
+{
+  "schema": "RemoteContentManifest",
+  "schema_version": "0.1.0",
+  "fixture_kind": "MOCK",
+  "_mock_notice": "NEGATIVE fixture: a package declares required=true. Remote content may never be required (DD-015). Must FAIL on RG-016. Integrity recomputed so the required check, not the digest check, is what fires.",
+  "manifest_id": "content.manifest.mock_0002",
+  "content_version": "0.2.0",
+  "published_utc": "2026-01-01T00:00:00Z",
+  "compatible_app_versions": {
+    "min_inclusive": "0.2.0",
+    "max_exclusive": "1.0.0"
+  },
+  "rollback_to": "content.manifest.mock_0001",
+  "integrity": {
+    "algorithm": "sha256",
+    "hex": "a25acb235bd7a1e44e9f8b3c2eaa615a0fadd389fc60b0010425996d26c1337e"
+  },
+  "packages": [
+    {
+      "package_id": "content.package.mock_optional_biome_pack",
+      "package_version": "0.2.0",
+      "required": true,
+      "enabled": true,
+      "size_bytes": 0,
+      "checksum": {
+        "algorithm": "sha256",
+        "hex": "dc957f7727ab70e6986ace8417551375d723fe33d74d14ab54052d53c71869c1"
+      },
+      "content_schema_version": "0.0.0",
+      "min_save_schema_version": "0.0.0",
+      "owner": "AI-03"
+    }
+  ],
+  "_expect_fail": "RG-016"
+}
