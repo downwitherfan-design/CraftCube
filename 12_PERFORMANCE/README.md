@@ -24,7 +24,12 @@ policy, profiling/measurement method, and performance acceptance evidence.
 │   └── PerformanceBudget.v0.1.0-draft.md      DRAFT contract (not consumable until FROZEN in Phase 01)
 ├── fixtures/
 │   └── performance_budget/
-│       └── budget_hypothesis_v0.json          HYPOTHESIS fixture — every number unmeasured, labelled as such
+│       ├── budget_hypothesis_v0.json          HYPOTHESIS fixture — every number unmeasured, labelled as such
+│       └── _expect_invalid/                   NEGATIVE fixtures — validator must reject each one
+│           ├── measured_without_evidence.json
+│           ├── missing_tier_value.json
+│           ├── duplicate_id.json
+│           └── unknown_build_id.json
 └── tools/
     └── validate_performance_budget.py         stdlib-only deterministic validator for the fixture/schema
 ```
