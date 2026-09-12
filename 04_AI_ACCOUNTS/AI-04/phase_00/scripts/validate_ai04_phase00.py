@@ -63,7 +63,10 @@ md_ids = {m for m in md_ids if "<" not in m}
 # 'haptic.*' style prose wildcards are not captured by the regex (asterisk excluded).
 # Intent notifications are written in md as interaction.intent.<value>; expand for comparison.
 reg_set = set(reg_ids)
-missing_in_reg = sorted(m for m in md_ids if m not in reg_set)
+reserved_ids = {r["id"] for r in reg.get("reservedNotProposed", [])}
+clash = sorted(reserved_ids & reg_set)
+fail(f"reserved-not-proposed IDs also present in proposed catalog: {clash}") if clash else ok(f"{len(reserved_ids)} reserved-not-proposed ID(s) kept out of the proposed catalog")
+missing_in_reg = sorted(m for m in md_ids if m not in reg_set and m not in reserved_ids)
 fail(f"IDs used in markdown but absent from registry: {missing_in_reg}") if missing_in_reg else ok("every markdown ID exists in registry")
 intent_ids = {f"interaction.intent.{v}" for v in reg["intents"]}
 missing_in_md = sorted(r for r in reg_set - md_ids if r not in intent_ids)
