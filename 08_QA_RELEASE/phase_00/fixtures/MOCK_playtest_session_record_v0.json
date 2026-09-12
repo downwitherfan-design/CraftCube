@@ -1,5 +1,5 @@
 {
-  "_MOCK": "TEMPORARY FIXTURE — NOT REAL PLAYTEST DATA. Every value here is invented to exercise playtest_session_record.schema.json and the coding pipeline. It must never be cited as evidence for any F10/IGM metric. Delete or replace when the first real cohort (Phase 06) is recorded. buildId is deliberately 'UNKNOWN' because no CraftCube build exists.",
+  "_MOCK": "MOCK — TEMPORARY FIXTURE — NOT REAL PLAYTEST DATA. Every value here is invented to exercise playtest_session_record.schema.json and the coding pipeline. It must never be cited as evidence for any F10/IGM metric. Delete or replace when the first real cohort (Phase 06) is recorded. buildId is deliberately 'UNKNOWN' because no CraftCube build exists.",
   "schemaVersion": "1.0.0",
   "sessionId": "PT-0000-001",
   "protocolVersion": "1.0.0-draft",
