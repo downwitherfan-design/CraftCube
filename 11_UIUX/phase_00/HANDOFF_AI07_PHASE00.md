@@ -85,7 +85,7 @@ INTEGRATION_STEPS:
 1. AI-13: resolve IR-AI07-001 (create `integration` or amend GITHUB_MODEL.md).
 2. AI-13: review `11_UIUX/` for ownership registration; apply IR-AI07-002/005/006 in governance files.
 3. AI-01: rule on D-UX-01..07; record decisions per CHANGE_CONTROL_AND_DECISION_LOG.
-4. Open PR `ai-07-uiux` → `integration` (or the confirmed target) using `07_GITHUB/PR_TEMPLATE.md`; reviewer runs the validator command above.
+4. PR OPENED: `ai-07-uiux` → `integration` — https://github.com/downwitherfan-design/CraftCube/pull/3 (body follows `07_GITHUB/PR_TEMPLATE.md`); reviewer runs the validator command above.
 5. Phase 01: freeze `AccessibilityPreference` 0.1.0 → 1.0.0 (or amend), with AI-02 storage decision (IR-AI07-007) and AI-04/08/11 consumer confirmation.
 6. Downstream tracks may already consume `11_UIUX/fixtures/accessibility_preference/*.json` as mocks, labelled DRAFT.
 
