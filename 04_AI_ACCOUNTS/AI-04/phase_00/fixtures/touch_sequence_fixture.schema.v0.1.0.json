@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "craftcube.ai04.touch_sequence_fixture.v0.1.0",
+  "title": "CraftCube AI-04 Touch Sequence Fixture (DRAFT 0.1.0)",
+  "description": "Deterministic touch-event replay fixture for arbiter classification tests. Proposed in 09_CONTRACT_PROPOSAL_INTERACTION_COMMAND_v0.1.0.md section 5. Not a released contract.",
+  "type": "object",
+  "required": ["schemaVersion", "fixtureId", "description", "tunables", "viewport", "scene", "events", "expected"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "fixtureId": { "type": "string", "pattern": "^fx\\.arbiter\\.[a-z0-9_]+$" },
+    "description": { "type": "string", "minLength": 1 },
+    "tunables": {
+      "type": "object",
+      "required": ["TAP_MS", "TAP_MOVE_PX", "HOLD_MS", "TWIST_START_PX", "ORBIT_START_PX", "TWIST_COMMIT_DEG", "TWIST_CANCEL_DEG", "FLICK_VEL_DEG_PER_S", "EDGE_INSET_DP", "REACTION_FRAMING_MAX_MS", "MAX_PLAUSIBLE_DELTA_DP", "FLICK_WINDOW_MS", "HITCH_MS"],
+      "additionalProperties": { "type": "number" }
+    },
+    "viewport": {
+      "type": "object",
+      "required": ["widthDp", "heightDp", "safeInsetsDp"],
+      "additionalProperties": false,
+      "properties": {
+        "widthDp": { "type": "number", "exclusiveMinimum": 0 },
+        "heightDp": { "type": "number", "exclusiveMinimum": 0 },
+        "safeInsetsDp": { "$ref": "#/$defs/insets" }
+      }
+    },
+    "scene": {
+      "type": "object",
+      "required": ["cubeHitRegion", "anchors"],
+      "additionalProperties": false,
+      "properties": {
+        "cubeHitRegion": { "$ref": "#/$defs/rect" },
+        "anchors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["anchorRef", "hitRect"],
+            "additionalProperties": false,
+            "properties": {
+              "anchorRef": { "type": "string", "minLength": 1 },
+              "hitRect": { "$ref": "#/$defs/rect" }
+            }
+          }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["t", "pointer", "type", "x", "y"],
+        "additionalProperties": false,
+        "properties": {
+          "t": { "type": "integer", "minimum": 0, "description": "milliseconds from fixture start; non-decreasing" },
+          "pointer": { "type": "integer", "minimum": 0, "maximum": 9 },
+          "type": { "enum": ["down", "move", "up", "cancel"] },
+          "x": { "type": "number" },
+          "y": { "type": "number" }
+        }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "required": ["intents", "commands"],
+      "additionalProperties": false,
+      "properties": {
+        "intents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["sequenceId", "intent"],
+            "additionalProperties": false,
+            "properties": {
+              "sequenceId": { "type": "integer", "minimum": 0 },
+              "intent": { "enum": ["puzzle", "camera", "world", "equipment", "ui_passthrough", "undecided"] }
+            }
+          }
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["commandId"],
+            "additionalProperties": false,
+            "properties": {
+              "commandId": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$" },
+              "payload": { "type": "object" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "rect": {
+      "type": "object",
+      "required": ["x", "y", "w", "h"],
+      "additionalProperties": false,
+      "properties": {
+        "x": { "type": "number" }, "y": { "type": "number" },
+        "w": { "type": "number", "minimum": 0 }, "h": { "type": "number", "minimum": 0 }
+      }
+    },
+    "insets": {
+      "type": "object",
+      "required": ["top", "bottom", "left", "right"],
+      "additionalProperties": false,
+      "properties": {
+        "top": { "type": "number", "minimum": 0 }, "bottom": { "type": "number", "minimum": 0 },
+        "left": { "type": "number", "minimum": 0 }, "right": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}
