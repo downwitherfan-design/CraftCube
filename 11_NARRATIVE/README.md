@@ -49,7 +49,7 @@ cannot collide with runtime/event IDs owned by other tracks (`game.*`, `companio
 | `nar.mystery.<slug>` | Major mystery | `nar.mystery.why_the_weaver` |
 | `nar.item_lore.<slug>` | Lore entry for an item (item *definition* is AI-02) | `nar.item_lore.memory_lens` |
 | `nar.motif.<slug>` | Environmental / audio motif meaning | `nar.motif.three_notch_mark` |
-| `nar.flag.<slug>` | Narrative memory flag (CharacterMemory / NarrativeMemoryFlag contract, AI-09 owner) | `nar.flag.orin_told_of_architect` |
+| `nar.flag.<slug>` | Narrative memory flag (CharacterMemory / NarrativeMemoryFlag contract, AI-09 owner) | `nar.flag.orin_accepts_design` |
 | `nar.term.<slug>` | Canon terminology entry | `nar.term.axis_loom` |
 
 Localization keys use a separate `loc.` namespace (grammar in `LOCALIZATION_TERMINOLOGY_BIBLE.md`).
