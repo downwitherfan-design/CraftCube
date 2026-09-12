@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "0.1.0",
+  "fixtureId": "fx.arbiter.second_finger_cancels_twist",
+  "description": "SAMPLE FIXTURE (not a test result). Conflict case from 04_GESTURE_ARBITRATION_MODEL.md section 10: a Twist is in progress on the Cube; a second finger lands; expected outcome is Cancel with zero state-changing commands and no zoom. Portrait 360x800dp viewport, cube centered.",
+  "tunables": {
+    "TAP_MS": 180,
+    "TAP_MOVE_PX": 8,
+    "HOLD_MS": 350,
+    "TWIST_START_PX": 12,
+    "ORBIT_START_PX": 10,
+    "TWIST_COMMIT_DEG": 45,
+    "TWIST_CANCEL_DEG": 30,
+    "FLICK_VEL_DEG_PER_S": 240,
+    "EDGE_INSET_DP": 24,
+    "REACTION_FRAMING_MAX_MS": 1200,
+    "MAX_PLAUSIBLE_DELTA_DP": 400,
+    "FLICK_WINDOW_MS": 80,
+    "HITCH_MS": 100
+  },
+  "viewport": {
+    "widthDp": 360,
+    "heightDp": 800,
+    "safeInsetsDp": { "top": 32, "bottom": 24, "left": 0, "right": 0 }
+  },
+  "scene": {
+    "cubeHitRegion": { "x": 80, "y": 250, "w": 200, "h": 200 },
+    "anchors": []
+  },
+  "events": [
+    { "t": 0,   "pointer": 0, "type": "down", "x": 180, "y": 350 },
+    { "t": 16,  "pointer": 0, "type": "move", "x": 186, "y": 350 },
+    { "t": 33,  "pointer": 0, "type": "move", "x": 196, "y": 350 },
+    { "t": 50,  "pointer": 0, "type": "move", "x": 210, "y": 350 },
+    { "t": 66,  "pointer": 1, "type": "down", "x": 60,  "y": 600 },
+    { "t": 83,  "pointer": 0, "type": "move", "x": 220, "y": 350 },
+    { "t": 100, "pointer": 1, "type": "up",   "x": 60,  "y": 600 },
+    { "t": 116, "pointer": 0, "type": "up",   "x": 220, "y": 350 }
+  ],
+  "expected": {
+    "intents": [
+      { "sequenceId": 0, "intent": "puzzle" }
+    ],
+    "commands": []
+  }
+}
