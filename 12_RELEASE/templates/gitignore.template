@@ -1,0 +1,97 @@
+# CraftCube — repository .gitignore TEMPLATE (AI-12, Phase 00)
+#
+# STATUS: TEMPLATE. The repository currently has NO root .gitignore (VERIFIED at 584141c).
+# The repo root is governance territory; AI-13 installs this as `/.gitignore` (RD-003 / RD-010).
+# Unity-specific sections become active when the Unity project is bootstrapped in Phase 02;
+# they are harmless before that.
+#
+# Rule R4 (Direction Lock §7): secrets never enter git. The "SECRETS" block below is the
+# first line of defence; the CI secret scan (RG-011) is the second; review is the third.
+
+########## SECRETS — never commit (Direction Lock §7) ##########
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+key.properties
+keystore.properties
+signing.properties
+*.ulf
+Unity_lic.ulf
+.env
+.env.*
+!.env.example
+**/secrets/
+**/*service-account*.json
+**/*serviceaccount*.json
+**/*-adminsdk-*.json
+google-services.json
+GoogleService-Info.plist
+*.credentials.json
+*.token
+
+########## Release artifacts — produced by CI, stored in artifact retention, not in git ##########
+/Release/artifacts/
+/12_RELEASE/artifacts/
+*.apk
+*.aab
+*.apk.idsig
+*.obb
+*.symbols.zip
+mapping.txt
+
+########## Unity (active from Phase 02) ##########
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+/Assets/AssetStoreTools*
+/Assets/Plugins/Editor/JetBrains*
+sysinfo.txt
+crashlytics-build.properties
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+/Assets/StreamingAssets/aa.meta
+/Assets/StreamingAssets/aa/*
+/Assets/AddressableAssetsData/*/*.bin*
+
+########## IDE / OS ##########
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+ExportedObj/
+.consulo/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+########## Gradle / Android (Unity Android export) ##########
+/**/.gradle/
+/**/local.properties
+/**/*.iml
+
+########## Python tooling (validators are stdlib; only caches appear) ##########
+__pycache__/
+*.pyc
+.pytest_cache/
