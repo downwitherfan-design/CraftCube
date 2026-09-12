@@ -24,5 +24,5 @@ file/owner, required behaviour, contract impact and acceptance test.
 
 ## Status
 
-All requests are OPEN as of this document's commit. None blocks AI-07 Phase 00 completion; the
-PR step depends on IR-AI07-001 (target branch) — see handoff for the fallback used.
+- IR-AI07-001: **RESOLVED** — `integration` branch verified on remote (`git ls-remote --heads origin integration` → `584141c`). PR target is `integration` as the model prescribes.
+- IR-AI07-002..010: OPEN. None blocks AI-07 Phase 00 completion.
