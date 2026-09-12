@@ -1,0 +1,124 @@
+# CraftCube — Release Gate workflow TEMPLATE (AI-12, Phase 00)
+#
+# STATUS: TEMPLATE — NOT ACTIVE. NOT EXECUTED. NO RUN RESULT IS CLAIMED.
+#
+# `.github/workflows/` is a protected zone (01_GOVERNANCE/MULTI_AI_OPERATING_MODEL.md §5) and
+# does not exist in the repository (VERIFIED). This file is staged under 12_RELEASE/ci/ and is
+# installed to `.github/workflows/release_gate.yml` only via RFC (RD-010) in Phase 02.
+#
+# What this template already enforces (RELEASE_VALIDATION_GATE_POLICY.md §4):
+#   * no `continue-on-error` on any RG step;
+#   * no `paths:` filter — every PR runs the gate; content-only PRs cannot skip it;
+#   * packaging job depends on the full validator job; it cannot run if validation is red or absent;
+#   * secrets are consumed only from the encrypted secret store and never echoed;
+#   * a secret scan runs BEFORE anything else.
+#
+# What is deliberately left as an explicit TODO_PHASE02 (UNKNOWN today, never invented):
+#   * the Unity build action/image and its pinned version (RD-004);
+#   * the Unity licence secret names (RD-005) — names are placeholders, values never exist in git;
+#   * runner label.
+#
+# Action references below use `@<PIN_SHA_PHASE02>` placeholders. Third-party actions MUST be pinned
+# to a full commit SHA before activation (supply-chain rule); tags are not acceptable for release jobs.
+
+name: release-gate
+
+on:
+  pull_request:
+    branches: [integration]        # per 07_GITHUB/GITHUB_MODEL.md; branch does not exist yet (RD-001)
+  push:
+    branches: [integration]
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "release.channel.<internal|alpha|beta|production>"
+        required: true
+        default: "release.channel.internal"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-gate-${{ github.ref }}
+  cancel-in-progress: false        # never cancel a validation mid-run; stale results are recomputed anyway
+
+jobs:
+
+  secret-scan:                      # RG-011 — runs first, blocks everything
+    runs-on: ubuntu-latest          # TODO_PHASE02: confirm runner label
+    steps:
+      - uses: actions/checkout@<PIN_SHA_PHASE02>
+        with:
+          fetch-depth: 0            # full history so the scan covers the whole diff range
+      - name: Secret pattern scan (file names + content)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # File-name patterns from 12_RELEASE/templates/gitignore.template SECRETS block
+          if git ls-files | grep -E '(\.keystore$|\.jks$|\.p12$|\.pfx$|\.pem$|\.key$|(^|/)key\.properties$|(^|/)keystore\.properties$|\.ulf$|(^|/)\.env(\..*)?$|service-?account.*\.json$|-adminsdk-.*\.json$|(^|/)google-services\.json$)' | grep -v '\.example$' ; then
+            echo "::error::RG-011 secret-like file tracked in git"; exit 1; fi
+          # Content patterns — conservative, deterministic; extended by AI-10 privacy QA later
+          if git grep -nE '(BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|storePassword\s*=|keyPassword\s*=)' -- . ':!12_RELEASE/ci/release_gate.template.yml' ; then
+            echo "::error::RG-011 secret-like content found"; exit 1; fi
+          echo "RG-011 OK"
+
+  ownership:                        # 07_GITHUB/scripts/validate_ownership.py — owner: AI-13 (RD-002 mapping fix needed)
+    needs: secret-scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@<PIN_SHA_PHASE02>
+      - name: Ownership check
+        run: python3 07_GITHUB/scripts/validate_ownership.py
+
+  validators:                       # full RG set — never path-filtered, never continue-on-error
+    needs: [secret-scan, ownership]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@<PIN_SHA_PHASE02>
+      - name: Content digest
+        id: digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          # TODO_PHASE01: replace the path list with the content roots declared by AI-03/AI-09 (RD-008)
+          CONTENT_ROOTS="12_RELEASE/fixtures"
+          DIGEST=$(git ls-files -- $CONTENT_ROOTS | LC_ALL=C sort | xargs -r sha256sum | sha256sum | cut -d' ' -f1)
+          echo "content_digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "content_digest=$DIGEST"
+      - name: RG-010/011/012/016/017 — AI-12 release fixture validator
+        run: python3 12_RELEASE/tools/validate_release_fixtures.py
+      - name: RG-002 — ID registry collision (owner AI-13/AI-10)
+        run: |
+          echo "::error::RG-002 validator MISSING — a missing validator is a FAIL, not a pass (gate policy §4)"; exit 1
+      # TODO_PHASE01: add RG-001, RG-003..RG-009, RG-013..RG-015 as their owners publish validators.
+      # Each MUST be a plain `run:` step with no continue-on-error. Until then this job is red by design.
+
+  build-and-provenance:             # only reachable when validators are green
+    needs: validators
+    if: github.event_name != 'pull_request'    # PRs validate only; artifacts come from integration pushes/dispatch
+    runs-on: ubuntu-latest          # TODO_PHASE02: Unity-capable runner/image (RD-004)
+    steps:
+      - uses: actions/checkout@<PIN_SHA_PHASE02>
+        with:
+          fetch-depth: 0
+      - name: Materialise signing material (secret store only; removed at job end)
+        shell: bash
+        env:
+          # Placeholder secret NAMES. Values live only in the encrypted secret store (RD-005). Never echoed.
+          UPLOAD_KEYSTORE_B64: ${{ secrets.TODO_PHASE02_UPLOAD_KEYSTORE_B64 }}
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$RUNNER_TEMP/signing"
+          printf '%s' "$UPLOAD_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/signing/upload.keystore"
+          echo "signing material materialised to RUNNER_TEMP (not printed)"
+      - name: Unity build
+        run: |
+          echo "::error::TODO_PHASE02 — Unity build step not defined; no Unity project exists (RD-004). This job must fail until then."; exit 1
+      - name: Generate BuildProvenance
+        run: |
+          echo "TODO_PHASE02 — generate 12_RELEASE-conformant BuildProvenance from build outputs; validate with RG-012; never hand-edit"
+      - name: Scrub signing material
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/signing"
+      # TODO_PHASE02: upload artifact + checksum manifest + provenance with retention per channel (R6).
