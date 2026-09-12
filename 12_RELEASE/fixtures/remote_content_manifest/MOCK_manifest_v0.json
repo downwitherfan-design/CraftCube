@@ -1,0 +1,34 @@
+{
+  "schema": "RemoteContentManifest",
+  "schema_version": "0.1.0",
+  "fixture_kind": "MOCK",
+  "_mock_notice": "MOCK fixture for AI-12 Phase 00. Remote content is OFF at v1 (RC-002). Package is a placeholder; checksum is sha256 of a labelled string. Must never be reachable from shipped content roots (RG-010).",
+  "manifest_id": "content.manifest.mock_0002",
+  "content_version": "0.2.0",
+  "published_utc": "2026-01-01T00:00:00Z",
+  "compatible_app_versions": {
+    "min_inclusive": "0.2.0",
+    "max_exclusive": "1.0.0"
+  },
+  "rollback_to": "content.manifest.mock_0001",
+  "integrity": {
+    "algorithm": "sha256",
+    "hex": "578ebfea3c61dd9aacb5b780f8b32460a7747108f400dde54a24725a357b12f8"
+  },
+  "packages": [
+    {
+      "package_id": "content.package.mock_optional_biome_pack",
+      "package_version": "0.2.0",
+      "required": false,
+      "enabled": true,
+      "size_bytes": 0,
+      "checksum": {
+        "algorithm": "sha256",
+        "hex": "dc957f7727ab70e6986ace8417551375d723fe33d74d14ab54052d53c71869c1"
+      },
+      "content_schema_version": "0.0.0",
+      "min_save_schema_version": "0.0.0",
+      "owner": "AI-03"
+    }
+  ]
+}
