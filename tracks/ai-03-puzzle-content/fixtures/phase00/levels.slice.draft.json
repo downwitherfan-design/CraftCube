@@ -1,0 +1,178 @@
+{
+  "schema_id": "CC.CONTENT.LEVEL",
+  "schema_version": "0.1.0",
+  "status": "DRAFT",
+  "owner": "AI-03",
+  "ruleset_version": "0.1.0-draft",
+  "note": "Phase 00 DRAFT Vertical Slice level set (chapter 01 complete, chapter 02 through Test). par_moves are authored claims (par_source=authored_unverified); reachability_verified=false until AI-02 solver exists (Phase 03). No player-facing text: *_key fields are LocalizationKey names proposed to AI-09.",
+  "levels": [
+    {
+      "level_id": "level.01.awaken",
+      "chapter_id": "chapter.01.first_light",
+      "ordinal": 1,
+      "signature_ref": "introduce",
+      "tier": "T0",
+      "protected_mastery": false,
+      "topology_id": "topology.cube.2",
+      "scramble": { "seed": 101, "depth_hint": 3 },
+      "objective": { "family": "objective.align", "params": { "faces": ["U"] } },
+      "level_rules": [
+        { "rule_id": "rule.axis_lock", "params": { "axes": ["X", "Z"] }, "relaxable": false }
+      ],
+      "tile_placement": [],
+      "challenge_conditions": [
+        { "condition_id": "challenge.standard", "params": {} }
+      ],
+      "par_moves": 3,
+      "par_source": "authored_unverified",
+      "reachability_verified": false,
+      "world_hooks": [ { "trigger": "on_objective_satisfied", "hook_ref": "PLACEHOLDER:AI-02:WorldStateEvent:mechanism_awakens" } ],
+      "reward_refs": ["reward.01.first_alignment"],
+      "discovery_refs": [],
+      "title_key": "loc.level.01.awaken.title",
+      "hint_key": "loc.level.01.awaken.hint"
+    },
+    {
+      "level_id": "level.01.seed_bed",
+      "chapter_id": "chapter.01.first_light",
+      "ordinal": 2,
+      "signature_ref": "practice",
+      "tier": "T1",
+      "protected_mastery": false,
+      "topology_id": "topology.cube.2",
+      "scramble": { "seed": 102, "depth_hint": 5 },
+      "objective": { "family": "objective.align", "params": { "faces": ["U"] } },
+      "level_rules": [
+        { "rule_id": "rule.axis_lock", "params": { "axes": ["Z"] }, "relaxable": false },
+        { "rule_id": "rule.tile_placement", "params": {}, "relaxable": false }
+      ],
+      "tile_placement": [ { "tile_type": "tile.seed", "home_face": "U", "home_index": 0 } ],
+      "challenge_conditions": [
+        { "condition_id": "challenge.standard", "params": {} }
+      ],
+      "par_moves": 5,
+      "par_source": "authored_unverified",
+      "reachability_verified": false,
+      "world_hooks": [ { "trigger": "on_seed_tile_home", "hook_ref": "PLACEHOLDER:AI-02:WorldStateEvent:biome_node_grows" } ],
+      "reward_refs": ["reward.01.seed_knowledge"],
+      "discovery_refs": ["discovery.01.first_pulse"],
+      "title_key": "loc.level.01.seed_bed.title",
+      "hint_key": "loc.level.01.seed_bed.hint"
+    },
+    {
+      "level_id": "level.01.hollow_stone",
+      "chapter_id": "chapter.01.first_light",
+      "ordinal": 3,
+      "signature_ref": "twist",
+      "tier": "T2",
+      "protected_mastery": false,
+      "topology_id": "topology.cube.2",
+      "scramble": { "seed": 103, "depth_hint": 7 },
+      "objective": { "family": "objective.align", "params": { "faces": ["U", "F"] } },
+      "level_rules": [],
+      "tile_placement": [],
+      "challenge_conditions": [
+        { "condition_id": "challenge.standard", "params": {} },
+        { "condition_id": "challenge.limited_assist", "params": { "max_assists": 0 } }
+      ],
+      "par_moves": 7,
+      "par_source": "authored_unverified",
+      "reachability_verified": false,
+      "world_hooks": [ { "trigger": "on_objective_satisfied", "hook_ref": "PLACEHOLDER:AI-09:NarrativeEvent:nox_appears" } ],
+      "reward_refs": ["reward.01.nox_meets", "reward.01.clean_hands"],
+      "discovery_refs": ["discovery.01.stone_mark"],
+      "title_key": "loc.level.01.hollow_stone.title",
+      "hint_key": "loc.level.01.hollow_stone.hint"
+    },
+    {
+      "level_id": "level.02.first_anchor",
+      "chapter_id": "chapter.02.broken_path",
+      "ordinal": 1,
+      "signature_ref": "introduce",
+      "tier": "T0",
+      "protected_mastery": false,
+      "topology_id": "topology.cube.3",
+      "scramble": { "seed": 201, "depth_hint": 4 },
+      "objective": { "family": "objective.align", "params": { "faces": ["U"] } },
+      "level_rules": [
+        { "rule_id": "rule.layer_lock", "params": { "locked_while_anchor_off_home": true }, "relaxable": true },
+        { "rule_id": "rule.tile_placement", "params": {}, "relaxable": false }
+      ],
+      "tile_placement": [ { "tile_type": "tile.anchor", "home_face": "U", "home_index": 4 } ],
+      "challenge_conditions": [
+        { "condition_id": "challenge.standard", "params": {} }
+      ],
+      "par_moves": 4,
+      "par_source": "authored_unverified",
+      "reachability_verified": false,
+      "world_hooks": [ { "trigger": "on_objective_satisfied", "hook_ref": "PLACEHOLDER:AI-02:WorldStateEvent:path_segment_assembles" } ],
+      "reward_refs": ["reward.02.anchor_knowledge"],
+      "discovery_refs": [],
+      "title_key": "loc.level.02.first_anchor.title",
+      "hint_key": "loc.level.02.first_anchor.hint"
+    },
+    {
+      "level_id": "level.02.resonant_gap",
+      "chapter_id": "chapter.02.broken_path",
+      "ordinal": 2,
+      "signature_ref": "practice",
+      "tier": "T1",
+      "protected_mastery": false,
+      "topology_id": "topology.cube.3",
+      "scramble": { "seed": 202, "depth_hint": 6 },
+      "objective": { "family": "objective.align", "params": { "faces": ["U"] } },
+      "level_rules": [
+        { "rule_id": "rule.layer_lock", "params": { "locked_while_anchor_off_home": true }, "relaxable": true },
+        { "rule_id": "rule.tile_placement", "params": {}, "relaxable": false }
+      ],
+      "tile_placement": [
+        { "tile_type": "tile.anchor", "home_face": "U", "home_index": 4 },
+        { "tile_type": "tile.resonant", "home_face": "U", "home_index": 8 }
+      ],
+      "challenge_conditions": [
+        { "condition_id": "challenge.standard", "params": {} },
+        { "condition_id": "challenge.companion", "params": { "companion_reaction_ref": "PLACEHOLDER:AI-06:CompanionReaction:nox_hum" } }
+      ],
+      "par_moves": 6,
+      "par_source": "authored_unverified",
+      "reachability_verified": false,
+      "world_hooks": [ { "trigger": "on_objective_satisfied", "hook_ref": "PLACEHOLDER:AI-02:WorldStateEvent:gap_bridged" } ],
+      "reward_refs": ["reward.02.tuning_fork"],
+      "discovery_refs": ["discovery.02.nox_sense"],
+      "title_key": "loc.level.02.resonant_gap.title",
+      "hint_key": "loc.level.02.resonant_gap.hint"
+    },
+    {
+      "level_id": "level.02.span",
+      "chapter_id": "chapter.02.broken_path",
+      "ordinal": 3,
+      "signature_ref": "test",
+      "tier": "T2",
+      "protected_mastery": true,
+      "topology_id": "topology.cube.3",
+      "scramble": { "seed": 203, "depth_hint": 9 },
+      "objective": { "family": "objective.align", "params": { "faces": ["U", "F"] } },
+      "level_rules": [
+        { "rule_id": "rule.layer_lock", "params": { "locked_while_anchor_off_home": true }, "relaxable": false },
+        { "rule_id": "rule.tile_placement", "params": {}, "relaxable": false }
+      ],
+      "tile_placement": [
+        { "tile_type": "tile.anchor", "home_face": "F", "home_index": 4 },
+        { "tile_type": "tile.seed", "home_face": "U", "home_index": 0 }
+      ],
+      "challenge_conditions": [
+        { "condition_id": "challenge.standard", "params": {} },
+        { "condition_id": "challenge.move_efficiency", "params": { "tolerance": 2 } },
+        { "condition_id": "challenge.discovery", "params": { "discovery_id": "discovery.02.under_span" } }
+      ],
+      "par_moves": 9,
+      "par_source": "authored_unverified",
+      "reachability_verified": false,
+      "world_hooks": [ { "trigger": "on_objective_satisfied", "hook_ref": "PLACEHOLDER:AI-02:WorldStateEvent:route_reconnected" } ],
+      "reward_refs": ["reward.02.path_restored", "reward.02.efficient_span", "reward.02.echo_route"],
+      "discovery_refs": ["discovery.02.under_span"],
+      "title_key": "loc.level.02.span.title",
+      "hint_key": "loc.level.02.span.hint"
+    }
+  ]
+}
