@@ -70,7 +70,7 @@ Time marks are targets for the whole session, not per-beat hard limits. Beats ar
 - **What the player does:** solves the chosen node's puzzle (AI-03: slightly larger scope than Beat 2, still observation-solvable).
 - **What the world does:** half the walkway rises and re-aligns. The *other* node brightens by itself (WR-2: restoration radiates). Nox runs onto the restored section and looks back.
 - **Meaning delivered:** R3 reinforced with persistence — if the player turns around, the first channel is still flowing (world memory, `WORLD_BIOME_BIBLE_V7.md`). R6: the reward is a *place*, not a number.
-- **Text:** none during the transformation. Afterwards, Mira, one line (`loc.dlg.ch01.mira.radiate`): "It woke the other one. They're… connected. I never had that on a map."
+- **Text:** none during the transformation. Afterwards, Mira, one line (`loc.dlg.ch01.mira.radiate.1`): "It woke the other one. They're… connected. I never had that on a map."
 
 ### Beat 7 — Orin at the threshold (`nar.beat.01.orin_threshold`) — 8:30–10:00
 - **What happens:** Orin (`nar.character.orin`) is waiting where the walkway meets the old road. He has heard the chord from far off. He is not hostile; he is moved, and certain.
