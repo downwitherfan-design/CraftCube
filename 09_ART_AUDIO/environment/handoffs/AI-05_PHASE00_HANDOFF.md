@@ -3,7 +3,7 @@
 Format: `05_PROMPTS/HANDOFF_TEMPLATE.md`. Evidence labels per `05_PROMPTS/ANTI_HALLUCINATION_ADDENDUM.md`.
 
 STATUS:
-READY_FOR_REVIEW — all AI-05 Phase-00 artifacts exist, validated and pushed. NOT "COMPLETE": phase closure requires AI-01 ratification of boundaries/cut list (DEP-08), AI-13 ratification of the owned path (DEP-07) and an `integration` branch to PR into (DEP-06).
+READY_FOR_REVIEW — all AI-05 Phase-00 artifacts exist, validated and pushed; PR #2 `ai-05-world` → `integration` is open (https://github.com/downwitherfan-design/CraftCube/pull/2). NOT "COMPLETE": phase closure requires AI-01 ratification of boundaries/cut list (DEP-08) and AI-13 ratification of the owned path (DEP-07). DEP-06 RESOLVED: `integration` branch exists on origin at `584141c`.
 
 TASK_ID:
 PHASE00-AI05-ENV-DIRECTION-LOCK
@@ -86,8 +86,8 @@ RISKS:
 - R-04 (Product): the cut list rejects day/night and weather; if Product wants them, the R3 cube-contrast guarantee must be re-designed.
 
 INTEGRATION_STEPS:
-1. AI-13: create `integration` branch from `main` (DEP-06) and ratify `09_ART_AUDIO/environment/` as the AI-05 owned path (DEP-07); update ownership examples (DEP-05).
-2. Open PR `ai-05-world` → `integration` using `07_GITHUB/PR_TEMPLATE.md`; merge order per `PHASE_KICKOFF_PROCEDURE.md` (docs/contract-adjacent, no code conflicts; independent of other tracks).
+1. AI-13: ratify `09_ART_AUDIO/environment/` as the AI-05 owned path (DEP-07); update ownership examples (DEP-05).
+2. Review/merge PR #2 `ai-05-world` → `integration` (opened with `07_GITHUB/PR_TEMPLATE.md`; fast-forward from `584141c`, docs-only, no code conflicts; independent of other tracks per `PHASE_KICKOFF_PROCEDURE.md`).
 3. AI-01: ratify Direction Lock §9 boundaries + cut list (DEP-08) or return with a decision record.
 4. AI-09: resolve DEP-03 naming; AI-05 will rename the `quiet_engine` slug before Phase-1 freeze if required.
 5. AI-02 (Phase 1): publish `CC.BIOME.STATE`; AI-05 will bind `canonical_biome_id` and bump fixture to `0.2.0` — additive change.
@@ -98,7 +98,7 @@ ROLLBACK_STEPS:
 - Revert commits `d9435c9`, `0e30236`, `b200a85`, `5895272` and the handoff/PROGRESS commits on `ai-05-world`, or `git rm -r 09_ART_AUDIO/environment/` and restore the AI-05 section of `00_CONTROL/PROGRESS.md` to the template. No other file, contract or ID is affected; nothing consumes these artifacts yet.
 
 NEXT_SAFE_ACTION:
-- Wait for DEP-06/07/08 ratifications; in parallel, prepare Phase-1 inputs: the `_RestoreAmount` shader-property contract proposal and the presentation-adapter interface request (`BiomePresentationState` DTO) for AI-02/AI-13 review. Do not start asset production before the Investment Gate.
+- Wait for DEP-07/08 ratifications and PR #2 review; in parallel, prepare Phase-1 inputs: the `_RestoreAmount` shader-property contract proposal and the presentation-adapter interface request (`BiomePresentationState` DTO) for AI-02/AI-13 review. Do not start asset production before the Investment Gate.
 
 OWNERSHIP_AUDIT:
 - All added files are under `09_ART_AUDIO/environment/` (environment art direction, biome presentation, materials/lighting direction, presentation fixtures/validator) → inside "environment art direction, modular world kits, materials, lighting, LODs, biome presentation".
