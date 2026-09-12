@@ -76,7 +76,7 @@ KNOWN_LIMITATIONS:
 - Screen-reader support is an open decision (D-UX-07), not a commitment.
 
 RISKS:
-- R1: `integration` branch absent → PR cannot target it as the model prescribes. Mitigation: IR-AI07-001; branch is pushed and reviewable now.
+- R1: RESOLVED — `integration` branch now exists on remote (verified `git ls-remote`); PR opened against it (see INTEGRATION_STEPS).
 - R2: Ownership example scripts assign UI to AI-05 → Phase 01 CODEOWNERS could lock AI-07 out of its path. Mitigation: IR-AI07-002 raised before freeze.
 - R3: If Product picks a slot count > 4 or a currency layer, SCR-LOADOUT and cut list need revision. Mitigation: decisions listed explicitly (D-UX-03).
 - R4: If AI-02 chooses to embed preferences in SaveSchema, AI-07 fixtures must be nested; schema body is unchanged (Option A/B designed to be identical).
