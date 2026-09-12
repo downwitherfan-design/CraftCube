@@ -41,6 +41,9 @@
     { "id": "equipment.channel.begin",  "stateChanging": true,  "consumer": "AI-02", "conditional": "only if an approved item declares channelled use" },
     { "id": "equipment.channel.end",    "stateChanging": true,  "consumer": "AI-02", "conditional": "only if an approved item declares channelled use" }
   ],
+  "reservedNotProposed": [
+    { "id": "puzzle.assist.request", "reason": "Depends on AI-03/AI-01 Phase 00 decision on assist features and AI-09 IP-safe naming. Reserved so no other stem is taken; NOT part of the proposed command catalog." }
+  ],
   "notifications": [
     "interaction.intent.puzzle",
     "interaction.intent.camera",
