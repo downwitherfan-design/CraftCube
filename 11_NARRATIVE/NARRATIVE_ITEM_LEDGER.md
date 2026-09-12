@@ -7,7 +7,7 @@
 
 `ItemDefinition` IDs do not yet exist in the repository (VERIFIED: no item schema or catalog with IDs is present). This ledger therefore keys entries by **`nar.item_lore.<slug>`** and records a `proposed_item_slug` that AI-02 may adopt or map. The lore ID remains stable even if AI-02 chooses a different item ID; the mapping lives in the canon registry fixture (`item_ref` field, currently `PROPOSED`).
 
-Candidates are drawn from `01_PREPRODUCTION/ITEM_CATALOG_STARTER_SET.md` (the seed set AI-01/AI-09 may rename, merge or reject). Phase 00 decision by AI-09 on the seed set: **keep 11, merge 1** — *Wayfinder Shard* is merged into Nox's sensing role (companion already "reveals direction to unresolved discovery"; a second system for the same semantic responsibility violates the anti-duplication rule). Recorded as `nar.item_lore` rejection below; AI-01 may overrule (OD-05).
+Candidates are drawn from `01_PREPRODUCTION/ITEM_CATALOG_STARTER_SET.md` (the seed set AI-01/AI-09 may rename, merge or reject). Phase 00 decision by AI-09 on the seed set: **keep 11, merge 1** — *Wayfinder Shard* is merged into Nox's sensing role (companion already "reveals direction to unresolved discovery"; a second system for the same semantic responsibility violates the anti-duplication rule). Recorded in the rejected/merged table below and in the registry fixture's `item_lore_rejected` list; AI-01 may overrule (OD-05).
 
 ## Relic philosophy (canon)
 
