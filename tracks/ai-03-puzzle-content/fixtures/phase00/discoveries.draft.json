@@ -1,0 +1,53 @@
+{
+  "schema_id": "CC.DISCOVERY.DEFINITION",
+  "schema_version": "0.1.0",
+  "status": "DRAFT",
+  "owner": "AI-03",
+  "note": "Phase 00 DRAFT DiscoveryDefinition fixture. blocks_progression is a schema constant (must be false). Categories = QUEST_DISCOVERY_BIBLE_V7 discovery categories; layers = DISCOVERY_AND_REPLAYABILITY layers. breadcrumb_key values are LocalizationKey names proposed to AI-09 (opaque to AI-03).",
+  "discoveries": [
+    {
+      "discovery_id": "discovery.01.first_pulse",
+      "chapter_id": "chapter.01.first_light",
+      "level_id": "level.01.seed_bed",
+      "category": "puzzle_state_secret",
+      "layer": "surface",
+      "trigger_condition": { "kind": "face_match_threshold_before_solve", "params": { "face": "U", "min_matching_tiles": 3 } },
+      "breadcrumb_key": "loc.discovery.01.first_pulse.breadcrumb",
+      "reveals_ref": { "owner": "AI-03", "kind": "MechanicIntro", "ref": "pulse" },
+      "blocks_progression": false
+    },
+    {
+      "discovery_id": "discovery.01.stone_mark",
+      "chapter_id": "chapter.01.first_light",
+      "level_id": "level.01.hollow_stone",
+      "category": "environmental_secret",
+      "layer": "curious",
+      "trigger_condition": { "kind": "solved_and_world_flag", "params": { "world_flag_ref": "PLACEHOLDER:AI-02:WorldState:mechanism_awakened", "expected": true } },
+      "breadcrumb_key": "loc.discovery.01.stone_mark.breadcrumb",
+      "reveals_ref": { "owner": "AI-09", "kind": "LoreEntry", "ref": "PLACEHOLDER:AI-09:LoreEntry:first_loom_symbol" },
+      "blocks_progression": false
+    },
+    {
+      "discovery_id": "discovery.02.under_span",
+      "chapter_id": "chapter.02.broken_path",
+      "level_id": "level.02.span",
+      "category": "alternate_world_state",
+      "layer": "mastery",
+      "trigger_condition": { "kind": "solved_with_tile_home_last", "params": { "tile_type": "tile.anchor" } },
+      "breadcrumb_key": "loc.discovery.02.under_span.breadcrumb",
+      "reveals_ref": { "owner": "AI-03", "kind": "RewardDefinition", "ref": "reward.02.echo_route" },
+      "blocks_progression": false
+    },
+    {
+      "discovery_id": "discovery.02.nox_sense",
+      "chapter_id": "chapter.02.broken_path",
+      "level_id": "level.02.resonant_gap",
+      "category": "companion_secret",
+      "layer": "systemic",
+      "trigger_condition": { "kind": "solved_with_tile_home_and_companion_present", "params": { "tile_type": "tile.resonant", "companion_flag_ref": "PLACEHOLDER:AI-06:CompanionState:nox_present" } },
+      "breadcrumb_key": "loc.discovery.02.nox_sense.breadcrumb",
+      "reveals_ref": { "owner": "AI-09", "kind": "LoreEntry", "ref": "PLACEHOLDER:AI-09:LoreEntry:nox_feels_patterns" },
+      "blocks_progression": false
+    }
+  ]
+}
