@@ -22,7 +22,7 @@ Rules:
 | **Cube** | The player-manipulated twisting puzzle object. | Generic word; already used across bibles. AI-02 owns its topology and truth. |
 | **Face** | One of the flat outer sides of the Cube. | Generic geometric term. |
 | **Layer** | A slice of the Cube that rotates as a unit about an axis. | "Slice" is a permitted synonym in prose but the ID stem is `layer`. |
-| **Tile** | One colored/patterned unit on a Face. | Repository already uses "special tiles" and "Sticker/TileView" (`02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md`). AI-04 adopts **Tile**; "sticker" is deprecated in AI-04 documents to keep one word. |
+| **Tile** | One colored/patterned unit on a Face. | Repository already uses "special tiles" and a `TileView` presentation module (`02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md`, which pairs it with a legacy synonym). AI-04 adopts **Tile** only; the legacy synonym is listed in §8 as not-used, to keep one word. |
 | **Axis** | One of the Cube's rotation axes. | Domain concept; `LockedAxis` is an existing typed failure in `06_CONTRACTS/INTERACTION_CONTRACTS.md`. |
 | **Anchor** | A world object the player can touch to interact with the environment (inspect, resonate, activate). | Original term. Chosen instead of "block" to stay clear of block-building vocabulary. |
 | **Loadout** | The set of currently equipped items available for runtime use. | Already used in `00_CONTROL/V7_1_WORLDCLASS_UPGRADE.md` §5.4. Reused, not invented. |
