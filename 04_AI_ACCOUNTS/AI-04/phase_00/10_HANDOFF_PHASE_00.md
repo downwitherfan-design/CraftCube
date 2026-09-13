@@ -4,7 +4,7 @@ Status: READY_FOR_REVIEW
 Format: `05_PROMPTS/HANDOFF_TEMPLATE.md`
 
 STATUS:
-READY_FOR_REVIEW. All AI-04 Phase 00 artifacts exist, are self-audited (30 passed / 0 failed), pushed to `ai-04-gameplay`, and contain no released-contract changes. PR target `integration` does not exist on the remote (see CONFLICT-04-01); PR step is BLOCKED pending AI-13 confirmation of the substitute target (`ai-13-integration` observed on remote).
+READY_FOR_REVIEW. All AI-04 Phase 00 artifacts exist, are self-audited (32 passed / 0 failed), pushed to `ai-04-gameplay`, and contain no released-contract changes. PR target `integration` exists on the remote at baseline `584141c` (re-verified before PR; see CONFLICT-04-01); dry-run merge shows 0 conflicts. PR opened against `integration` (number recorded in the PR itself and in PROGRESS.md).
 
 TASK_ID:
 craftcube.phase00.ai04.product_ip_lock
@@ -97,11 +97,11 @@ RISKS:
 - R1: Portrait-only default (OD-04-01) may be reversed → recovery path and reach criteria need extension.
 - R2: If AI-02 makes Cube Reorient a domain move (OD-04-04), command catalog and undo semantics change before freeze.
 - R3: If Product keeps source-GDD assist concepts (OD-04-03), a hint command must be added and mastery metrics adjusted.
-- R4: Branch-model mismatch (CONFLICT-04-01) may misroute PRs across all 13 accounts.
+- R4: Branch-name mismatch between `07_GITHUB/GITHUB_MODEL.md` and the remote (CONFLICT-04-01, naming only) may confuse other accounts' PR routing.
 - R5: Ownership example files (CONFLICT-04-02) could be wired into CI as-is and reject legitimate AI-04/AI-05/AI-06 changes.
 
 INTEGRATION_STEPS:
-1. AI-13: confirm PR target branch (`integration` missing; `ai-13-integration` exists) and record decision.
+1. AI-13: review PR `ai-04-gameplay` → `integration`; align `07_GITHUB/GITHUB_MODEL.md` branch names with actual remote names (IR-04-15).
 2. AI-13: register CC.INTERACTION.COMMAND 0.1.0 as DRAFT; publish AI-04 namespace ownership table.
 3. AI-02: answer IR-04-01..04 (legality pre-check, ref formats, synchronous accept, cheap state query); decide OD-04-04.
 4. AI-07: answer IR-04-06..08 (AccessibilityPreference change notification + fields, `equipment.arm` emission, UI-consumed flag).
@@ -114,7 +114,7 @@ ROLLBACK_STEPS:
 - All changes are additive documentation/fixtures. Rollback = revert the 22 AI-04 commits on `ai-04-gameplay` (`git log --oneline main..ai-04-gameplay`) or `git checkout main -- 00_CONTROL/PROGRESS.md && git rm -r 04_AI_ACCOUNTS/AI-04`. No contract, save schema, build file or other account's file is affected.
 
 NEXT_SAFE_ACTION:
-- Open PR to the integration branch once AI-13 confirms its name; until then, no further AI-04 edits are needed. Phase 01 work (freeze proposal, arbiter reference implementation in pure C# against fixtures) begins only after OD-04-04/05 and IR-04-01/02 are answered or explicitly mocked.
+- Await AI-13 review of the PR; no further AI-04 edits are needed in Phase 00. Phase 01 work (freeze proposal, arbiter reference implementation in pure C# against fixtures) begins only after OD-04-04/05 and IR-04-01/02 are answered or explicitly mocked.
 
 OWNERSHIP_AUDIT:
 - Files touched: 16 under `04_AI_ACCOUNTS/AI-04/` (AI-04-owned deliverable space) + `00_CONTROL/PROGRESS.md` (own section only, as PROGRESS.md itself instructs).
