@@ -1,0 +1,19 @@
+# validate_product_lock.py run — branch ai-01-product @ ed83af1 — 2026-09-13T12:44Z
+$ python3 01_PREPRODUCTION/PRODUCT/validate_product_lock.py
+validate_product_lock.py — root=/home/user/craftcube_repo
+[PASS] all 7 required product documents present
+[PASS] header rows (Owner / Document ID / Version) checked
+[PASS] family PD: 24 unique IDs (PD-001..PD-024)
+[PASS] family F10: 7 unique IDs (F10-001..F10-007)
+[PASS] family IGM: 18 unique IDs (IGM-001..IGM-008)
+[PASS] family CUT: 31 unique IDs (CUT-001..CUT-031)
+[PASS] family AGP: 21 unique IDs (AGP-001..AGP-025)
+[PASS] family CMP: 12 unique IDs (CMP-001..CMP-012)
+[PASS] every PD/F10/IGM/CUT/AGP/CMP reference resolves to a definition
+[PASS] all bare `FILE.md` links resolve to exactly one repository file
+[PASS] 24 PD entries: verdict vocabulary and acceptance tags OK
+[PASS] AGP/CMP rows carry check type or default action
+SUMMARY pass=12 fail=0
+exit=0
+
+# Negative self-test summary (temp copy of tree; see commit message): duplicate PD id -> FAIL; missing COMPETITOR_REVIEW.md + dangling CUT-099 -> FAIL; APPROVED PD without acceptance tag -> FAIL. All three exit=1 as required.
