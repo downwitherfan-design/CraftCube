@@ -145,6 +145,10 @@ def collect_governance_ids(errors: list[str]) -> None:
             continue
         if path.name == "validate_registry.py":
             continue
+        # evidence/ holds captured command output (including deliberately invalid
+        # IDs used in negative tests); it is not a governance artifact.
+        if "evidence" in path.relative_to(ROOT).parts:
+            continue
         for prefix, num in REFERENCE_RE.findall(path.read_text(encoding="utf-8", errors="replace")):
             referenced[prefix].add(f"{prefix}-{num}")
     for prefix in ID_SOURCES:
