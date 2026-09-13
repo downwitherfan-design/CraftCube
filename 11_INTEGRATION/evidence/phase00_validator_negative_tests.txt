@@ -1,0 +1,47 @@
+# validate_registry.py negative tests
+# Method: full `git archive HEAD` copy extracted to /tmp/negtest; each case mutates one file, runs the validator, restores.
+# Generated: 2026-09-13T12:31:14Z
+
+--- N1 duplicate id (expect FAIL): exit=1
+FAIL (1 finding(s)):
+  - CC.PUZZLE.STATE: duplicate id (also at index 0)
+
+--- N2 alias claimed twice (expect FAIL): exit=1
+FAIL (1 finding(s)):
+  - CC.WORLD.STATE: alias 'PuzzleState' already claimed by CC.PUZZLE.STATE
+
+--- N3 FROZEN without version (expect FAIL): exit=1
+FAIL (1 finding(s)):
+  - CC.PUZZLE.STATE: status FROZEN requires a version
+
+--- N4 unknown owner (expect FAIL): exit=1
+FAIL (1 finding(s)):
+  - CC.PUZZLE.STATE: owner 'AI-14' not a known account
+
+--- N5 bad id format (expect FAIL): exit=1
+FAIL (1 finding(s)):
+  - puzzle.state: id does not match ^CC\.[A-Z]+(\.[A-Z_]+)+$
+
+--- N6 DRAFT carrying a version (expect FAIL): exit=1
+FAIL (1 finding(s)):
+  - CC.PUZZLE.STATE: DRAFT/DEPRECATED contract must not carry a version
+
+--- N7 nonexistent source path (expect FAIL): exit=1
+FAIL (1 finding(s)):
+  - CC.PUZZLE.STATE: source path '06_CONTRACTS/DOES_NOT_EXIST.md' does not exist
+
+--- N8 undefined CR referenced (expect FAIL): exit=1
+FAIL (1 finding(s)):
+  - CR-0099 is referenced but never defined in CHANGE_REQUESTS.md
+
+--- N9 numbering gap in RISK IDs (expect FAIL): exit=1
+FAIL (2 finding(s)):
+  - RISK_REGISTER.md: RISK numbering has gaps or does not start at 0001: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13]
+  - RISK-0012 is referenced but never defined in RISK_REGISTER.md
+
+--- N10 stale render (expect FAIL): exit=1
+FAIL (1 finding(s)):
+  - CONTRACT_REGISTRY.md is stale; run --render
+
+--- N11 restored baseline (expect PASS): exit=0
+PASS: 27 contracts, 27 DRAFT, 0 consumable; governance IDs consistent.
