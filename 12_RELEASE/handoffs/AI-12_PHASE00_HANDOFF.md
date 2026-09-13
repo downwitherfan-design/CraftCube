@@ -3,7 +3,7 @@
 Format: `05_PROMPTS/HANDOFF_TEMPLATE.md`. Evidence labels per `05_PROMPTS/ANTI_HALLUCINATION_ADDENDUM.md`.
 
 STATUS:
-READY_FOR_REVIEW — all AI-12 Phase 00 artifacts exist, are validated and are pushed to `origin/ai-12-build`. NOT "COMPLETE": phase closure requires (a) AI-13 ratification of the `12_RELEASE/` owned path (RD-003), (b) an `integration` branch to PR into (RD-001 — MISSING on origin), (c) AI-13 registration of `BuildProvenance` as a contract family and of the `RG/RD/RC` ID families, (d) human decisions RD-005/006/007 which are explicitly deferred, not guessed.
+READY_FOR_REVIEW — all AI-12 Phase 00 artifacts exist, are validated and are pushed to `origin/ai-12-build`. PR opened: https://github.com/downwitherfan-design/CraftCube/pull/8 (`ai-12-build` → `integration`). RD-001 update: `integration` branch now exists on origin at `584141c` (VERIFIED after initial inspection; created by governance, not by AI-12) — PR is fast-forwardable, 21 files / +2097 lines, disjoint from every sibling branch. NOT "COMPLETE": phase closure requires (a) AI-13 ratification of the `12_RELEASE/` owned path (RD-003), (b) AI-13 integration-gate approval of PR #8, (c) AI-13 registration of `BuildProvenance` as a contract family and of the `RG/RD/RC` ID families, (d) human decisions RD-005/006/007 which are explicitly deferred, not guessed.
 
 TASK_ID:
 PHASE00-AI12-RELEASE-DIRECTION-LOCK
