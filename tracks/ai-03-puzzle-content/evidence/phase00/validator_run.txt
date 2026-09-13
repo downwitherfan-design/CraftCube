@@ -1,0 +1,90 @@
+# AI-03 Phase 00 — validator & test evidence
+# Captured: 2026-09-13T12:21:40Z  commit: 3565382  branch: ai-03-puzzle
+# python: Python 3.13.14
+
+$ python3 tracks/ai-03-puzzle-content/validators/validate_phase00_content.py
+AI-03 Phase 00 content validator — fixtures: /home/user/CraftCube/tracks/ai-03-puzzle-content/fixtures/phase00
+  WARN  chapter.02.broken_path: no 'twist' level (required for full chapter; acceptable for Slice-partial chapter)
+  metrics: {"chapters": 7, "discoveries": 4, "information_ratio": {"level.01.awaken": 0.0, "level.01.hollow_stone": 0.0, "level.01.seed_bed": 0.0, "level.02.first_anchor": 0.0, "level.02.locked_gap": 0.0, "level.02.span": 0.0}, "levels": 6, "par_unverified": 6, "protected_progression_rewards": 6, "reachability_unverified": 6, "rewards": 9, "rule_load": {"level.01.awaken": 1, "level.01.hollow_stone": 0, "level.01.seed_bed": 2, "level.02.first_anchor": 2, "level.02.locked_gap": 2, "level.02.span": 2}, "total_ids": 26}
+RESULT: PASS (0 errors, 1 warnings)
+exit=0
+
+$ python3 tracks/ai-03-puzzle-content/validators/validate_phase00_content.py --json
+{
+  "errors": [],
+  "metrics": {
+    "chapters": 7,
+    "discoveries": 4,
+    "information_ratio": {
+      "level.01.awaken": 0.0,
+      "level.01.hollow_stone": 0.0,
+      "level.01.seed_bed": 0.0,
+      "level.02.first_anchor": 0.0,
+      "level.02.locked_gap": 0.0,
+      "level.02.span": 0.0
+    },
+    "levels": 6,
+    "par_unverified": 6,
+    "protected_progression_rewards": 6,
+    "reachability_unverified": 6,
+    "rewards": 9,
+    "rule_load": {
+      "level.01.awaken": 1,
+      "level.01.hollow_stone": 0,
+      "level.01.seed_bed": 2,
+      "level.02.first_anchor": 2,
+      "level.02.locked_gap": 2,
+      "level.02.span": 2
+    },
+    "total_ids": 26
+  },
+  "warnings": [
+    "chapter.02.broken_path: no 'twist' level (required for full chapter; acceptable for Slice-partial chapter)"
+  ]
+}
+exit=0
+
+$ python3 -m unittest tracks/ai-03-puzzle-content/validators/test_validate_phase00_content.py -v 2>&1 | grep -E "^(test_|Ran|OK|FAILED)"
+test_all_axes_locked ... ok
+test_blocks_progression_constant ... ok
+test_chapter_not_opening_with_t0 ... ok
+test_dd006_protected_reward_gated_by_mastery ... ok
+test_discovery_trigger_tile_not_placed ... ok
+test_duplicate_chapter_id ... ok
+test_duplicate_level_tuple ... ok
+test_duplicate_reward_id ... ok
+test_embedded_text_instead_of_loc_key ... ok
+test_fabricated_reachability_rejected ... ok
+test_family_used_before_introduced ... ok
+test_good_fixtures_pass ... ok
+test_idempotent_constant ... ok
+test_invalid_json_is_exit_2 ... ok
+test_invented_cross_track_id_rejected ... ok
+test_layer_lock_without_anchor ... ok
+test_level_references_undefined_discovery ... ok
+test_missing_fixture_is_exit_2 ... ok
+test_missing_standard_challenge ... ok
+test_orphan_reward ... ok
+test_protected_mastery_with_relaxable_rule ... ok
+test_r1_chapter_introduces_nothing ... ok
+test_r1_reintroducing_existing_element ... ok
+test_r2_consecutive_identical_pair ... ok
+test_r3_recombines_unknown ... ok
+test_r4_two_new_families ... ok
+test_released_status_rejected_in_phase00 ... ok
+test_resource_class_forbidden ... ok
+test_reward_condition_not_on_level ... ok
+test_t0_with_pressure_condition ... ok
+test_tile_used_before_introduced ... ok
+test_unknown_discovery_category ... ok
+test_validator_is_deterministic ... ok
+Ran 33 tests in 0.048s
+OK
+
+$ for f in tracks/ai-03-puzzle-content/fixtures/phase00/*.json; do python3 -c "import json,sys;json.load(open(sys.argv[1]));print(\"json-ok\",sys.argv[1])" "$f"; done
+json-ok tracks/ai-03-puzzle-content/fixtures/phase00/chapters.draft.json
+json-ok tracks/ai-03-puzzle-content/fixtures/phase00/discoveries.draft.json
+json-ok tracks/ai-03-puzzle-content/fixtures/phase00/levels.slice.draft.json
+json-ok tracks/ai-03-puzzle-content/fixtures/phase00/rewards.draft.json
+
+# NOT RUN / NOT CLAIMED: Unity build, Android device test, solver reachability, par verification (no engine exists in repo at this commit).
