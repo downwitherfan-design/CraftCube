@@ -47,18 +47,13 @@ FAMILIES = {
     "AGP": r"^\| (AGP-\d{3}) \| ",              # policy table row
     "CMP": r"^\| (CMP-\d{3}) \| ",              # policy table row
 }
-REFERENCE_RE = re.compile(r"\b(PD|F10|IGM|CUT|AGP|CMP)-(\d{3})([a-e])?\b")
+# A trailing '+' marks a forward pointer ("PD-025+" = next free number), not a reference.
+REFERENCE_RE = re.compile(r"\b(PD|F10|IGM|CUT|AGP|CMP)-(\d{3})([a-e])?\b(?!\+)")
 HEADER_ROWS = ("| Owner |", "| Document ID |", "| Version |")
-VERDICTS = {
-    "APPROVED",
-    "APPROVED_WITH_LIMITS",
-    "REJECTED",
-    "DEFERRED_TO_HUMAN",
-    "DEFERRED_TO_EVIDENCE",
-    "APPROVED (merge)",
-    "APPROVED (this decision *defines* the cap)",
-    "APPROVED (product level; canon text remains a Human gate)",
-}
+# Verdict must START with one of these tokens; a parenthetical qualifier may follow.
+VERDICT_RE = re.compile(
+    r"^(APPROVED_WITH_LIMITS|APPROVED|REJECTED|DEFERRED_TO_HUMAN|DEFERRED_TO_EVIDENCE)(\s*\(.*\))?$"
+)
 CHECK_TAGS = ("[VALIDATOR]", "[BUILD]", "[PLAYTEST]", "[EVIDENCE]")
 LINK_RE = re.compile(r"`([A-Z0-9_]+\.md)`")
 
@@ -155,20 +150,31 @@ def check_references(docs: dict[str, str], defs: dict[str, dict[str, str]], rep:
         rep.ok("every PD/F10/IGM/CUT/AGP/CMP reference resolves to a definition")
 
 
-def check_links(docs: dict[str, str], folder: Path, rep: Report) -> None:
-    broken = []
+def check_links(docs: dict[str, str], folder: Path, root: Path, rep: Report) -> None:
+    """Bare `FILE.md` references must resolve to exactly one file somewhere in the
+    repository (local PRODUCT folder first). Ambiguous or missing names fail."""
+    index: dict[str, list[Path]] = {}
+    for p in root.rglob("*.md"):
+        if ".git" in p.parts:
+            continue
+        index.setdefault(p.name, []).append(p)
+    broken, ambiguous = [], []
     for name, text in docs.items():
         for m in LINK_RE.finditer(text):
             target = m.group(1)
-            if target in REQUIRED_DOCS or (folder / target).is_file():
+            if (folder / target).is_file():
                 continue
-            # Links to files elsewhere in the repo are written with a path
-            # prefix and are not matched by LINK_RE; bare names must be local.
-            broken.append((name, target))
+            hits = index.get(target, [])
+            if not hits:
+                broken.append((name, target))
+            elif len(hits) > 1:
+                ambiguous.append((name, target, [str(h.relative_to(root)) for h in hits]))
     for name, target in broken:
-        rep.fail(f"{name}: bare link to `{target}` does not resolve in PRODUCT folder")
-    if not broken:
-        rep.ok("all bare `FILE.md` links resolve inside 01_PREPRODUCTION/PRODUCT")
+        rep.fail(f"{name}: bare link to `{target}` does not resolve anywhere in the repository")
+    for name, target, hits in ambiguous:
+        rep.fail(f"{name}: bare link to `{target}` is ambiguous: {hits}")
+    if not broken and not ambiguous:
+        rep.ok("all bare `FILE.md` links resolve to exactly one repository file")
 
 
 def check_pd_verdicts(docs: dict[str, str], rep: Report) -> None:
@@ -179,7 +185,7 @@ def check_pd_verdicts(docs: dict[str, str], rep: Report) -> None:
         pid = block.split(" ", 1)[0]
         m = re.search(r"\*\*Verdict:\*\* (.+)", block)
         verdict = m.group(1).strip() if m else ""
-        if verdict not in VERDICTS:
+        if not VERDICT_RE.match(verdict):
             bad_verdict.append((pid, verdict))
         if verdict.startswith("APPROVED") and not any(t in block for t in CHECK_TAGS):
             no_tag.append(pid)
@@ -229,7 +235,7 @@ def main() -> int:
         defs = collect_definitions(docs, rep)
         check_contiguity(defs, rep)
         check_references(docs, defs, rep)
-        check_links(docs, folder, rep)
+        check_links(docs, folder, root, rep)
         check_pd_verdicts(docs, rep)
         check_policy_rows(docs, rep)
     print(f"SUMMARY pass={len(rep.passes)} fail={len(rep.failures)}")
