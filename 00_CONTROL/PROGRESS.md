@@ -23,3 +23,13 @@ This file is deliberately short. Each AI must update only its own section in the
 - Tests:
 - Known issues:
 - Next integration action:
+
+### AI-13
+- Branch: `ai-13-integration` (PR target `integration`, created by AI-13 from `584141c` in Phase 00)
+- Task: Phase 00 — Integration / Governance contribution to Product/IP Lock
+- Status: READY_FOR_REVIEW
+- Contract versions consumed: none (no contract is FROZEN/RELEASED yet)
+- Contract versions changed: none. Registered 27 contracts as DRAFT with canonical `CC.*` IDs in `11_INTEGRATION/registry/contract_registry.json`; no version assigned.
+- Tests: `python3 11_INTEGRATION/scripts/validate_registry.py --check-render` → PASS (27 DRAFT, 0 consumable). Negative tests: `11_INTEGRATION/evidence/phase00_validator_negative_tests.txt` (10 injected defects FAIL, baseline PASS).
+- Known issues: CR-0001…CR-0007 open to owning accounts; OD-0001…OD-0007 open Product/Human decisions; RISK-0001…RISK-0012 registered. Phase 00 gate verdict NOT PASSED pending other accounts' artifacts (`11_INTEGRATION/PHASE00_INTEGRATION_GATE.md`).
+- Next integration action: merge `ai-13-integration` → `integration` first (step 1 of `11_INTEGRATION/INTEGRATION_ORDER_AND_MERGE_SEQUENCE.md`), then gate-review AI-01 and AI-09 PRs.
