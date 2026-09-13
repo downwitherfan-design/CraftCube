@@ -1,8 +1,8 @@
 command: python3 04_AI_ACCOUNTS/AI-04/phase_00/scripts/validate_ai04_phase00.py
 cwd: repo root (/home/user/CraftCube)
 python: Python 3.13.14
-git HEAD before evidence commit: 3518c0b
-date_utc: 2026-09-12T08:04:44Z
+git HEAD before evidence commit: 88d76fd
+date_utc: 2026-09-13T12:24:43Z
 ---
 AI-04 Phase 00 self-audit
 root: /home/user/CraftCube/04_AI_ACCOUNTS/AI-04/phase_00
@@ -25,6 +25,7 @@ PASS  04_GESTURE_ARBITRATION_MODEL.md: no forbidden terms
 PASS  05_INTERRUPTION_AND_RECOVERY.md: no forbidden terms
 PASS  06_EQUIPMENT_AND_WORLD_RUNTIME_INTERACTION.md: no forbidden terms
 PASS  07_SUCCESS_CRITERIA_AND_MEASURABLE_BOUNDARIES.md: no forbidden terms
+PASS  08_OPEN_DECISIONS_AND_INTEGRATION_REQUESTS.md: no forbidden terms
 PASS  09_CONTRACT_PROPOSAL_INTERACTION_COMMAND_v0.1.0.md: no forbidden terms
 PASS  01_INTERACTION_VISION_AND_PRINCIPLES.md: Status declared
 PASS  02_PLATFORM_AND_INPUT_ASSUMPTIONS.md: Status declared
@@ -33,6 +34,7 @@ PASS  04_GESTURE_ARBITRATION_MODEL.md: Status declared
 PASS  05_INTERRUPTION_AND_RECOVERY.md: Status declared
 PASS  06_EQUIPMENT_AND_WORLD_RUNTIME_INTERACTION.md: Status declared
 PASS  07_SUCCESS_CRITERIA_AND_MEASURABLE_BOUNDARIES.md: Status declared
+PASS  08_OPEN_DECISIONS_AND_INTEGRATION_REQUESTS.md: Status declared
 PASS  09_CONTRACT_PROPOSAL_INTERACTION_COMMAND_v0.1.0.md: Status declared
-summary: 28 passed, 0 failed
+summary: 30 passed, 0 failed
 exit=0
