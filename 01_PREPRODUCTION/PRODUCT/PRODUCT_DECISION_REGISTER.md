@@ -4,7 +4,7 @@
 |---|---|
 | Owner | AI-01 — Product / Game Direction |
 | Document ID | `CC.PRODUCT.DECISIONS` |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | ID family | `PD-###` (Product Decision). Immutable once released. Never reuse a number. |
 | Relationship to `DD-###` | `00_CONTROL/V7_DESIGN_DECISION_REGISTER.md` holds *starting design decisions*. `PD-###` records Product's **approve / reject / defer** verdicts on them and on the v7 bibles, with testable acceptance criteria. `PD` entries cite the `DD` they confirm; they never duplicate a `DD`. |
 
@@ -263,9 +263,119 @@ All items in `CUT_LIST_AND_COMPLEXITY_BUDGET.md` marked `REJECT` are rejected by
 
 ---
 
+## PD-017 — Story Promise (AI-09 OD-03)
+
+**Verdict:** APPROVED (product level; canon text remains a Human gate)
+**Subject:** AI-09's proposed Story Promise in `01_PREPRODUCTION/STORY_BIBLE_V7.md` (branch `ai-09-narrative`): *"Every time you master the cube, the world visibly answers — and the more you understand it, the less certain you become that putting it back the way it was is the right thing to do."*
+**Confirms:** PD-001, DD-003, DD-008.
+
+**Why approved:** see `PROGRESSION_ANTI_GRIND_AND_EXPRESSION_POLICY.md` §1. Product boundaries on the promise are listed there and are binding on AI-09.
+
+**Acceptance criteria:**
+- `[VALIDATOR]` The false lead ("back / the way it was") is planted in Chapter 1 content by an action or a character line ≤ 25 words, not by narration.
+- `[PLAYTEST]` After Act I, ≥ 40% of players, asked "do you think you should put the world back the way it was?", give a non-certain answer ("not sure", "maybe not", "depends") — evidence that the second clause is felt, not told.
+
+---
+
+## PD-018 — Finale option set (AI-09 OD-04)
+
+**Verdict:** APPROVED_WITH_LIMITS
+**Subject:** `nar.flag.final_configuration` = {hold, weave, open}; three closed options, no "bad" ending, all warm.
+**Confirms:** DD-008, CUT-013.
+
+**Limits:**
+- Exactly **3** options; adding a fourth requires a new PD and Human canon approval.
+- The three finales differ in **presentation, epilogue lines and world-visual state only**. No option may require a separately authored chapter, biome or puzzle set (that would be CUT-013 branch explosion).
+- The choice is made through a **real cube configuration the player performs** (§7 rule 4 of the policy: the cube is never a cutscene prop), not through a dialogue menu.
+- Option names are English placeholders owned by AI-09; player-facing text via `loc.*` keys only.
+
+**Acceptance criteria:**
+- `[VALIDATOR]` Finale content declares one `nar.flag.final_configuration` write and ≤ 3 flag-dependent presentation variants (`CMP-008`).
+- `[VALIDATOR]` Finale authored-asset count for the three variants ≤ 1.5× the count of a single variant (measured by AI-13 at Phase 06+ when assets exist).
+- `[PLAYTEST]` ≥ 70% of Gold Slice players (when the finale exists) can explain what their chosen option meant in one sentence.
+
+---
+
+## PD-019 — Wayfinder Shard merged into Nox (AI-09 OD-05)
+
+**Verdict:** APPROVED (merge)
+**Subject:** AI-09's anti-duplication decision to fold the seed item *Wayfinder Shard* ("reveal direction to unresolved discovery") into Nox's sensing role.
+**Confirms:** DD-007, DD-011, `CMP-003`.
+
+**Ruling:** Nox is the single owner of the player question "where is something I haven't found?". No item, UI marker or menu may duplicate this. A **Companion Gear** item may *sharpen* Nox's sensing (e.g., the seed candidate *Nox Harness*) because it acts through the companion, not beside it.
+
+**Acceptance criteria:**
+- `[VALIDATOR]` No `CC.ITEM.DEFINITION`/`CC.EQUIPMENT.EFFECT` entry declares a "reveal direction to discovery" effect outside the Companion Gear family.
+- Seed set count becomes 11 candidates (Product cap for release remains ≤ 12 equipment/relic items, `PD-002`).
+
+---
+
+## PD-020 — Canonical item family list and rarity labels (AI-13 OD-0007)
+
+**Verdict:** APPROVED
+**Subject:** Three documents list item families with different names; two documents list rarity tiers with different labels (`11_INTEGRATION/PHASE00_INTEGRATION_GATE.md` §3 items 3–4).
+
+**Ruling (canonical, for `CC.ITEM.DEFINITION` freeze):**
+- **Families (6):** `Relics`, `Tools`, `Resonators`, `Companion Gear`, `Field Modules`, `Memory Collectibles` — exactly as in `EQUIPMENT_ITEM_MASTER_BIBLE_V7.md` §Item families. Already ruled in PD-002; restated here so OD-0007 has a single citation. "Resources" (from `ITEM_EQUIPMENT_PROGRESSION.md`) is **not** a family — it is the single resource of PD-004, if it exists at all.
+- **Rarity labels (4):** `Utility`, `Named`, `Relic`, `Mastery` — as in `EQUIPMENT_ITEM_MASTER_BIBLE_V7.md` §Item rarity philosophy. The `NARRATIVE_ITEM_INTEGRATION.md` set (Common utility / Named artifact / Chapter relic / Mastery relic) is treated as **descriptive prose for the same four tiers**, not a second enum. Note the word "Relic" is both a family and a tier; the enum identifiers must therefore be namespaced (e.g., family vs rarity) by AI-02 so the two never share one field.
+
+**Acceptance criteria:**
+- `[VALIDATOR]` `family` enum has exactly the 6 canonical values; `rarity` enum has exactly the 4 canonical values; no free-text family/rarity anywhere.
+- AI-09/AI-13: older documents (`ITEM_EQUIPMENT_PROGRESSION.md`, `ITEM_DESIGN_BIBLE.md`, `NARRATIVE_ITEM_INTEGRATION.md`) are to be annotated "superseded by PD-020 for family/rarity names" — Product does not edit them (ownership).
+
+---
+
+## PD-021 — Resource / currency layer in the Gold Slice (AI-13 OD-0006)
+
+**Verdict:** APPROVED_WITH_LIMITS (refines PD-004)
+**Subject:** Whether a resource exists in the Phase 06 Gold Slice; `TECHNICAL_BLUEPRINT.md` save design lists `economy`.
+
+**Ruling:**
+- The Gold Slice ships with **zero** player-visible resources. Upgrade decisions in the slice are unlocked by story/mastery/discovery only.
+- `CC.RESOURCE.LEDGER` may be **defined and frozen** (so save schema is stable) but must be **empty/unused** in the slice. The save-schema `economy` field, if kept, must be optional, versioned and default-empty; it may not be a migration risk if the resource is later cut for good (PD-004 fallback).
+- The single resource (≤ 1) may be introduced **only after** Phase 06 evidence shows a preparation/discovery/choice decision that story/mastery unlocks cannot express. The burden of proof is on adding it.
+
+**Acceptance criteria:**
+- `[VALIDATOR]` `11_INTEGRATION/COMPLEXITY_BUDGET.md` currency count = 0 at the Phase 06 gate.
+- `[BUILD]` Gold Slice renders no resource counter (`F10-006` "no numeric progression indicator" extended to the whole slice).
+- `[EVIDENCE]` Any later PD introducing the resource must cite a specific Gold Slice decision point it improves.
+
+---
+
+## PD-022 — Single owner for `CC.WORLD.STATE_EVENT` (AI-13 OD-0003)
+
+**Verdict:** APPROVED
+**Ruling:** Owner = **AI-02** (domain semantics). AI-13 holds versioning/registry governance, not content ownership. This matches `NARRATIVE_ITEM_CONTRACTS.md` ("AI-13 versioning and integration governance") and the single-owner rule of `ACCOUNT_MATRIX.md`. AI-02 acknowledgement is expected in its Phase 01 handoff.
+
+**Acceptance criteria:** `[VALIDATOR]` registry entry `owner: AI-02`, `governance: AI-13`, `owner_evidence: VERIFIED` once AI-02 acknowledges.
+
+---
+
+## PD-023 — Asset-manifest contract owner (AI-13 OD-0004)
+
+**Verdict:** APPROVED
+**Ruling:** The asset **manifest format** (schema, required metadata per `09_ART_AUDIO/ASSET_PIPELINE.md`, versioning, integrity fields) is owned by **AI-12 (Build/Release)**, because the manifest's consumers are packaging, size budgets, placeholder-leak detection and remote-content integrity (all AI-12 concerns). Asset **IDs and entries** are produced by the asset owners (AI-05 environment, AI-06 characters/VFX, AI-08 audio) inside their own namespaces (`<type>_<system>_…` per the pipeline naming rule). AI-11 consumes memory estimates.
+
+Rationale: the alternative (one art account owning a format the others must follow) creates a cross-art dependency and leaves audio unrepresented; packaging is the only track that reads every asset.
+
+**Acceptance criteria:** `[VALIDATOR]` a `CC.ASSET.MANIFEST` (or AI-12-chosen `CC.BUILD.*`) registry row exists with owner AI-12, consumers {AI-05, AI-06, AI-08, AI-11, AI-13}; no second manifest format is registered.
+
+---
+
+## PD-024 — Speaking cast size and voice-over (AI-09 OD-02, OD-08)
+
+**Verdict:** APPROVED_WITH_LIMITS
+**Ruling:**
+- **Cast:** speaking characters in Phases 00–06 are exactly Mira, Orin and Nox (non-verbal, captioned). The Weaver is silent; the Quiet Architect is a title, not a speaker. Any additional speaking character requires `IGM-005c` attachment evidence and a new PD (`CMP-012`).
+- **Voice-over:** v1 is designed **unvoiced** (text + non-verbal companion audio). Full or partial VO is LATER; it must not become a Phase 06 dependency. Rationale: localization cost (`PD-012`), text-speed accessibility control (`PD-011`), and the "≤ 25 words per line" rule make written lines the safer product bet.
+
+**Acceptance criteria:** `[VALIDATOR]` named speaking cast count ≤ 3 in narrative canon registry through Phase 06; `[VALIDATOR]` no audio contract lists VO cue families before a PD reinstates VO.
+
+---
+
 ## Register integrity rules
 
-- IDs `PD-001` … `PD-016` are released with v1.0.0 of this register. Never renumber.
-- New decisions append `PD-017+`.
+- IDs `PD-001` … `PD-016` are released with v1.0.0 of this register. `PD-017` … `PD-024` are released with v1.1.0 (Phase 00, second pass — resolving open decisions routed to AI-01 by AI-13 and AI-09). Never renumber.
+- New decisions append `PD-025+`.
 - A verdict change is recorded as a **new** entry that supersedes the old one (`Supersedes: PD-0xx`), never an in-place rewrite.
 - `validate_product_lock.py` (same folder) checks ID uniqueness and required headings; run it before any PR touching this folder.
