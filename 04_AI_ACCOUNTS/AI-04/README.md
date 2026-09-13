@@ -23,4 +23,22 @@ AI-04 does **not** own: puzzle simulation truth (AI-02), puzzle/content rules (A
 
 | Phase | Directory | Status |
 |---|---|---|
-| 00 — Product/IP Lock | `phase_00/` | IN_PROGRESS |
+| 00 — Product/IP Lock | `phase_00/` | READY_FOR_REVIEW |
+
+## Phase 00 contents
+
+| File | Purpose |
+|---|---|
+| `phase_00/01_INTERACTION_VISION_AND_PRINCIPLES.md` | Interaction promise, 8 protected pillars, non-goals, IP-safe direction |
+| `phase_00/02_PLATFORM_AND_INPUT_ASSUMPTIONS.md` | Android/Unity/input/lifecycle assumptions with VERIFIED/ASSUMED/UNKNOWN tags |
+| `phase_00/03_INTERACTION_TERMINOLOGY.md` | Internal IP-safe vocabulary and PROPOSED stable-ID stems |
+| `phase_00/04_GESTURE_ARBITRATION_MODEL.md` | Single-arbiter model preventing camera/puzzle/world/equipment gesture conflicts; tunable hypotheses |
+| `phase_00/05_INTERRUPTION_AND_RECOVERY.md` | Required behavior per gesture state for every interruption class |
+| `phase_00/06_EQUIPMENT_AND_WORLD_RUNTIME_INTERACTION.md` | ARM→TARGET→USE runtime model; puzzle-mastery protection at the input layer |
+| `phase_00/07_SUCCESS_CRITERIA_AND_MEASURABLE_BOUNDARIES.md` | SC-* criteria operationalizing Investment Gate C |
+| `phase_00/08_OPEN_DECISIONS_AND_INTEGRATION_REQUESTS.md` | OD/IR/CONFLICT register for other owners |
+| `phase_00/09_CONTRACT_PROPOSAL_INTERACTION_COMMAND_v0.1.0.md` | DRAFT contract (not released) |
+| `phase_00/fixtures/` | ID registry, touch-fixture JSON schema, sample fixture |
+| `phase_00/scripts/validate_ai04_phase00.py` | Self-audit validator (stdlib only) |
+| `phase_00/evidence/` | Captured validator output |
+| `phase_00/10_HANDOFF_PHASE_00.md` | Mandatory handoff |
