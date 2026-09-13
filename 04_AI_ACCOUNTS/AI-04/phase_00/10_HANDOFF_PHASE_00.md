@@ -98,7 +98,7 @@ RISKS:
 - R2: If AI-02 makes Cube Reorient a domain move (OD-04-04), command catalog and undo semantics change before freeze.
 - R3: If Product keeps source-GDD assist concepts (OD-04-03), a hint command must be added and mastery metrics adjusted.
 - R4: Branch-model mismatch (CONFLICT-04-01) may misroute PRs across all 13 accounts.
-- R5: Ownership example files (CONFLICT-04-02) could be wired into CI as-is and block legitimate AI-04/AI-05/AI-06 changes.
+- R5: Ownership example files (CONFLICT-04-02) could be wired into CI as-is and reject legitimate AI-04/AI-05/AI-06 changes.
 
 INTEGRATION_STEPS:
 1. AI-13: confirm PR target branch (`integration` missing; `ai-13-integration` exists) and record decision.
