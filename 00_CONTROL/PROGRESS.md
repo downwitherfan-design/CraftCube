@@ -32,4 +32,4 @@ This file is deliberately short. Each AI must update only its own section in the
 - Contract versions changed: none. Proposed (DRAFT, not released): CC.INTERACTION.COMMAND 0.1.0.
 - Tests: `python3 04_AI_ACCOUNTS/AI-04/phase_00/scripts/validate_ai04_phase00.py` → 28 passed, 0 failed (evidence: `04_AI_ACCOUNTS/AI-04/phase_00/evidence/validate_ai04_phase00.output.txt`). No Unity build, no device test — none exist yet.
 - Known issues: no `integration` branch on remote (CONFLICT-04-01); ownership example files contradict account matrix (CONFLICT-04-02); 8 open decisions + 16 integration requests in `04_AI_ACCOUNTS/AI-04/phase_00/08_OPEN_DECISIONS_AND_INTEGRATION_REQUESTS.md`.
-- Next integration action: AI-13 to register CC.INTERACTION.COMMAND as DRAFT and confirm PR target branch; AI-02/AI-07 to answer IR-04-01..08 before Phase 01 freeze.
+- Next integration action: AI-13 to review PR #6 (`ai-04-gameplay` → `integration`, https://github.com/downwitherfan-design/CraftCube/pull/6) and register CC.INTERACTION.COMMAND as DRAFT; AI-02/AI-07 to answer IR-04-01..08 before Phase 01 freeze.
