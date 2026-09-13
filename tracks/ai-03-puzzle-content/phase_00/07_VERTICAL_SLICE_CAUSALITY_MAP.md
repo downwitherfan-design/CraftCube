@@ -27,9 +27,9 @@ Protected loop (`START_HERE.md`, VERIFIED):
 | B2 — Proximity has a voice | `level.01.seed_bed` (T1, `seed` tile) | Pulse fires at ≥3 matching tiles; `seed` home on solve | biome node grows where the seed tile was | `discovery.01.first_pulse` | `reward.01.seed_knowledge` | one discovery (Surface layer); reactive biome |
 | B3 — Someone notices | `level.01.hollow_stone` (T2, twist: align two faces) | objective satisfied; optional assist-free | stone symbol glows if B1 flag set | Nox appears through the solve; `discovery.01.stone_mark` | `reward.01.nox_meets`, optional `reward.01.clean_hands` | one companion interaction; one story arc segment; world-memory consequence (B1 flag read here) |
 | B4 — Order matters | `level.02.first_anchor` (T0 of ch.02) | anchor home unlocks layer | path segment assembles in solve order | Mira/Orin beat optional (AI-09) | `reward.02.anchor_knowledge` | understanding→decision pressure transition; anti-repetition R1 (new signature) |
-| B5 — A tool, and a choice | `level.02.resonant_gap` (T1, `resonant` tile) | resonant tile home; Pulse | gap bridges | `discovery.02.nox_sense` if companion present | `reward.02.tuning_fork` (capability, main path, deterministic) | one meaningful equipment decision (equip Tuning Fork → Tool slot; or not); DD-006 deterministic acquisition |
-| B6 — The path stays | `level.02.span` (T2 Test, `protected_mastery: true`) | objective satisfied; Legality/Cost effects inert; Information (Tuning Fork Pulse range) allowed | route reconnected — **persists** across save/reload | `discovery.02.under_span` (anchor-last order) → hidden route | `reward.02.path_restored`, optional `reward.02.efficient_span`, `reward.02.echo_route` | protected mastery demonstrated; world-memory consequence; save/reload cycle; discovery→world change |
-| B7 — Upgrade/capability decision | post-`level.02.span` | — | — | — | **UNKNOWN**: the Gold Slice requires "one upgrade/capability decision". No upgrade path exists in ch.01–02 content. AI-03 proposes the Tuning Fork's *Precision vs Discovery* branch (Equipment Bible §Upgrade system) as the Slice's upgrade decision; owner AI-02 (`UpgradeDefinition`) + AI-01. Recorded as **DECISION REQUEST AI03-D3**. | one upgrade/capability decision |
+| B5 — A tool, and a choice | `level.02.locked_gap` (T1, two `anchor` tiles) | both anchors home; layers unlock in the order the player chooses | gap bridges | `discovery.02.nox_sense` if companion present | `reward.02.rootweave_gauntlet` (capability, main path, deterministic) | one meaningful equipment decision (equip Rootweave Gauntlet → Tool slot, gaining early relaxation of `relaxable` layer locks; or not); DD-006 deterministic acquisition |
+| B6 — The path stays | `level.02.span` (T2 Test, `protected_mastery: true`) | objective satisfied; Legality/Cost effects inert (the Gauntlet just earned does *nothing* here — the player must solve the lock order themselves); Information surface remains allowed | route reconnected — **persists** across save/reload | `discovery.02.under_span` (anchor-last order) → hidden route | `reward.02.path_restored`, optional `reward.02.efficient_span`, `reward.02.echo_route` | protected mastery demonstrated; world-memory consequence; save/reload cycle; discovery→world change |
+| B7 — Upgrade/capability decision | post-`level.02.span` | — | — | — | **UNKNOWN**: the Gold Slice requires "one upgrade/capability decision". No upgrade path exists in ch.01–02 content. AI-03 proposes the Rootweave Gauntlet's *Precision vs Versatility* branch (Equipment Bible §Upgrade system: relax one lock earlier vs relax one lock per attempt on any anchor) as the Slice's upgrade decision; owner AI-02 (`UpgradeDefinition`) + AI-01. Recorded as **DECISION REQUEST AI03-D3**. | one upgrade/capability decision |
 
 ## 3. First-session (10-minute) check — V7.1 §14
 
@@ -48,7 +48,7 @@ Protected loop (`START_HERE.md`, VERIFIED):
 |---|---|---|
 | `WorldStateEvent` "mechanism awakens", "route reconnected", "hidden route opens" | AI-02/AI-13 | `PLACEHOLDER:` refs in `fixtures/phase00/rewards.draft.json`; validator accepts `PLACEHOLDER:` only while `status == DRAFT` |
 | `NarrativeEvent` "Nox appears" | AI-09 | same |
-| `ItemDefinition` Tuning Fork | AI-02 (definition), AI-01/AI-09 (approval/name) | same |
+| `ItemDefinition` Rootweave Gauntlet | AI-02 (definition), AI-01/AI-09 (approval/name) | same |
 | companion presence flag | AI-06 | same |
 | `LocalizationKey` for breadcrumbs/titles | AI-09 | `*_key` fields hold key *names* proposed by AI-03 in `loc.` namespace; AI-09 may rename — AI-03 fixtures treat them as opaque |
 | solver for `par_moves`/reachability | AI-02 (Phase 03) | `par_source: "authored_unverified"`, `reachability_verified: false` |
@@ -56,8 +56,8 @@ Protected loop (`START_HERE.md`, VERIFIED):
 ## 5. Evidence the Slice must produce for the AI-03 domain (Phase 06 acceptance, stated now)
 
 1. Replay log of B1–B6 from a fresh profile with `assist_count = 0`, no equipment → all main-path rewards granted.
-2. Same replay with Tuning Fork equipped → identical `move_count`, identical `is_satisfied` outcomes, additional
-   `pulse_range_bonus` recorded (P-1 evidence).
+2. Same replay with Rootweave Gauntlet equipped → identical `is_satisfied` outcomes, `move_count` recorded raw,
+   `rule_relaxations` recorded separately; on `level.02.span` (protected) the effect is reported inert (P-1 evidence).
 3. Save after B6 → kill process → reload → route still reconnected; `discovery.02.under_span` still in ledger.
 4. Replay `level.02.span` after reload → no duplicate `reward.02.path_restored` (idempotency).
 5. Anti-repetition validator passes on the two-chapter fixture.
