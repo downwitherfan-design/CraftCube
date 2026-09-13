@@ -4,7 +4,7 @@
 |---|---|
 | Owner | AI-01 — Product / Game Direction |
 | Document ID | `CC.PRODUCT.IGM` |
-| Version | 1.0.0 |
+| Version | 1.0.1 |
 | ID family | `IGM-###` (Investment Gate Metric). Immutable once released. |
 | Extends | `01_PREPRODUCTION/INVESTMENT_GATE.md` (Gates A–D) and `05_PROMPTS/00_MASTER_CONTROL_PROMPT.md` §Investment Gate extension |
 | Applied at | Phase 00 exit (documentation form), Phase 06 Gold Slice (measured form), Phase 15 soft launch (live form) |
@@ -77,7 +77,8 @@ For the Phase 06 Gold Slice gate:
 
 ### IGM-003b — Competitor review (Phase 00 documentation form)
 - **Priority:** MUST (documentation)
-- **Method:** `INVESTMENT_GATE.md` Gate A requires a review of the top 5 direct/adjacent competitors. **Status: MISSING in repository.** Product will not fabricate a competitor list from memory as evidence. Required action: AI-01 (with human input) produces `COMPETITOR_REVIEW.md` with named titles, verified store facts and the differentiation claim per title before the Phase 00 gate is declared PASS. Until then Gate A is `CONDITIONAL` on this item.
+- **Method:** `INVESTMENT_GATE.md` Gate A requires a review of the top 5 direct/adjacent competitors.
+- **Status (v1.0.1): PRESENT** — `COMPETITOR_REVIEW.md` v1.0.0 reviews five adjacent titles with store-listing-verified facts and a per-title differentiation claim, and supplies the coding lists for `IGM-003`. Gate A item is satisfied at documentation level; **Human confirmation of the differentiation claim (§2 of that document) is still open** because product taste is a human gate (`V7_1_WORLDCLASS_UPGRADE.md` §17). Until that confirmation is recorded the item is `CONDITIONAL (human review)`, not `MISSING`.
 
 ---
 
