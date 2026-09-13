@@ -1,0 +1,96 @@
+# Phase 00 AI-13 self-audit
+# Generated: 2026-09-13T12:32:42Z
+# HEAD: c06241f  base: 584141c
+
+## files changed vs baseline (ownership audit: only 11_INTEGRATION/ and AI-13 section of PROGRESS.md allowed)
+ 00_CONTROL/PROGRESS.md                             |  10 +
+ 11_INTEGRATION/CHANGE_REQUESTS.md                  |  72 +++
+ 11_INTEGRATION/COMPLEXITY_BUDGET.md                |  44 ++
+ 11_INTEGRATION/CONTRACT_REGISTRY.md                | 117 +++++
+ 11_INTEGRATION/DEPENDENCY_GRAPH.md                 |  67 +++
+ .../INTEGRATION_ORDER_AND_MERGE_SEQUENCE.md        | 111 +++++
+ 11_INTEGRATION/PHASE00_INTEGRATION_GATE.md         |  95 ++++
+ 11_INTEGRATION/PHASE00_PREFLIGHT_FINDINGS.md       |  90 ++++
+ 11_INTEGRATION/README.md                           |  64 +++
+ 11_INTEGRATION/RISK_REGISTER.md                    |  74 +++
+ .../evidence/phase00_preflight_repo_facts.txt      | 375 +++++++++++++++
+ .../evidence/phase00_validator_negative_tests.txt  |  47 ++
+ 11_INTEGRATION/registry/contract_registry.json     | 501 +++++++++++++++++++++
+ 11_INTEGRATION/scripts/validate_registry.py        | 243 ++++++++++
+ 14 files changed, 1910 insertions(+)
+
+## PROGRESS.md deletions (expect none: additive only)
+none
+
+## commits on branch
+c06241f AI-13 Phase00: validator excludes evidence/ captures from governance-ID reference scan
+8b2fc29 AI-13 Phase00: update own PROGRESS.md section (READY_FOR_REVIEW)
+0e7a141 AI-13 Phase00: add validator negative-test evidence (10 FAIL cases, baseline PASS)
+8e78bea AI-13 Phase00: add rendered CONTRACT_REGISTRY.md (generated from JSON)
+fa517e4 AI-13 Phase00: add complexity budget baseline from v7/v7.1 bibles
+b570624 AI-13 Phase00: add producer/consumer dependency graph and mock policy per edge
+46ab8f1 AI-13 Phase00: add actual branch model, Phase 00 merge order, gate procedure, rollback
+3e03706 AI-13 Phase00: add Phase 00 integration gate, lock checklist, conflict watch-list, OD-0001..OD-0007
+6ce6dd7 AI-13 Phase00: add cross-track risk register RISK-0001..RISK-0012
+05a88b2 AI-13 Phase00: add change requests CR-0001..CR-0007 returned to owning accounts
+ada49ed AI-13 Phase00: add deterministic registry/ID validator and renderer
+1eaa286 AI-13 Phase00: add machine-readable DRAFT contract registry (26 contracts, aliases, owners)
+4f337a2 AI-13 Phase00: add preflight evidence capture; correct tracked-file count to verified 322
+1595b19 AI-13 Phase00: record preflight findings (branches, conflicts, UNKNOWNs)
+d1bd0e1 AI-13 Phase00: add 11_INTEGRATION governance workspace README
+
+## validator (committed tree)
+PASS: 27 contracts, 27 DRAFT, 0 consumable; governance IDs consistent.
+exit=0
+
+## duplicate governance ID definitions (expect none)
+checked
+
+## CC.* IDs: pre-existing in 06_CONTRACTS vs registry
+pre-existing:
+CC.BIOME.STATE
+CC.COMPANION.REACTION
+CC.DISCOVERY.EVENT
+CC.EQUIPMENT.DEFINITION
+CC.EQUIPMENT.EFFECT
+CC.ITEM.ACQUISITION
+CC.ITEM.DEFINITION
+CC.ITEM.UPGRADE
+CC.NARRATIVE.CHAPTER
+CC.NARRATIVE.EVENT
+CC.PUZZLE.AFFINITY
+CC.REWARD.DEFINITION
+CC.WORLD.STATE
+registry:
+CC.ACCESSIBILITY.PREFERENCE
+CC.BIOME.STATE
+CC.COMPANION.REACTION
+CC.COMPETITIVE.RESULT
+CC.DISCOVERY.DEFINITION
+CC.EQUIPMENT.DEFINITION
+CC.EQUIPMENT.EFFECT
+CC.ITEM.ACQUISITION
+CC.ITEM.DEFINITION
+CC.ITEM.IDENTITY
+CC.ITEM.UPGRADE
+CC.LOCALIZATION.KEY
+CC.NARRATIVE.CHAPTER
+CC.NARRATIVE.CHARACTER_MEMORY
+CC.NARRATIVE.EVENT
+CC.NARRATIVE.MEMORY_FLAG
+CC.PERFORMANCE.BUDGET
+CC.PUZZLE.AFFINITY
+CC.PUZZLE.STATE
+CC.QUEST.STATE
+CC.REMOTE.CONTENT_MANIFEST
+CC.RESOURCE.LEDGER
+CC.REWARD.DEFINITION
+CC.SAVE.SCHEMA
+CC.TELEMETRY.EVENT
+CC.WORLD.STATE
+CC.WORLD.STATE_EVENT
+
+## note: CC.DISCOVERY.EVENT (pre-existing) intentionally NOT registered — see CR-0005
+
+## integration branch state
+584141c Initial CraftCube v7 WORLDCLASS baseline
