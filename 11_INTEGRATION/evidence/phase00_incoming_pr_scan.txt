@@ -1,0 +1,88 @@
+# Phase 00 AI-13 preliminary gate scan of incoming account branches/PRs
+# Generated: 2026-09-14T17:05:58Z · AI-13 HEAD: 2e6ddd3
+
+## Open PRs (GitHub REST API, live)
+1 open ai-02-core -> ai-13-integration | AI-02 Phase 00: core domain boundary audit + draft concept register (R    <-- WRONG BASE (must target integration)
+2 open ai-05-world -> integration | AI-05 Phase 00: Environment Art Direction Lock + Biome Presentation Ma 
+3 open ai-07-uiux -> integration | AI-07 Phase 00: UX Product Lock, Accessibility Baseline, Accessibility 
+4 open ai-11-performance -> integration | AI-11 Phase 00: Performance/Android Product Lock, device tier matrix,  
+5 open ai-09-narrative -> ai-13-integration | AI-09 Phase 00: Story Bible refinement + narrative registers, fixtures    <-- WRONG BASE (must target integration)
+6 open ai-04-gameplay -> integration | AI-04 Phase 00 — Product/IP Lock: interaction vision, terminology, ges 
+7 open ai-10-qa -> integration | AI-10 Phase 00: QA traceability register, IP/terminology rules, playte 
+8 open ai-12-build -> integration | AI-12 Phase 00: Release & Build Direction Lock, validation gate policy 
+9 open ai-13-integration -> integration | AI-13 Phase 00: integration governance workspace (registry, gate, risk 
+10 open ai-01-product -> integration | AI-01 Phase 00: Product/IP Lock — decisions PD-001..024, F10, IGM, CUT 
+
+## Commits ahead of baseline per branch
+ai-01-product: 15
+ai-02-core: 4
+ai-03-puzzle: 23
+ai-04-gameplay: 28
+ai-05-world: 9
+ai-06-creatures: 9
+ai-07-uiux: 18
+ai-08-audio: 8
+ai-09-narrative: 18
+ai-10-qa: 14
+ai-11-performance: 15
+ai-12-build: 22
+ai-13-integration: 17
+
+## Shared-file audit (baseline-owned files touched outside the account's new directory)
+ai-01-product: 00_CONTROL/PROGRESS.md 
+ai-02-core: 00_CONTROL/PROGRESS.md 02_ARCHITECTURE/AI02_CORE_DOMAIN_BOUNDARY_AUDIT_PHASE00.md 
+ai-03-puzzle: 00_CONTROL/PROGRESS.md 
+ai-04-gameplay: 00_CONTROL/PROGRESS.md 
+ai-05-world: 00_CONTROL/PROGRESS.md 
+ai-06-creatures: 00_CONTROL/PROGRESS.md 
+ai-07-uiux: 00_CONTROL/PROGRESS.md 
+ai-08-audio: 00_CONTROL/PROGRESS.md 
+ai-09-narrative: 00_CONTROL/PROGRESS.md 01_PREPRODUCTION/STORY_BIBLE_V7.md 
+ai-10-qa: 00_CONTROL/PROGRESS.md 
+ai-11-performance: 00_CONTROL/PROGRESS.md 
+ai-12-build: 00_CONTROL/PROGRESS.md 
+
+## PROGRESS.md discipline (deletions must be 0; exactly own section)
+ai-01-product: deletions=0 sections=### AI-01 
+ai-02-core: deletions=0 sections=### AI-02 
+ai-03-puzzle: deletions=0 sections=### AI-03 
+ai-04-gameplay: deletions=0 sections=### AI-04 
+ai-05-world: deletions=0 sections=### AI-05 
+ai-06-creatures: deletions=0 sections=### AI-06 
+ai-07-uiux: deletions=0 sections=### AI-07 
+ai-08-audio: deletions=0 sections=### AI-08 
+ai-09-narrative: deletions=0 sections=### AI-09 
+ai-10-qa: deletions=0 sections=### AI-10 
+ai-11-performance: deletions=0 sections=### AI-11 
+ai-12-build: deletions=0 sections=### AI-12 
+
+## CC.* IDs used per branch not present in 11_INTEGRATION/registry/contract_registry.json
+ai-01-product: unregistered: CC.ASSET.MANIFEST CC.PRODUCT.COMPETITORS CC.PRODUCT.CUTLIST CC.PRODUCT.DECISIONS CC.PRODUCT.IGM CC.PRODUCT.LOCK CC.PRODUCT.PROGRESSION_POLICY 
+ai-02-core: unregistered: CC.DISCOVERY.EVENT 
+ai-03-puzzle: unregistered: CC.CONTENT.CHAPTER_SIGNATURE CC.CONTENT.LEVEL 
+ai-04-gameplay: unregistered: CC.INTERACTION.COMMAND 
+ai-05-world: unregistered: none
+ai-06-creatures: unregistered: CC.CHARVFX.LOCK CC.CHARVFX.REACTION_MODEL CC.PRODUCT.LOCK 
+ai-07-uiux: unregistered:  
+ai-08-audio: unregistered: CC.AUDIO.CUE CC.AUDIO.OTHER 
+ai-09-narrative: unregistered: none
+ai-10-qa: unregistered: CC.PRODUCT.CUTLIST CC.PRODUCT.DECISIONS CC.PRODUCT.IGM CC.PRODUCT.LOCK CC.QA.FINDINGS CC.QA.PLAYTEST_SESSION_RECORD CC.QA.PROTOCOL CC.QA.TERMRULES CC.QA.TRACE 
+ai-11-performance: unregistered: CC.PERF.DEVICE_MATRIX CC.PERF.LOCK CC.PERF.METHOD 
+ai-12-build: unregistered:  
+
+## Contract artifacts observed (draft versions self-declared by owners)
+11_UIUX/contracts/AccessibilityPreference.v0.1.0-draft.md
+12_PERFORMANCE/contracts/PerformanceBudget.v0.1.0-draft.md
+12_RELEASE/contracts/BuildProvenance.v0.1.0-draft.md
+12_RELEASE/contracts/RemoteContentManifest.v0.1.0-draft.md
+12_RELEASE/contracts/TelemetryEvent.v0.1.0-draft.md
+
+## Product decisions on ai-01-product relevant to open OD items (on branch only, not yet on integration)
+46:## PD-002 — Role of equipment and item progression
+54:**Approved item families (6):** Relics, Tools, Resonators, Companion Gear, Field Modules, Memory Collectibles — as named in the Equipment Bible. `ITEM_EQUIPMENT_PROGRESSION.md` lists a slightly different set (adds "Resources", names "Story Relics"/"Resonance Equipment"/"Companion Items"/"Collectibles"). **Product ruling:** the Equipment & Item Master Bible naming is canonical; "Resources" is *not* an item family — it is the single resource governed by `PD-004` and DD-014. AI-09/AI-13 should reconcile the older document; no track may implement seven families.
+59:- Active loadout: **≤ 4 slots** (Core Resonator, Tool, Companion Module, Field Module as the *candidate* structure). Exact count ≤ 4 is validated in the Gold Slice (`PD-015`).
+62:- Rarity tiers: Utility / Named / Relic / Mastery (Equipment Bible). No color-coded rarity ladder beyond these four; no numeric rarity.
+113:## PD-004 — Economy and resources
+233:## PD-013 — Final public title
+240:## PD-014 — Monetization model
+249:## PD-015 — Release chapter count and slot count
