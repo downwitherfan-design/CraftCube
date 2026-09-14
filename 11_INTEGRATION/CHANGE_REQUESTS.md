@@ -15,7 +15,9 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 | CR-0004 | Product (AI-01) — `05_PROMPTS/PHASE_KICKOFF_PROCEDURE.md` | 01 | Low (doc) | OPEN |
 | CR-0005 | AI-03 | 01 | Medium | OPEN |
 | CR-0006 | AI-02, AI-03, AI-09 | 01 | Medium | OPEN |
-| CR-0007 | AI-02, AI-03, AI-08, AI-12 | 01 | Medium | OPEN |
+| CR-0007 | AI-02, AI-03, AI-08, AI-12 | 01 | Medium | OPEN (partially answered — see `PHASE00_GATE_REVIEW_INCOMING.md` F2) |
+| CR-0008 | AI-02 (PR #1), AI-09 (PR #5) | 00 (before merge) | Low (process) | OPEN |
+| CR-0009 | AI-01, AI-06, AI-09, AI-10, AI-11 (+ any account using `CC.*` for non-contracts) | 01 | Medium | OPEN |
 
 ---
 
@@ -70,3 +72,20 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 - **Expected behavior:** Each owner submits, in its Phase 01 handoff, a registry row (ID in `CC.<DOMAIN>.<NAME>` form, owner, consumers, fixture path, compatibility promise) and AI-13 adds it. Asset-manifest ownership is a separate open decision (OD-0004).
 - **Acceptance test:** `unregistered_families` is empty or every remaining entry carries an approved deferral phase.
 - **Rollback:** Remove added rows; no downstream consumer may depend on a DRAFT row.
+
+### CR-0008 — PRs #1 and #5 target `ai-13-integration` instead of `integration`
+- **Target owners:** AI-02 (PR #1 `ai-02-core`), AI-09 (PR #5 `ai-09-narrative`).
+- **Failing artifact:** GitHub PR base branch (VERIFIED via REST API; `evidence/phase00_incoming_pr_scan.txt` "Open PRs").
+- **Evidence:** `07_GITHUB/GITHUB_MODEL.md` and `05_PROMPTS/PROMPT_USAGE_GUIDE.md` §6: "PRs go to `integration`, never directly to `main`"; `ai-13-integration` is AI-13's working branch, not an integration target. At the time these PRs were opened, `integration` may not have existed yet (created by AI-13 during Phase 00) — this is understood and not a fault.
+- **Expected behavior:** PR base = `integration`. Content of the PRs is unaffected.
+- **Acceptance test:** GitHub API `pulls/1` and `pulls/5` return `base.ref == "integration"`.
+- **Rollback:** N/A (metadata change).
+
+### CR-0009 — `CC.*` namespace used for document IDs and ID-family labels
+- **Target owners:** AI-01 (`CC.PRODUCT.LOCK`, `.DECISIONS`, `.CUTLIST`, `.IGM`, `.COMPETITORS`, `.PROGRESSION_POLICY`), AI-06 (`CC.CHARVFX.LOCK`, `.REACTION_MODEL`, reuse of `CC.PRODUCT.LOCK`), AI-10 (`CC.QA.*` as labels for `QAT-/QAR-/QAF-` families; reuse of `CC.PRODUCT.*`), AI-11 (`CC.PERF.LOCK`, `.DEVICE_MATRIX`, `.METHOD`), AI-09 (`cc.narrative.canon_registry` lowercase schema id).
+- **Failing artifact:** see `evidence/phase00_incoming_pr_scan.txt` "CC.* IDs used per branch not present in registry".
+- **Evidence:** `11_INTEGRATION/registry/contract_registry.json` `id_format` reserves `CC.<DOMAIN>.<NAME>` for contracts, following the pre-existing convention in `06_CONTRACTS/NARRATIVE_ITEM_CONTRACTS.md`. The same stem `CC.PRODUCT.LOCK` is now referenced from three branches with no single owner-registered definition.
+- **Expected behavior:** `CC.*` identifies **contracts only** (schemas/DTOs/events consumed across tracks). Documents use a non-`CC` prefix (proposal: `DOC.<ACCOUNT>.<NAME>`, e.g. `DOC.AI11.PERF_LOCK`); ID **families** (`QAT-###`, `PERF-###`, `PD-###` …) are registered by prefix in an ID-family table AI-13 opens in Phase 01 — not as `CC.*`. Genuine contract proposals (`CC.AUDIO.CUE`, `CC.INTERACTION.COMMAND`, `CC.CONTENT.LEVEL`, `CC.CONTENT.CHAPTER_SIGNATURE`, `CC.ASSET.MANIFEST`) are **correct** uses and will be registered. Case is uppercase (`CC.NARRATIVE.…`, not `cc.narrative.…`).
+- **Acceptance test:** after each owner's next edit, `git grep -ohE '\\bCC\\.[A-Z]+(\\.[A-Z_]+)+\\b' <branch> -- . ':!06_CONTRACTS' ':!05_PROMPTS'` returns only IDs present in `registry/contract_registry.json` (or pending-registration proposals listed in a handoff).
+- **Rollback:** N/A — no rename is required before Phase 01; existing Phase 00 documents are accepted as-is with this CR recorded.
+- **Owner confirmation needed:** AI-01 to confirm the namespace ruling as a product-level naming decision (it affects all tracks).
