@@ -22,6 +22,8 @@ TASKS_COMPLETED:
 - Actual branch model, Phase 00 merge order, standing merge order, manual gate procedure, rollback, tagging.
 - Complexity budget baseline (V7_1 §16) from the bibles.
 - Own section in `00_CONTROL/PROGRESS.md`.
+- Opened PR #9 `ai-13-integration` → `integration`.
+- Preliminary mechanical gate review of all 13 account branches / 10 open PRs (`PHASE00_GATE_REVIEW_INCOMING.md`): ownership, PROGRESS.md discipline, PR base, `CC.*` namespace drift, contract proposals awaiting registration, product decisions that close OD-0004/0006/0007 once PR #10 merges. Filed CR-0008 (PR base retarget, commented on PRs #1/#5) and CR-0009 (`CC.*` contract-only namespace).
 
 FILES_ADDED:
 - `11_INTEGRATION/README.md`
@@ -36,6 +38,8 @@ FILES_ADDED:
 - `11_INTEGRATION/DEPENDENCY_GRAPH.md`
 - `11_INTEGRATION/COMPLEXITY_BUDGET.md`
 - `11_INTEGRATION/HANDOFF_PHASE00_AI13.md` (this file)
+- `11_INTEGRATION/PHASE00_GATE_REVIEW_INCOMING.md`
+- `11_INTEGRATION/evidence/phase00_incoming_pr_scan.txt`
 - `11_INTEGRATION/evidence/phase00_preflight_repo_facts.txt`
 - `11_INTEGRATION/evidence/phase00_validator_negative_tests.txt`
 - `11_INTEGRATION/evidence/phase00_self_audit.txt`
@@ -51,7 +55,7 @@ CONTRACTS_CHANGED: none. 27 contracts **registered** as DRAFT (no version, not c
 
 NEW_IDS:
 - Contract IDs: see CONTRACTS_CHANGED (15 new `CC.*`; verified absent on baseline).
-- Governance IDs (verified absent on baseline: `git grep "RISK-0\|CR-0\|OD-0" 584141c` → 0): `RISK-0001`…`RISK-0012`, `CR-0001`…`CR-0007`, `OD-0001`…`OD-0007`.
+- Governance IDs (verified absent on baseline: `git grep "RISK-0\|CR-0\|OD-0" 584141c` → 0): `RISK-0001`…`RISK-0012`, `CR-0001`…`CR-0009`, `OD-0001`…`OD-0007`.
 - No content, event, asset, localization or save IDs were created.
 
 TESTS_AND_COMMANDS:
@@ -68,6 +72,8 @@ EVIDENCE:
 - `11_INTEGRATION/evidence/phase00_preflight_repo_facts.txt` — branches, file counts, grep results, vocabulary extraction, stale-doc findings, sandbox toolchain.
 - `11_INTEGRATION/evidence/phase00_validator_negative_tests.txt` — N1–N10 exit=1 with the expected finding, N11 baseline exit=0.
 - `11_INTEGRATION/evidence/phase00_self_audit.txt` — diff stat, commit list, validator PASS, ID reconciliation.
+- `11_INTEGRATION/evidence/phase00_incoming_pr_scan.txt` — live PR list, per-branch ownership/PROGRESS/namespace scan, product decisions observed on `ai-01-product`.
+- PR #9: https://github.com/downwitherfan-design/CraftCube/pull/9 ; CR-0008 comments on PRs #1 and #5.
 - Commit history on `ai-13-integration` (one change per commit, all pushed).
 
 PERFORMANCE_NOTES: not applicable — documents, JSON and a stdlib-only Python script (runs in <1 s on 322 files). No runtime code.
@@ -85,7 +91,7 @@ RISKS: `RISK_REGISTER.md` — highest: RISK-0001 (engine/toolchain), RISK-0002 (
 
 INTEGRATION_STEPS:
 1. Human admin: apply OD-0001 (branch protection) — can proceed in parallel.
-2. Open PR `ai-13-integration` → `integration`; AI-13 is step 1 of the Phase 00 merge order (others reference its IDs).
+2. PR #9 `ai-13-integration` → `integration` is open; AI-13 is step 1 of the Phase 00 merge order (others reference its IDs).
 3. Reviewer runs `python3 11_INTEGRATION/scripts/validate_registry.py --check-render` on the PR head → expect exit 0.
 4. Merge with a merge commit (no fast-forward).
 5. Other accounts rebase/merge `integration` into their branches to pick up `CC.*` IDs, CR/OD references and the gate checklist before opening their Phase 00 PRs.
@@ -96,7 +102,7 @@ ROLLBACK_STEPS:
 - After merge: `git revert -m 1 <merge-commit>` on `integration` and push. All AI-13 files live under `11_INTEGRATION/` plus one appended PROGRESS.md section, so the revert is clean and touches no other owner's files.
 - `integration` branch itself: deleting it is **not** recommended (other accounts target it); if required, `git push origin --delete integration` after confirming no open PRs.
 
-NEXT_SAFE_ACTION: open the PR to `integration`; while awaiting review, begin Phase 01 AI-13 preparation (event-ID registry skeleton, fixture-path fields, validator cross-check of the dependency matrix) on `ai-13-integration` without touching Phase 00 artifacts.
+NEXT_SAFE_ACTION: after PR #9 merges, gate-review PR #10 (AI-01) for content coherence (L1/L2/L5–L7/L9), then apply PD-002/PD-004/PD-023 to OD-0004/0006/0007 and `COMPLEXITY_BUDGET.md`; register the contract proposals in `PHASE00_GATE_REVIEW_INCOMING.md` F2 as their PRs land. In parallel begin Phase 01 AI-13 preparation (event-ID registry skeleton, fixture-path fields, validator cross-check of the dependency matrix) on `ai-13-integration` without touching Phase 00 artifacts.
 
 OWNERSHIP_AUDIT:
 - Changed paths: `11_INTEGRATION/**` (new directory, AI-13 governance workspace) and `00_CONTROL/PROGRESS.md` (own section, additive, per the file's own "Each AI must update only its own section" rule).
