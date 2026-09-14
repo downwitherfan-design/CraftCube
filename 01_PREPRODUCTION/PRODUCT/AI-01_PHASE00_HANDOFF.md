@@ -97,7 +97,7 @@ ROLLBACK_STEPS:
 - Single decision: append a superseding `PD-025+` entry (`Supersedes: PD-0xx`); never rewrite or renumber. Validator enforces uniqueness/contiguity.
 - Validator: deleting `validate_product_lock.py` has no runtime effect; evidence log becomes stale and should be removed with it.
 
-NEXT_SAFE_ACTION: open PR `ai-01-product` → `integration` (done in this session if the API call succeeds; see PR link in the chat handoff). Then wait for AI-13 gate review and Human decisions; Phase 01 for AI-01 begins by converting `PRODUCT_LOCK_V1.md` §10 boundaries into acceptance tests attached to the first FROZEN contracts.
+NEXT_SAFE_ACTION: PR opened — https://github.com/downwitherfan-design/CraftCube/pull/10 (`ai-01-product` → `integration`). Then wait for AI-13 gate review and Human decisions; Phase 01 for AI-01 begins by converting `PRODUCT_LOCK_V1.md` §10 boundaries into acceptance tests attached to the first FROZEN contracts.
 
 OWNERSHIP_AUDIT (VERIFIED):
 ```
