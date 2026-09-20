@@ -4,8 +4,8 @@
 |---|---|
 | Owner | AI-01 — Product / Game Direction |
 | Document ID | `CC.PRODUCT.PROGRESSION_POLICY` |
-| Version | 1.0.0 |
-| Status | READY_FOR_REVIEW (Story Promise section becomes canon-approved only after Human review — story canon is a human gate per `00_CONTROL/13_AI_EXECUTION_MANUAL.md`) |
+| Version | 1.0.1 |
+| Status | READY_FOR_REVIEW — Story Promise section is **canon-approved by Human decision `PD-028` §A**; monetization constraints in §5 are now backed by `PD-027` (premium one-time purchase). |
 | ID family | `AGP-###` (Anti-Grind / Progression rule) and `CMP-###` (Complexity-too-high criterion). Immutable once released. Verified absent from all branches before creation. |
 | Source requirements | `05_PROMPTS/phase_00/ai_01.md` §v7 phase-critical requirement; `04_AI_ACCOUNTS/AI-01_Track.md` §v7 product deliverables |
 | Canonical intent sources | `00_CONTROL/CRAFTCUBE_GAME_MASTER_BIBLE.md` §2, §5, §8, §9, §11; `01_PREPRODUCTION/PROGRESSION_AND_MASTERY_BIBLE_V7.md`; `01_PREPRODUCTION/EQUIPMENT_ITEM_MASTER_BIBLE_V7.md`; `00_CONTROL/V7_1_WORLDCLASS_UPGRADE.md` §2, §5–§7, §16 |
@@ -34,7 +34,7 @@ Why it passes the product test:
 - The ending is a **scoped choice** (DD-008) among a closed set with no "bad" ending; see `PD-018` for the finale option set.
 - Nothing in the promise may be delivered as a mandatory text block > 40 words (`PRODUCT_LOCK_V1.md` §10).
 
-**Human gate:** canon approval of the Story Bible text remains a Human decision. Product approval here means "this promise is the right product promise", not "the Story Bible is frozen."
+**Human gate — CLOSED (v1.0.1):** the Human Product Authority approved the Story Promise and Story Bible v0.1.0 as the Phase 00 canon baseline in `PD-028` (with the S1–S4 terminology/scope resolutions recorded there). The Story Bible is still not *frozen* as a contract — freezing is the Phase 01 step owned by AI-09/AI-13; the boundaries above remain binding.
 
 ## 2. Emotional fantasy — LOCKED
 
@@ -102,6 +102,8 @@ Progression is the four-layer model of the Progression Bible — **Knowledge →
 | AGP-017 | Playtest signal: in exit interviews, 0% of "why would you come back" answers may cite a timer, streak, reward schedule or fear of missing out (`IGM-008`). | Coded exit answers. | `[PLAYTEST]` |
 
 Product will treat any `AGP-01x` violation found at a gate as a **cut**, not as a balancing task.
+
+**Monetization backing (v1.0.1):** `PD-027` fixes the model as premium one-time purchase with no ads, subscription, second/premium currency, loot boxes, timers, paid assists or dark-pattern retention. AGP-011, AGP-012, AGP-016, AGP-017 and AGP-021 are therefore not only design rules but consequences of the monetization decision; reopening any of them requires a Human decision superseding `PD-027`.
 
 ## 6. Player-expression boundaries
 
