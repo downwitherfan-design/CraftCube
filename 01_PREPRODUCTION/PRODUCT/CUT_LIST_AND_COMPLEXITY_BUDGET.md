@@ -4,7 +4,7 @@
 |---|---|
 | Owner | AI-01 — Product / Game Direction |
 | Document ID | `CC.PRODUCT.CUTLIST` |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | ID family | `CUT-###`. Immutable once released. A cut item is never deleted from this file; if reinstated, its status changes and a new `PD-###` is cited. |
 | Source requirements | Phase 00 prompt ("Maintain a hard CUT LIST"), `INVESTMENT_GATE.md` Gate D, `V7_1_WORLDCLASS_UPGRADE.md` §16 complexity budget, `13_AI_EXECUTION_MANUAL.md` human gates |
 
@@ -61,7 +61,7 @@
 | CUT-027 | Item memory (first-found location, chapter of acquisition) | Cheap if `ItemIdentity` contract carries the fields; promote once AI-02 confirms save cost |
 | CUT-028 | Companion bond progression beyond first capability | After IGM-005c |
 | CUT-029 | Set synergy beyond 3 named combinations | After Gold Slice equipment data |
-| CUT-030 | Verdant Archive biome + chapter | Blocked on AI-09 chapter mapping (`PRODUCT_LOCK_V1.md` §6.4); if unmapped by Phase 01 freeze → remains LATER |
+| CUT-030 | Verdant Archive biome + chapter (AI-09 draft Ch.08 "The Unfinished Pattern") | **LATER confirmed by Human decision `PD-028` §C** — not v1 MUST scope regardless of the chapter mapping now present in the AI-09 draft. Promotion requires a new PD + Human canon/scope approval. |
 | CUT-031 | Earned (non-paid) cosmetic expression: cube face patterns, companion accents, restored-area visual variants | SHOULD-tier at Phase 09 if complexity budget has headroom; see `PROGRESSION_ANTI_GRIND_AND_EXPRESSION_POLICY.md` |
 
 ## 3. Complexity budget (hard caps, v1)
@@ -86,8 +86,9 @@ Counters AI-13 reports at each gate. Sources are named so the count is reproduci
 | Narrative memory flags per chapter | 6 | `NarrativeMemoryFlag` per chapter | Cut flag |
 | Total narrative memory flags at v1 | 60 | same | Cut |
 | Companions | 1 | `CompanionReaction` owners | Reject |
-| Biomes at v1 | 6 (5 if CUT-030 stays LATER) | `BiomeState` definitions | Cut biome |
-| Chapters at v1 | ≤ 10 (min 3 = Act I); exact via PD-015 | `CC.NARRATIVE.CHAPTER` | Cut from Act III backward |
+| Biomes at v1 | **5** (Verdant Archive LATER — `PD-028` §C) | `BiomeState` definitions | Cut biome |
+| Chapters at v1 | **≤ 9** (min 3 = Act I; Ch.08 LATER — `PD-028` §C); exact via PD-015 | `CC.NARRATIVE.CHAPTER` | Cut from Act III backward |
+| Monetization surfaces (ads, IAP SKUs beyond the store purchase, subscriptions, premium currency, timers, paid assists) | **0** (`PD-027` premium one-time purchase) | AI-12 build flags / dependency list; `CC.*` fixtures | Reject |
 | Top-level player menus (excl. Settings) | 4 | AI-07 screen inventory | Merge |
 | Onboarding steps before free play | 5 | AI-07 onboarding spec | Cut |
 | Mandatory pre-first-solve text | 40 words | AI-09 narrative nodes | Cut text |
@@ -118,3 +119,6 @@ Any change to §1–§4 is appended here with date, `PD` reference and direction
 | Date | Change | Direction | PD ref |
 |---|---|---|---|
 | Phase 00 | Initial cut list v1.0.0 | — | PD-016 |
+| Phase 00 closure | CUT-030 Verdant Archive: LATER **confirmed by Human**; v1 biomes 6→5, chapter ceiling 10→9 | shrink | PD-028 §C |
+| Phase 00 closure | Monetization model fixed: premium one-time purchase; CUT-002/003/012/016/017/020 reinstatement now requires a Human decision **superseding PD-027**, not merely "Human (monetization gate)" | no growth (hardened) | PD-027 |
+| Phase 00 closure | Engine confirmed Unity 6 + URP + Android; no scope change | — | PD-025 |
