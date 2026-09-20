@@ -4,7 +4,7 @@
 |---|---|
 | Owner | AI-01 — Product / Game Direction |
 | Document ID | `CC.PRODUCT.IGM` |
-| Version | 1.0.1 |
+| Version | 1.0.2 |
 | ID family | `IGM-###` (Investment Gate Metric). Immutable once released. |
 | Extends | `01_PREPRODUCTION/INVESTMENT_GATE.md` (Gates A–D) and `05_PROMPTS/00_MASTER_CONTROL_PROMPT.md` §Investment Gate extension |
 | Applied at | Phase 00 exit (documentation form), Phase 06 Gold Slice (measured form), Phase 15 soft launch (live form) |
@@ -165,13 +165,14 @@ All numbers in this dimension are **product ceilings**. AI-11 owns engineering b
 - **Threshold (Phase 06):** ≥ 50% "yes"; ≥ 70% of "yes/maybe" reasons map to the healthy list; **0%** of reasons cite a timer, reward schedule or fear of missing out (there must be none to cite).
 - **Method (Phase 15):** D1 and D7 retention from opt-in telemetry (AI-12 `TelemetryEvent`), privacy-minimal per `02_ARCHITECTURE/ANALYTICS_PRIVACY_COMPETITIVE_ARCHITECTURE.md`.
 - **Threshold (Phase 15):** set by Product after Phase 06 data; Product will not invent a retention benchmark before seeing the slice.
+- **Monetization note (v1.0.2):** with `PD-027` (premium, no ads/IAP/subscription), retention has **no revenue function** at v1; it is measured solely as a product-quality signal. The "0% dark-pattern reasons" condition is therefore structurally guaranteed by the model and the metric checks that the design has not drifted.
 
 ---
 
 ## Gate B/D items this document does not measure
 
 - **Gate B (technical feasibility):** owned by AI-02/AI-11/AI-12 evidence; Product consumes it.
-- **Gate D (business protection):** monetization hypothesis is `PD-014` (DEFERRED_TO_HUMAN); cut list is `CUT_LIST_AND_COMPLEXITY_BUDGET.md`; IP/licensing risk is `PRODUCT_LOCK_V1.md` §6 plus the risk register maintained by AI-13.
+- **Gate D (business protection):** monetization hypothesis is **decided** — premium one-time purchase (`PD-027`, HUMAN_DECIDED, supersedes `PD-014`); exact price not frozen; cut list is `CUT_LIST_AND_COMPLEXITY_BUDGET.md`; IP/licensing risk is `PRODUCT_LOCK_V1.md` §6 plus the risk register maintained by AI-13; title trademark clearance remains an open human/legal item (`PD-026`, `PD-029`).
 
 ## Summary table
 
