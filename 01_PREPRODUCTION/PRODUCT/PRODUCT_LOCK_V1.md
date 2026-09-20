@@ -4,8 +4,8 @@
 |---|---|
 | Owner | AI-01 — Product / Game Direction |
 | Document ID | `CC.PRODUCT.LOCK` |
-| Version | 1.0.0 |
-| Status | READY_FOR_REVIEW (becomes LOCKED only after Human Product Authority approval — see `13_AI_EXECUTION_MANUAL.md` §Human approval gates) |
+| Version | 1.1.0 |
+| Status | READY_FOR_REVIEW — Human Product Authority decisions for engine, title/namespace, monetization and canon are RECORDED (PD-025..PD-028). Remaining human items are listed in §11 / PD-029. Integration gate verdict is AI-13's. |
 | Phase | 00 — Product/IP Lock |
 | Supersedes | nothing (first product lock) |
 | Canonical intent source | `00_CONTROL/CRAFTCUBE_GAME_MASTER_BIBLE.md` |
@@ -63,7 +63,7 @@ Design consequences:
 | Assumption | Value | Owner to verify | Status |
 |---|---|---|---|
 | Primary platform | Android phones, portrait-first | AI-04 / AI-11 | ASSUMED |
-| Engine | Unity 6 + URP (per `02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md`) | AI-02 / AI-12 | STATED IN BLUEPRINT, not yet instantiated in repo |
+| Engine | Unity 6 + URP + Android (per `02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md`); Domain/Simulation pure C#, engine-independent | Human Project Owner (licence, CI/build environment before Phase 02) / AI-02 / AI-12 | **HUMAN_DECIDED (PD-025).** Exact Unity/URP/SDK/NDK/JDK versions deliberately NOT pinned until the technical freeze step. |
 | Device tiers | low / mid / high defined by AI-11 device matrix | AI-11 | MISSING (no matrix in repo yet) |
 | Frame targets | 60 FPS mid-tier target, 30 FPS safe mode (Blueprint hypothesis) | AI-11 | HYPOTHESIS |
 | Offline | Entire critical path playable with no network (DD-015) | AI-02 / AI-12 | PRODUCT REQUIREMENT |
@@ -87,23 +87,25 @@ These are approved for use across all tracks as **design vocabulary**. They are 
 
 | Concept | Approved term | Rejected / avoid |
 |---|---|---|
-| Game title | **CraftCube** (working public title; final title is a Human decision — `PD-013`) | — |
-| World | **Asterra** | any real-world or franchise place name |
+| Game title | **CraftCube** (working/public working title for the current development phase — `PD-026`; trademark clearance NOT claimed; final brand lock requires human/legal check) | — |
+| World | **Asterra** — **INTERNAL-ONLY until legal clearance (`PD-026` §3, `PD-028` §D)**; player-facing use only via `loc.term.asterra` | any real-world or franchise place name; any external/marketing use of "Asterra" before clearance |
 | Central mechanism | **the Axis Loom** / "the Loom" | "core", "matrix", "nexus" (generic) |
 | Catastrophe | **the Great Misalignment** | "the Fall", "the Cataclysm" (generic) |
 | Player role | **Weaver** | "hero", "chosen one", "miner", "crafter" |
 | Puzzle object | **the cube** (lowercase, player-facing) | "Rubik", "magic cube", "speedcube" |
 | Solve consequence | **restoration** / "the world answers" | "loot", "drop", "XP" |
 | Companion #1 | **Nox** | any franchise creature name |
-| Biomes | Hearthwild, Glassroot, Sunken Grid, Ember Hollow, Verdant Archive, The Quiet Engine | block/ore/mob names |
+| Biomes (v1) | Hearthwild, Glassroot, Sunken Grid, Ember Hollow, **The Quiet Engine** (single canonical name — `PD-028` §B) | block/ore/mob names; "Silent Engine" as a competing canonical ID |
+| Biome (LATER, not v1) | Verdant Archive (`PD-028` §C, CUT-030) | treating it as a required v1 biome/chapter |
+| Contract namespace | **`CC.`** — stable technical prefix, **independent of the public title** (`PD-026` §4) | any contract ID that embeds the product name |
 | Item families | Relics, Tools, Resonators, Companion Gear, Field Modules, Memory Collectibles (Equipment Bible §Item families) | "weapons", "armor", "gear score" |
 | Assist feature | **Smart Assist** (retained from source GDD as a mechanic name) | "auto-solve", "cheat" |
 
 Any track that needs a term not on this list uses a clearly-labeled placeholder (`TBD_<concept>`) and files a request to AI-09.
 
-### 6.4 Known terminology CONFLICTS (reported, not resolved here)
-- `WORLD_BIOME_BIBLE_V7.md` names Biome 6 **"The Quiet Engine"**; `STORY_BIBLE_V7.md` names Chapter 7 **"The Silent Engine"**. Owner: AI-09. Product recommendation: one canonical name, and the biome/chapter split made explicit.
-- **"Verdant Archive"** exists as Biome 5 but no Story Bible chapter maps to it. Owner: AI-09 (story) with AI-03 (content feasibility). Product recommendation: either map it to Act II/III or move it to the CUT list as `LATER`.
+### 6.4 Terminology CONFLICTS — RESOLVED by Human decision (PD-028), v1.1.0
+- **Quiet Engine / Silent Engine** — RESOLVED: one canonical name, **"Quiet Engine"**, for the biome/chapter concept (`PD-028` §B). AI-09 applies the rename to the DRAFT chapter-07 identifiers before Phase 01 freeze. *(Original v1.0.0 report: `WORLD_BIOME_BIBLE_V7.md` Biome 6 "The Quiet Engine" vs `STORY_BIBLE_V7.md` Chapter 7 "The Silent Engine".)*
+- **Verdant Archive** — RESOLVED: **LATER / deferred content, not v1 MUST** (`PD-028` §C; CUT-030). AI-09's draft Chapter 08 mapping is retained as LATER design, not v1 scope. *(Original v1.0.0 report: Biome 5 had no chapter mapping on `main`.)*
 
 ## 7. Scope boundaries for v1 (release target)
 
@@ -128,6 +130,7 @@ Any track that needs a term not on this list uses a clearly-labeled placeholder 
 - Deterministic daily challenge seed (offline-capable).
 
 ### 7.3 Later (post-v1 unless Product re-approves)
+- Verdant Archive biome and its chapter (`PD-028` §C, CUT-030) — v1 biomes = 5, chapter ceiling = 9.
 - Second companion.
 - Leaderboards / competitive results.
 - Remote content packs.
@@ -177,12 +180,15 @@ These are product boundaries, not engineering budgets. Engineering budgets are o
 
 ## 11. Unresolved Product/Human decisions (explicitly deferred — do not guess)
 
-| Item | Why deferred | Decision owner |
+| Item | Status (v1.1.0) | Decision owner |
 |---|---|---|
-| Final public title ("CraftCube" vs alternative) | Product identity — human gate | Human Product Authority (`PD-013`) |
-| Monetization model (premium vs free + optional) | Monetization direction — human gate | Human Product Authority (`PD-014`) |
-| Total chapter count at release (10 as per Story Bible vs fewer) | Scope — depends on Phase 06 evidence | AI-01 after Gold Slice (`PD-015`) |
-| Whether "Verdant Archive" ships in v1 | Story/content mapping conflict | AI-09 + AI-03 → AI-01 |
+| Engine / technology lock | **DECIDED** — Unity 6 + URP + Android (`PD-025`); versions pinned later | Human Project Owner provides licence/CI before Phase 02 |
+| Public title | **DECIDED for current phase** — "CraftCube" working title (`PD-026`); **trademark/legal clearance still REQUIRED before final brand lock** | Human / legal |
+| "Asterra" public use | **DECIDED** — internal-only until legal clearance (`PD-026`, `PD-028` §D) | Human / legal |
+| Monetization model | **DECIDED** — premium one-time purchase (`PD-027`); **exact price NOT frozen** | Human (price: commercial/store decision) |
+| Story canon baseline | **DECIDED** — Story Bible v0.1.0 approved with S1–S4 resolutions (`PD-028`) | — |
+| Total chapter count at release (≤ 9 after `PD-028` §C) | Scope — depends on Phase 06 evidence | AI-01 after Gold Slice (`PD-015`) |
+| Remaining human-gated items | see `PD-029` | Human |
 
 ## 12. Consumption notes for downstream tracks
 
