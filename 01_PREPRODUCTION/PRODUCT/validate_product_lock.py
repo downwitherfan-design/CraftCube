@@ -14,6 +14,17 @@ Scope: product validation only (AI-01 ownership). Checks the Markdown files in
   5. Every PD entry has a Verdict from the allowed vocabulary.
   6. Every PD/AGP/CMP acceptance rule carries at least one check-type tag
      ([VALIDATOR] / [BUILD] / [PLAYTEST] / [EVIDENCE]) so AI-10 can trace it.
+  7. Supersession integrity: every 'Supersedes: PD-xxx' target exists and
+     carries a matching 'Superseded by: PD-yyy' pointer; a superseded entry is
+     never itself HUMAN_DECIDED/APPROVED-without-pointer (no two live verdicts
+     for one subject).
+  8. Phase 00 human-decision consistency (v1.2.0):
+     - PD-025: no numeric Unity/URP/SDK/NDK/JDK version is pinned in PRODUCT/.
+     - PD-026: CC. namespace independence from the public title is recorded.
+     - PD-027: premium model recorded; no PRODUCT/ text re-approves ads, IAP
+       store, subscription, premium currency, timers or paid assists.
+     - PD-028: Story Promise, Quiet Engine, Verdant Archive LATER, Asterra
+       internal-only and the Hold/Weave/Open finale set are explicitly recorded.
 
 Exit code 0 = PASS, 1 = FAIL. No network, no repository writes.
 
@@ -52,7 +63,7 @@ REFERENCE_RE = re.compile(r"\b(PD|F10|IGM|CUT|AGP|CMP)-(\d{3})([a-e])?\b(?!\+)")
 HEADER_ROWS = ("| Owner |", "| Document ID |", "| Version |")
 # Verdict must START with one of these tokens; a parenthetical qualifier may follow.
 VERDICT_RE = re.compile(
-    r"^(APPROVED_WITH_LIMITS|APPROVED|REJECTED|DEFERRED_TO_HUMAN|DEFERRED_TO_EVIDENCE)(\s*\(.*\))?$"
+    r"^(HUMAN_DECIDED|APPROVED_WITH_LIMITS|APPROVED|REJECTED|DEFERRED_TO_HUMAN|DEFERRED_TO_EVIDENCE)(\s*\(.*\))?$"
 )
 CHECK_TAGS = ("[VALIDATOR]", "[BUILD]", "[PLAYTEST]", "[EVIDENCE]")
 LINK_RE = re.compile(r"`([A-Z0-9_]+\.md)`")
@@ -221,6 +232,110 @@ def check_policy_rows(docs: dict[str, str], rep: Report) -> None:
         rep.ok("AGP/CMP rows carry check type or default action")
 
 
+def _pd_blocks(text: str) -> dict[str, str]:
+    blocks = re.split(r"^## (?=PD-\d{3} — )", text, flags=re.MULTILINE)[1:]
+    return {b.split(" ", 1)[0]: b for b in blocks}
+
+
+def check_supersession(docs: dict[str, str], rep: Report) -> None:
+    text = docs.get("PRODUCT_DECISION_REGISTER.md", "")
+    blocks = _pd_blocks(text)
+    problems = []
+    for pid, block in blocks.items():
+        for m in re.finditer(r"\*\*Supersedes:\*\* ([^\n]+)", block):
+            for target in re.findall(r"PD-\d{3}", m.group(1)):
+                if target not in blocks:
+                    problems.append(f"{pid} supersedes unknown {target}")
+                    continue
+                if f"Superseded by:** {pid}" not in blocks[target] and f"closed by:** {pid}" not in blocks[target]:
+                    problems.append(f"{target} lacks a 'Superseded by' pointer back to {pid}")
+    # A superseded DEFERRED_TO_HUMAN entry must not still be the only record of a decided subject.
+    for pid, block in blocks.items():
+        if "Superseded by:" in block:
+            ref = re.search(r"Superseded by:\*\* (PD-\d{3})", block)
+            if ref and ref.group(1) not in blocks:
+                problems.append(f"{pid} points to missing superseding entry {ref.group(1)}")
+    for p in problems:
+        rep.fail(f"supersession: {p}")
+    if not problems:
+        rep.ok("supersession chain consistent (Supersedes <-> Superseded by)")
+
+
+VERSION_PIN_RE = re.compile(
+    r"\b(Unity\s+6\.\d|Unity\s+20\d\d\.\d|URP\s+\d+\.\d|NDK\s*r?\d{2}|JDK\s*\d{1,2}\b|API\s+level\s+\d{2}|minSdk\s*=?\s*\d{2}|targetSdk\s*=?\s*\d{2})",
+    re.IGNORECASE,
+)
+
+
+def check_human_decisions(docs: dict[str, str], rep: Report) -> None:
+    reg = docs.get("PRODUCT_DECISION_REGISTER.md", "")
+    blocks = _pd_blocks(reg)
+    fails = []
+
+    # PD-025: engine decided, versions not pinned anywhere in PRODUCT/.
+    b = blocks.get("PD-025", "")
+    if "HUMAN_DECIDED" not in b or "Unity 6 + URP + Android" not in b:
+        fails.append("PD-025 must record HUMAN_DECIDED Unity 6 + URP + Android")
+    for name, text in docs.items():
+        for m in VERSION_PIN_RE.finditer(text):
+            fails.append(f"{name}: pinned toolchain version '{m.group(0)}' forbidden by PD-025")
+
+    # PD-026: CC namespace independence + Asterra internal-only.
+    b = blocks.get("PD-026", "")
+    if "INDEPENDENT of the public product title" not in b:
+        fails.append("PD-026 must state CC. namespace is INDEPENDENT of the public product title")
+    if "INTERNAL-ONLY until legal clearance" not in b:
+        fails.append("PD-026 must state Asterra is INTERNAL-ONLY until legal clearance")
+    if "trademark clearance is claimed" not in b and "No trademark clearance" not in b:
+        fails.append("PD-026 must state that no trademark clearance is claimed")
+
+    # PD-027: premium; forbidden monetization not re-approved anywhere.
+    b = blocks.get("PD-027", "")
+    if "PREMIUM ONE-TIME PURCHASE" not in b:
+        fails.append("PD-027 must record PREMIUM ONE-TIME PURCHASE")
+    for item in ("no advertising", "no subscription", "no second/premium currency", "no loot boxes", "no energy timers", "no paid gameplay assists"):
+        if item not in b:
+            fails.append(f"PD-027 missing constraint '{item}'")
+    approve_bad = re.compile(r"\*\*Verdict:\*\* (APPROVED|HUMAN_DECIDED)[^\n]*\n(?:(?!\n## ).)*?\b(advertis|subscription|loot box|gacha|energy timer|premium currency|paid assist)", re.IGNORECASE | re.DOTALL)
+    for pid, block in blocks.items():
+        if pid in ("PD-027", "PD-016"):
+            continue
+        m = approve_bad.search(block)
+        if m and not re.search(r"\b(no|never|reject|forbid|not|zero|without)\b[^\n]{0,60}" + re.escape(m.group(2)), block, re.IGNORECASE):
+            fails.append(f"{pid}: approves a monetization surface ('{m.group(2)}') contradicting PD-027")
+
+    # PD-028: story decisions explicitly recorded.
+    b = blocks.get("PD-028", "")
+    for needle, label in (
+        ("APPROVED as canon baseline", "Story Promise canon approval"),
+        ('ONE canonical name: "Quiet Engine."', "Quiet Engine single canonical name"),
+        ("NOT part of v1 MUST scope", "Verdant Archive LATER"),
+        ("Internal-only until legal clearance", "Asterra internal-only"),
+        ("{Hold, Weave, Open}", "finale option set"),
+        ("WR-1 through WR-8", "world rules baseline"),
+        ("Wayfinder Shard merged into Nox", "Wayfinder merge"),
+        ("unvoiced", "unvoiced cast direction"),
+    ):
+        if needle not in b:
+            fails.append(f"PD-028 missing explicit record: {label}")
+    # Cut list must agree with PD-028 §C.
+    cut = docs.get("CUT_LIST_AND_COMPLEXITY_BUDGET.md", "")
+    if not re.search(r"\| Biomes at v1 \| \*\*5\*\*", cut):
+        fails.append("CUT list biome cap must be 5 per PD-028 §C")
+    if not re.search(r"\| Chapters at v1 \| \*\*≤ 9\*\*", cut):
+        fails.append("CUT list chapter ceiling must be ≤ 9 per PD-028 §C")
+    lock = docs.get("PRODUCT_LOCK_V1.md", "")
+    if "independent of the public title" not in lock:
+        fails.append("PRODUCT_LOCK must record CC. namespace title-independence (PD-026)")
+    if "INTERNAL-ONLY until legal clearance" not in lock:
+        fails.append("PRODUCT_LOCK must record Asterra internal-only (PD-026/028)")
+
+    for f in fails:
+        rep.fail(f"human-decision consistency: {f}")
+    if not fails:
+        rep.ok("Phase 00 human decisions PD-025..028 recorded consistently; no toolchain versions pinned; monetization constraints coherent")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=None, help="repository root (default: derived from script path)")
@@ -238,6 +353,8 @@ def main() -> int:
         check_links(docs, folder, root, rep)
         check_pd_verdicts(docs, rep)
         check_policy_rows(docs, rep)
+        check_supersession(docs, rep)
+        check_human_decisions(docs, rep)
     print(f"SUMMARY pass={len(rep.passes)} fail={len(rep.failures)}")
     return 1 if rep.failures else 0
 
