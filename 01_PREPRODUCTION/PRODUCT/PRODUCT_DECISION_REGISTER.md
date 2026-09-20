@@ -4,7 +4,7 @@
 |---|---|
 | Owner | AI-01 — Product / Game Direction |
 | Document ID | `CC.PRODUCT.DECISIONS` |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | ID family | `PD-###` (Product Decision). Immutable once released. Never reuse a number. |
 | Relationship to `DD-###` | `00_CONTROL/V7_DESIGN_DECISION_REGISTER.md` holds *starting design decisions*. `PD-###` records Product's **approve / reject / defer** verdicts on them and on the v7 bibles, with testable acceptance criteria. `PD` entries cite the `DD` they confirm; they never duplicate a `DD`. |
 
@@ -373,9 +373,127 @@ Rationale: the alternative (one art account owning a format the others must foll
 
 ---
 
+---
+
+# Human Product Authority decisions — Phase 00 closure (v1.2.0)
+
+The entries below record decisions **made by the Human Product Authority** after reviewing the Phase 00 Human Decision Brief. AI-01 is the recorder, not the decider. Wording of each decision is taken from the human instruction; AI-01 adds only the register fields (supersedes, scope, downstream impact, acceptance criteria). Verdict vocabulary extension: **HUMAN_DECIDED** — a human-gated decision that has been taken; it carries the same force as APPROVED and can only be superseded by a later human decision.
+
+## PD-025 — Engine / technology lock (resolves AI-13 OD-0002)
+
+**Verdict:** HUMAN_DECIDED
+**Previous decision:** none in this register. `PRODUCT_LOCK_V1.md` §5 listed the engine as "STATED IN BLUEPRINT, not yet instantiated in repo"; AI-13 raised OD-0002; RISK-0001 (H/H).
+**Superseding decision:** **Unity 6 + URP + Android is CONFIRMED** as the locked engine/technology direction (`02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md` §Engine). The Domain/Simulation layer remains **pure C# and engine-independent** exactly as the existing architecture defines (Blueprint §Dependency rule). The Human Project Owner **provides and owns Unity licensing and the required CI/build environment before Phase 02 Bootstrap**.
+**Reason:** the repository documents exactly one engine candidate across the Technical Blueprint, Account Matrix, Roadmap and all Phase 00 track notes; no alternative was proposed; code sunk cost is zero, so confirming now removes RISK-0001 ambiguity before Phase 01 contracts name runtime DTOs.
+**Effective scope:** all tracks; Phase 01 onward.
+**Explicitly NOT decided here:** exact Unity, URP, Android SDK/NDK/JDK versions. These are **pinned at the later technical freeze step based on verified compatibility** (AI-12 RD-004 / AI-02 project bootstrap) — no number is to be written before then.
+**Downstream impact:** AI-13 closes OD-0002 and re-rates RISK-0001 (toolchain gap moves from "engine unknown" to "environment provisioning pending, owner Human"); AI-12 RD-004 remains UNKNOWN by design until pinning, RD-005 owner = Human Project Owner; AI-04 PA-04 (input package) and AI-06 particle choice and AI-08 AUD-OD-02 may proceed as Unity-scoped decisions; `PRODUCT_LOCK_V1.md` §5 engine row status becomes HUMAN_DECIDED.
+
+**Acceptance criteria:**
+- `[VALIDATOR]` No document in `01_PREPRODUCTION/PRODUCT/` states a numeric Unity/URP/SDK/NDK/JDK version (AI-01 self-check; AI-13 gate check on other tracks).
+- `[VALIDATOR]` Phase 02 bootstrap PR contains a Domain assembly with zero `UnityEngine` references (Blueprint rule; owner AI-02, test owner AI-10).
+- `[EVIDENCE]` Before Phase 02 kickoff, a human-provided record exists naming the Unity licence custody and CI build environment (AI-12 RD-005 closed by Human).
+
+---
+
+## PD-026 — Product title and `CC.` namespace independence (supersedes PD-013; resolves AI-13 OD-0005 product part; resolves AI-09 OD-01)
+
+**Verdict:** HUMAN_DECIDED
+**Supersedes:** PD-013 (DEFERRED_TO_HUMAN).
+**Previous decision:** PD-013 recommended keeping "CraftCube" as working title through Phase 06 and running a title check before Phase 14, with no brand-asset spend.
+**Superseding decision:**
+1. **"CraftCube" is KEPT as the working/public working title for the current development phase.**
+2. **No trademark clearance is claimed.** Final trademark/legal clearance **remains a required human/legal check before final commercial brand lock**.
+3. **"Asterra" is INTERNAL-ONLY until legal clearance.** It must not be used as an externally committed public brand or world name. Player-facing use stays behind `loc.term.asterra` so the string can change without ID changes (AI-09 OD-01 proposal confirmed).
+4. **The `CC.` contract/registry prefix is INDEPENDENT of the public product title.** No future dependency may be created in which changing the public title requires renaming the `CC.*` contract namespace. `CC.` is a stable technical namespace, not a brand reference.
+**Reason:** two adjacent products already own "Cube" associations and trademark status is UNKNOWN (`COMPETITOR_REVIEW.md` §1 C3/C4, §3.2); decoupling the namespace now prevents a Phase 01 registry freeze from binding contract IDs to an uncleared name.
+**Effective scope:** all tracks; immediately.
+**Downstream impact:** AI-13 records `CC.` as title-independent in `11_INTEGRATION/CONTRACT_REGISTRY.md` id-format notes and closes OD-0005 (product part; legal part remains a Human/legal action); AI-09 closes OD-01 (Asterra internal); AI-12 RD-006 keeps `TBD_applicationId` until the brand lock; no logo/brand assets are commissioned before legal clearance (PD-013 recommendation carried forward).
+
+**Acceptance criteria:**
+- `[VALIDATOR]` Registry id-format documentation states the `CC.` prefix is title-independent; no contract ID embeds the word "CraftCube".
+- `[VALIDATOR]` No player-facing string fixture (`loc.*`) references "Asterra" outside the `loc.term.asterra` key and its dependents; no store/marketing text in the repository uses "Asterra" (there is none today — VERIFIED).
+- `[EVIDENCE]` A human/legal clearance record for the final title exists before Phase 14 store package (AI-12 Gate F precondition).
+
+---
+
+## PD-027 — Monetization model (supersedes PD-014)
+
+**Verdict:** HUMAN_DECIDED
+**Supersedes:** PD-014 (DEFERRED_TO_HUMAN).
+**Previous decision:** PD-014 recommended designing "as if premium or free-with-single-unlock" with no monetization slots; any ads/IAP/subscription would require human approval and a new PD.
+**Superseding decision:** **OPTION 1 — PREMIUM ONE-TIME PURCHASE.** Product direction, binding:
+- paid upfront;
+- no advertising;
+- no subscription;
+- no second/premium currency;
+- no loot boxes / gacha;
+- no energy timers;
+- no paid gameplay assists;
+- no dark-pattern retention monetization.
+**Exact final price is NOT frozen** by this decision; it may be finalized later as a commercial/store decision. The existing anti-grind and player-respect constraints (`PROGRESSION_ANTI_GRIND_AND_EXPRESSION_POLICY.md` §5, AGP-010..017, AGP-021) **remain binding**. The rejected monetization classes (CUT-002, CUT-003, CUT-012, CUT-016, CUT-017, CUT-020) **are not reopened** unless a future Human Product Decision explicitly supersedes this one.
+**Reason:** matches the audience statement (`PRODUCT_LOCK_V1.md` §4: "dislikes energy timers and forced ads"), the premium positioning of V7.1 §1, DD-009/DD-014, and requires no change to the Product Lock or to any Phase 01–06 system.
+**Effective scope:** v1 release; all tracks.
+**Downstream impact:** `TECHNICAL_BLUEPRINT.md` "IAP/Entitlement abstraction" is **not required for v1 gameplay** (store licence validation only; AI-02/AI-12 may keep the abstraction as a no-op seam — Product has no objection but does not require it); AI-12 RD-007 store declarations: no ads SDK, no in-app products, telemetry stance unchanged (opt-in, minimal, PD-010); PD-004/PD-021 unchanged (zero visible resources in the Gold Slice; any single resource remains gameplay-only and never purchasable); `INVESTMENT_GATE.md` Gate D "monetization hypothesis documented" is satisfied by this entry.
+
+**Acceptance criteria:**
+- `[VALIDATOR]` No contract, fixture or content definition declares a purchasable SKU, ad placement, subscription, premium currency, timer or paid assist (AI-10 lint over `CC.*` fixtures; AI-13 gate).
+- `[BUILD]` Release build manifest/dependency list contains no advertising or billing SDK beyond what the store requires for a paid app (AI-12 provenance record `feature_flags` shows no IAP/ads flag).
+- `[PLAYTEST]` `IGM-008`: 0% of "why come back" reasons cite a timer, reward schedule or fear of missing out (unchanged; now also enforced by monetization model).
+
+---
+
+## PD-028 — Story canon baseline v0.1.0 and terminology resolutions (confirms PD-017; refines PD-018; resolves AI-09 OD-01/03/04 and Product Lock §6.4 conflicts)
+
+**Verdict:** HUMAN_DECIDED
+**Previous decisions:** PD-017 approved the Story Promise at product level with canon text pending Human; PD-018 approved the finale option *set* with placeholder names; `PRODUCT_LOCK_V1.md` §6.4 reported two terminology CONFLICTS; CUT-030 held Verdant Archive as LATER pending chapter mapping.
+**Superseding / resolving decision:** **Story Bible v0.1.0** (`01_PREPRODUCTION/STORY_BIBLE_V7.md` on branch `ai-09-narrative`, with its `11_NARRATIVE/` registers and fixtures) **is APPROVED as the Phase 00 canon baseline**, subject to the following explicit resolutions:
+
+| Item | Resolution |
+|---|---|
+| A) Story Promise | **APPROVED as canon baseline** (text as quoted in PD-017). |
+| B) S1 — Engine terminology | **ONE canonical name: "Quiet Engine."** Used consistently for the biome/chapter concept. "Quiet Engine" and "Silent Engine" are **not** retained as two competing canonical IDs for the same concept. Downstream: AI-09 renames `nar.chapter.07_silent_engine` / `loc.chapter.07.title` (currently DRAFT, not frozen — no migration needed) to the Quiet Engine form before Phase 01 freeze. |
+| C) S2 — Verdant Archive | **NOT part of v1 MUST scope. LATER / deferred content.** Verdant Archive and Chapter 08 ("The Unfinished Pattern") are not required v1 biome/chapter. CUT-030 status confirmed as LATER by human decision (see `CUT_LIST_AND_COMPLEXITY_BUDGET.md` §5 log). Complexity budget: v1 biomes = **5**, v1 chapter ceiling = **9** (Act III shrinks from 3 to 2 authored chapters unless a future PD reinstates). Existing `nar.*`/`loc.*` keys for the biome/chapter may remain in the DRAFT registry marked LATER; they must not appear in any v1 critical-path prerequisite. |
+| D) S3 — Asterra | **Internal-only until legal clearance** (cross-reference PD-026 §3). |
+| E) S4 — Finale options | **Three-option set {Hold, Weave, Open} APPROVED as WORKING NAMES.** Final localized/public wording may be refined later **without changing the three-option structure** (PD-018 limits unchanged). |
+| F) Canon boundaries approved as baseline | Story Promise; **WR-1 through WR-8**; approved cast structure (Weaver, Mira, Orin, Nox, Quiet Architect as title — PD-024); **Weaver silence / non-naming rule** (CUT-014); **memory-flag ceiling** (≤ 6 per chapter, ≤ 60 total — PD-003, CMP-007); existing approved finale structure (PD-018); **Wayfinder Shard merged into Nox** (PD-019); **v1 unvoiced cast direction** (PD-024). |
+
+**Canon scope is NOT expanded** beyond what is already documented. Any addition is a new PD + Human canon gate.
+**Reason:** removes RISK-0008 (terminology drift, H) and the phantom-biome count before `nar.*`/`loc.*` IDs become immutable in Phase 01; commits the Act III turn (WR-8) that every mystery payoff depends on.
+**Effective scope:** all content tracks (AI-03, AI-05, AI-06, AI-07, AI-08, AI-09); Phase 01 freeze.
+**Downstream impact:** AI-09 — set Story Bible status DRAFT → APPROVED BASELINE v0.1.0 (patch version for the S1 rename allowed), close OD-01/OD-03/OD-04, apply S1 rename, mark Verdant Archive/Ch.08 IDs LATER; AI-13 — close OD-0005 (product part) and OD-0007 already closed by PD-020; update complexity budget biomes 6→5, chapters ≤ 9; re-rate RISK-0008; AI-05 — Biome 5 presentation work is LATER (no v1 spend); AI-03 — no v1 puzzle content for Verdant Archive; AI-02 — `CC.NARRATIVE.MEMORY_FLAG` ceiling values are now human-approved and may be frozen.
+
+**Acceptance criteria:**
+- `[VALIDATOR]` Narrative canon registry contains exactly one term ID for the engine concept and no `*silent_engine*` identifier at Phase 01 freeze (owner AI-09; check AI-10).
+- `[VALIDATOR]` No v1 critical-path prerequisite references Verdant Archive or `nar.chapter.08_*`; complexity budget reports biomes = 5, chapters ≤ 9.
+- `[VALIDATOR]` `nar.flag.final_configuration` enum has exactly three values; display strings are behind `loc.term.hold/weave/open` keys (rename-safe).
+- `[VALIDATOR]` Memory-flag counts ≤ 6 per chapter and ≤ 60 total at every gate.
+- `[EVIDENCE]` Story Bible header on `integration` shows human-approved baseline status with the PD-028 reference.
+
+---
+
+## PD-029 — Register of decisions that remain human-gated after Phase 00 closure (informational)
+
+**Verdict:** DEFERRED_TO_HUMAN
+**Subject:** Items that PD-025..028 explicitly leave open so no track treats them as decided.
+1. Final trademark/legal clearance of the public title (PD-026 §2) — before final commercial brand lock / Phase 14.
+2. Legal clearance for public use of "Asterra" (PD-026 §3).
+3. Exact retail price (PD-027) — commercial/store decision.
+4. Exact Unity / URP / SDK / NDK / JDK versions (PD-025) — technical freeze step, not a product decision, but human-owned licensing gates it.
+5. Unity licence custody and CI build environment provisioning (PD-025; AI-12 RD-005) — Human Project Owner, before Phase 02.
+6. Branch protection on `integration`/`main` (AI-13 OD-0001) — repository admin.
+7. Signing key custody and store-managed signing confirmation (AI-12 §7 item 3) — Phase 14.
+8. Release chapter count within the new ceiling of 9 (PD-015) — Product after Gold Slice evidence, not human unless scope grows.
+
+**Acceptance criteria:**
+- `[VALIDATOR]` Each item above is either still listed here or closed by a later `PD-###`/`OD-####` record; none is silently assumed by any track.
+
+---
+
 ## Register integrity rules
 
-- IDs `PD-001` … `PD-016` are released with v1.0.0 of this register. `PD-017` … `PD-024` are released with v1.1.0 (Phase 00, second pass — resolving open decisions routed to AI-01 by AI-13 and AI-09). Never renumber.
-- New decisions append `PD-025+`.
+- IDs `PD-001` … `PD-016` are released with v1.0.0 of this register. `PD-017` … `PD-024` are released with v1.1.0 (Phase 00, second pass — resolving open decisions routed to AI-01 by AI-13 and AI-09). `PD-025` … `PD-029` are released with v1.2.0 (Phase 00 closure — Human Product Authority decisions recorded by AI-01). Never renumber.
+- New decisions append `PD-030+`.
+- Superseded entries (PD-013, PD-014, PD-017-canon-pending) keep their original text; their status is read together with the superseding entry. A `Superseded by:` line is the only in-place addition permitted.
 - A verdict change is recorded as a **new** entry that supersedes the old one (`Supersedes: PD-0xx`), never an in-place rewrite.
 - `validate_product_lock.py` (same folder) checks ID uniqueness and required headings; run it before any PR touching this folder.
