@@ -15,6 +15,7 @@
 - **REJECTED** — Not to be built; listed in the Cut List.
 - **DEFERRED_TO_HUMAN** — Touches a human approval gate (`00_CONTROL/13_AI_EXECUTION_MANUAL.md` §Human approval gates). Product recommendation recorded; no track may act as if decided.
 - **DEFERRED_TO_EVIDENCE** — Decision waits for a named phase gate's measured evidence.
+- **HUMAN_DECIDED** — A human-gated decision that the Human Product Authority has taken; recorded verbatim by AI-01. Same force as APPROVED; superseded only by a later human decision. (Added in v1.2.0.)
 
 Every acceptance criterion is written so AI-10 can turn it into a test, a playtest protocol item, or a validator check. Criteria that need player data are marked `[PLAYTEST]`; criteria checkable from data/content are `[VALIDATOR]`; criteria checkable from a build are `[BUILD]`.
 
@@ -233,6 +234,7 @@ Every acceptance criterion is written so AI-10 can turn it into a test, a playte
 ## PD-013 — Final public title
 
 **Verdict:** DEFERRED_TO_HUMAN
+**Superseded by:** PD-026 (HUMAN_DECIDED, v1.2.0) — working title kept; trademark clearance still required; `CC.` namespace declared title-independent.
 **Product recommendation:** keep **CraftCube** as the working title through Phase 06; run a title check (trademark/store-name availability) before Phase 14. Do not spend on logo/brand assets before the human decision.
 
 ---
@@ -240,6 +242,7 @@ Every acceptance criterion is written so AI-10 can turn it into a test, a playte
 ## PD-014 — Monetization model
 
 **Verdict:** DEFERRED_TO_HUMAN
+**Superseded by:** PD-027 (HUMAN_DECIDED, v1.2.0) — premium one-time purchase.
 **Product recommendation:** design v1 as if **premium (one-time purchase) or free-with-single-unlock**, with no in-game currency store. This keeps all systems honest to DD-009/DD-014 and avoids designing economy hooks that a later premium decision would have to rip out. Any ads, IAP or subscription requires human approval and a new `PD`.
 
 **Design constraint enforced now regardless of outcome:** no system may be designed with a "monetization slot" (e.g., a second currency, a timer, a paid assist).
@@ -266,6 +269,7 @@ All items in `CUT_LIST_AND_COMPLEXITY_BUDGET.md` marked `REJECT` are rejected by
 ## PD-017 — Story Promise (AI-09 OD-03)
 
 **Verdict:** APPROVED (product level; canon text remains a Human gate)
+**Canon gate closed by:** PD-028 §A (HUMAN_DECIDED, v1.2.0) — Story Promise approved as canon baseline.
 **Subject:** AI-09's proposed Story Promise in `01_PREPRODUCTION/STORY_BIBLE_V7.md` (branch `ai-09-narrative`): *"Every time you master the cube, the world visibly answers — and the more you understand it, the less certain you become that putting it back the way it was is the right thing to do."*
 **Confirms:** PD-001, DD-003, DD-008.
 
