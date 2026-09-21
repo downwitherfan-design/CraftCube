@@ -21,8 +21,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 NAR_DIR = ROOT / "11_NARRATIVE"
-REGISTRY = NAR_DIR / "fixtures" / "narrative_canon_registry.v0.1.0.json"
-EN = NAR_DIR / "fixtures" / "loc" / "en.v0.1.0.json"
+REGISTRY = NAR_DIR / "fixtures" / "narrative_canon_registry.v0.1.1.json"
+EN = NAR_DIR / "fixtures" / "loc" / "en.v0.1.1.json"
 MD_FILES = sorted(NAR_DIR.glob("*.md")) + [ROOT / "01_PREPRODUCTION" / "STORY_BIBLE_V7.md"]
 
 ID_RE = re.compile(r"^[a-z0-9_.]+$")
@@ -123,11 +123,19 @@ def main() -> int:
     else:
         fail(f"chapter numbering not 1..10: {nums}")
 
-    # 4. flags: budget, written-once, every written flag is read, chapters exist
+    # 4. flags: budget (PD-003 / PD-028 §F: <= 6 per chapter, <= 60 total), written-once, every written flag is read, chapters exist
     if len(flags) <= reg["flag_budget"]:
-        ok(f"flag count {len(flags)} <= budget {reg['flag_budget']}")
+        ok(f"flag count {len(flags)} <= total budget {reg['flag_budget']}")
     else:
-        fail(f"flag count {len(flags)} exceeds budget {reg['flag_budget']}")
+        fail(f"flag count {len(flags)} exceeds total budget {reg['flag_budget']}")
+    per_chapter: dict[str, int] = {}
+    for f in flags:
+        per_chapter[f["written_in"]] = per_chapter.get(f["written_in"], 0) + 1
+    over = {c: n for c, n in per_chapter.items() if n > reg["flag_budget_per_chapter"]}
+    if over:
+        fail(f"per-chapter flag ceiling {reg['flag_budget_per_chapter']} exceeded: {over}")
+    else:
+        ok(f"per-chapter flag counts <= {reg['flag_budget_per_chapter']} (max observed {max(per_chapter.values())})")
     written_by_chapter: dict[str, list[str]] = {}
     for c in chapters:
         for f in c["flags_written"]:
@@ -154,6 +162,82 @@ def main() -> int:
             if r_num < w_num:
                 fail(f"flag {f['id']} read in chapter {r_num} before written in {w_num}")
     ok("flag write/read integrity checked")
+
+    # 4b. PD-028 canon resolutions
+    silent = [i for i in all_nar_ids if "silent_engine" in i] + [k for k in strings if "silent_engine" in k]
+    if silent:
+        fail(f"PD-028 §B: stale silent_engine identifiers {silent}")
+    else:
+        ok("PD-028 §B: no *silent_engine* identifier in registry or loc keys")
+    engine_terms = [t["id"] for t in terms if "engine" in t["id"]]
+    if engine_terms == ["nar.term.quiet_engine"]:
+        ok("PD-028 §B: exactly one engine term ID (nar.term.quiet_engine)")
+    else:
+        fail(f"PD-028 §B: expected exactly one engine term, got {engine_terms}")
+    for sup in reg.get("superseded_ids", []):
+        if sup["old"] in nar_set:
+            fail(f"superseded ID {sup['old']} still present in registry")
+        if sup["new"] not in nar_set:
+            fail(f"superseded_ids: replacement {sup['new']} not present in registry")
+    ok("superseded_ids consistent")
+    # scope integrity: every chapter/flag/item_lore has scope v1|LATER; LATER chapter is not a v1 prerequisite
+    later_chapters = {c["id"] for c in chapters if c.get("scope") == "LATER"}
+    v1_chapters = [c for c in chapters if c.get("scope") == "v1"]
+    for coll, label in ((chapters, "chapter"), (flags, "flag"), (items, "item_lore")):
+        bad = [x["id"] for x in coll if x.get("scope") not in ("v1", "LATER")]
+        if bad:
+            fail(f"{label}: missing/invalid scope on {bad}")
+    ss = reg["scope_summary"]
+    if len(v1_chapters) == ss["v1_chapter_count"] and len(v1_chapters) <= ss["v1_chapter_ceiling"]:
+        ok(f"PD-028 §C: v1 chapters = {len(v1_chapters)} (ceiling {ss['v1_chapter_ceiling']}); LATER = {sorted(later_chapters)}")
+    else:
+        fail(f"PD-028 §C: v1 chapter count {len(v1_chapters)} != summary {ss['v1_chapter_count']} or > ceiling")
+    if sorted(later_chapters) != sorted(ss["later_chapters"]):
+        fail(f"scope_summary.later_chapters {ss['later_chapters']} != chapters marked LATER {sorted(later_chapters)}")
+    v1_biomes = {c["biome"] for c in v1_chapters} - {"all"}
+    if v1_biomes == set(ss["v1_biomes"]) and len(v1_biomes) == ss["v1_biome_count"] == 5:
+        ok(f"PD-028 §C: v1 biomes = 5 {sorted(v1_biomes)}; LATER biomes {ss['later_biomes']}")
+    else:
+        fail(f"PD-028 §C: v1 biome set {sorted(v1_biomes)} != summary {ss['v1_biomes']}")
+    for c in v1_chapters:
+        for f in c["flags_written"]:
+            fl = next(x for x in flags if x["id"] == f)
+            if fl.get("scope") != "v1":
+                fail(f"v1 chapter {c['id']} writes non-v1 flag {f}")
+    for f in flags:
+        if f.get("scope") == "v1" and f["written_in"] in later_chapters:
+            fail(f"v1 flag {f['id']} is written in LATER chapter {f['written_in']} (v1 prerequisite on LATER content)")
+        if f.get("scope") == "LATER" and f["written_in"] not in later_chapters:
+            fail(f"LATER flag {f['id']} written in v1 chapter {f['written_in']}")
+    for it in items:
+        if it.get("scope") == "v1" and it["chapter"] in later_chapters:
+            fail(f"v1 item_lore {it['id']} acquired in LATER chapter")
+    ok("PD-028 §C: no v1 flag/item depends on a LATER chapter")
+    # LATER-dependent mystery stages must be declared
+    for m in mysteries:
+        dep = sorted(k for k, v in m["stages"].items() if v in later_chapters)
+        if dep != sorted(m.get("later_dependent_stages", [])):
+            fail(f"mystery {m['id']}: later_dependent_stages {m.get('later_dependent_stages')} != stages hosted by LATER chapters {dep}")
+    ok("LATER-dependent mystery stages declared")
+    # finale enum: exactly three values besides unset (PD-018 / PD-028 §E); display behind loc.term keys
+    fc = next(f for f in flags if f["id"] == "nar.flag.final_configuration")
+    opts = [v for v in fc["values"] if v != "unset"]
+    if len(opts) == 3 and all(f"loc.term.{o}" in strings for o in opts):
+        ok(f"PD-028 §E: final_configuration has exactly 3 options {opts} with loc.term.* keys")
+    else:
+        fail(f"PD-028 §E: final_configuration options invalid {opts}")
+    # cast ceiling (PD-024): speaking characters <= 3 (Nox counts as non-verbal companion)
+    speakers = [c["id"] for c in chars if c["speaks"]]
+    if len(speakers) <= 2 and len(chars) == 5:
+        ok(f"PD-024/PD-028 §F: speaking cast {speakers}; total cast 5 (Weaver silent, Architect a title)")
+    else:
+        fail(f"PD-024: cast structure changed: speakers {speakers}, total {len(chars)}")
+    # Asterra: only in loc.term.asterra (PD-026 §3)
+    ast = [k for k, v in strings.items() if "asterra" in v.lower() and k != "loc.term.asterra"]
+    if ast:
+        fail(f"PD-026 §3: 'Asterra' appears in player-facing strings outside loc.term.asterra: {ast}")
+    else:
+        ok("PD-026 §3: 'Asterra' only behind loc.term.asterra")
 
     # 5. characters: flags they read/write exist
     for ch in chars:
@@ -292,7 +376,7 @@ def main() -> int:
     for f in failures:
         print("FAIL ", f)
     print(f"--- {len(passes)} pass groups, {len(failures)} failures ---")
-    print(f"registry: {len(all_nar_ids)} nar.* IDs | en fixture: {len(strings)} loc.* keys | flags: {len(flags)}/{reg['flag_budget']}")
+    print(f"registry {reg['schema_version']} [{reg['status']}]: {len(all_nar_ids)} nar.* IDs | en {en['schema_version']}: {len(strings)} loc.* keys | flags: {len(flags)}/{reg['flag_budget']} total, per-chapter cap {reg['flag_budget_per_chapter']} | v1 chapters {reg['scope_summary']['v1_chapter_count']}, LATER {len(reg['scope_summary']['later_chapters'])}")
     return 1 if failures else 0
 
 
