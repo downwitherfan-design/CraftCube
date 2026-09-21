@@ -1,0 +1,34 @@
+# validate_product_lock.py run — Phase 00 human decisions recorded — branch ai-01-product @ 5a8bf42 — 2026-09-21T20:04Z
+$ python3 01_PREPRODUCTION/PRODUCT/validate_product_lock.py
+validate_product_lock.py — root=/home/user/craftcube_repo
+[PASS] all 7 required product documents present
+[PASS] header rows (Owner / Document ID / Version) checked
+[PASS] family PD: 29 unique IDs (PD-001..PD-029)
+[PASS] family F10: 7 unique IDs (F10-001..F10-007)
+[PASS] family IGM: 18 unique IDs (IGM-001..IGM-008)
+[PASS] family CUT: 31 unique IDs (CUT-001..CUT-031)
+[PASS] family AGP: 21 unique IDs (AGP-001..AGP-025)
+[PASS] family CMP: 12 unique IDs (CMP-001..CMP-012)
+[PASS] every PD/F10/IGM/CUT/AGP/CMP reference resolves to a definition
+[PASS] all bare `FILE.md` links resolve to exactly one repository file
+[PASS] 29 PD entries: verdict vocabulary and acceptance tags OK
+[PASS] AGP/CMP rows carry check type or default action
+[PASS] supersession chain consistent (Supersedes <-> Superseded by)
+[PASS] Phase 00 human decisions PD-025..028 recorded consistently; no toolchain versions pinned; monetization constraints coherent
+SUMMARY pass=14 fail=0
+exit=0
+
+# Negative self-tests (temp copies of the tree, not committed) — all must exit 1:
+#  NEG1 duplicate PD heading (PD-029->PD-028)            -> FAIL (duplicate + unresolved PD-029 + PD-028 records lost)
+#  NEG2 COMPETITOR_REVIEW.md removed + dangling CUT-099   -> FAIL
+#  NEG3 PD-022 APPROVED with acceptance tags stripped      -> FAIL
+#  NEG4 'Superseded by: PD-027' removed from PD-014        -> FAIL (supersession chain)
+#  NEG5 'Unity 6.1 and URP 17.0' appended to Product Lock  -> FAIL (PD-025 no version pins)
+#  NEG6 CC. independence sentence altered in PD-026        -> FAIL
+#  NEG7 new PD APPROVED adding advertising                  -> FAIL (contradicts PD-027)
+#  NEG8 Quiet Engine resolution altered in PD-028          -> FAIL
+#  NEG9 Cut-list biome cap set back to 6                    -> FAIL (PD-028 §C)
+# Result: 9/9 negative cases exit=1.
+
+# ID collision scan: PD-025..PD-029 and 'HUMAN_DECIDED' absent from all other origin/* branches (git grep, 0 hits).
+# Contradiction audit: DEFERRED_TO_HUMAN entries PD-013/PD-014 carry 'Superseded by' pointers; PD-009/PD-015 remain DEFERRED_TO_EVIDENCE by design; PD-029 lists remaining human items.
