@@ -40,7 +40,7 @@ Every acceptance criterion is written so AI-10 can turn it into a test, a playte
 - `[VALIDATOR]` No mandatory narrative text node before the first solve exceeds 40 words in the source language.
 - `[VALIDATOR]` The main story path is completable with zero optional lore entries read (Story Bible §Narrative fail-safe) — expressed as: no critical-path prerequisite references a `Memory Collectible` or optional discovery.
 
-**Open items for AI-09 (not blocking approval):** "Quiet Engine" vs "Silent Engine" naming conflict; "Verdant Archive" biome lacks a chapter mapping (see `PRODUCT_LOCK_V1.md` §6.4).
+**Open items for AI-09 (not blocking approval):** "Quiet Engine" vs "Silent Engine" naming conflict; "Verdant Archive" biome lacks a chapter mapping (see `PRODUCT_LOCK_V1.md` §6.4). **Resolved by:** PD-028 §B (Quiet Engine canonical) and PD-028 §C (Verdant Archive LATER).
 
 ---
 
