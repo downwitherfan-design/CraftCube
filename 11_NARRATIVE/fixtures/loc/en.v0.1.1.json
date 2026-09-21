@@ -1,9 +1,23 @@
 {
   "schema": "cc.loc.strings",
-  "schema_version": "0.1.0",
+  "schema_version": "0.1.1",
   "locale": "en",
-  "status": "DRAFT",
+  "status": "APPROVED_BASELINE",
   "owner": "AI-09",
+  "approval": {
+    "decision": "PD-028",
+    "approved_version": "0.1.0",
+    "note": "v0.1.1: patch text change on loc.chapter.07.title (Silent→Quiet, PD-028 §B). Keys unchanged."
+  },
+  "key_notes": {
+    "loc.term.asterra": "INTERNAL-ONLY world name until legal clearance (PD-026 §3 / PD-028 §D). Do not use in store, marketing or externally committed text. String may change without key change.",
+    "loc.term.hold": "APPROVED WORKING NAME (PD-028 §E). Final localized/public wording may be refined; three-option structure is stable.",
+    "loc.term.weave": "APPROVED WORKING NAME (PD-028 §E). Final localized/public wording may be refined; three-option structure is stable.",
+    "loc.term.open": "APPROVED WORKING NAME (PD-028 §E). Final localized/public wording may be refined; three-option structure is stable.",
+    "loc.chapter.08.title": "LATER content (PD-028 §C). Retained; not required for v1.",
+    "loc.biome.verdant_archive.name": "LATER content (PD-028 §C). Retained; not required for v1.",
+    "loc.term.verdant_archive": "LATER content (PD-028 §C). Retained; not required for v1."
+  },
   "strings": {
     "loc.act.1.question": "Why does the world react to my hands?",
     "loc.act.1.title": "Awakening",
@@ -23,7 +37,7 @@
     "loc.chapter.04.title": "Glassroot",
     "loc.chapter.05.title": "The Sunken Grid",
     "loc.chapter.06.title": "Ember Hollow",
-    "loc.chapter.07.title": "The Silent Engine",
+    "loc.chapter.07.title": "The Quiet Engine",
     "loc.chapter.08.title": "The Unfinished Pattern",
     "loc.chapter.09.title": "The Last Alignment",
     "loc.chapter.10.title": "A World Rewritten",
