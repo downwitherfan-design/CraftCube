@@ -106,3 +106,39 @@ git diff --name-only origin/main...HEAD
   01_PREPRODUCTION/PRODUCT/*                   (AI-01 owned: GDD/product/scope/acceptance)
 ```
 No runtime code, assets, UI, audio, CI or non-product tests were touched. No file owned by another account was edited; all cross-track needs are expressed as PD rulings and integration requests above.
+
+---
+
+# Addendum — Phase 00 closure: Human Product Authority decisions recorded
+
+STATUS: READY_FOR_REVIEW (unchanged). Human decisions for the four Phase 00 human gates are RECORDED in AI-01 scope. Phase 00 is **not** declared PASSED by AI-01; the integration gate verdict is AI-13's.
+
+DECISIONS RECORDED (all HUMAN_DECIDED, recorded verbatim; AI-01 added only register fields):
+- **PD-025** — Engine/technology lock: Unity 6 + URP + Android confirmed; Domain/Simulation pure C# engine-independent; Human Project Owner provides Unity licensing and CI/build environment before Phase 02; exact Unity/URP/SDK/NDK/JDK versions NOT pinned (later technical freeze). Resolves AI-13 OD-0002.
+- **PD-026** — Title/trademark (supersedes PD-013): "CraftCube" kept as working/public working title for the current phase; no trademark clearance claimed; final legal clearance required before commercial brand lock; "Asterra" INTERNAL-ONLY until legal clearance; `CC.` contract namespace INDEPENDENT of the public title. Resolves OD-0005 (product part) and AI-09 OD-01.
+- **PD-027** — Monetization (supersedes PD-014): premium one-time purchase; no ads, subscription, second/premium currency, loot boxes/gacha, energy timers, paid assists, dark-pattern retention; price NOT frozen; anti-grind constraints remain binding; rejected classes not reopened without a superseding human decision.
+- **PD-028** — Story/canon: Story Bible v0.1.0 approved as canon baseline; A) Story Promise approved as canon; B) "Quiet Engine" single canonical name (no competing "Silent Engine" ID); C) Verdant Archive / Ch.08 NOT v1 MUST → LATER (v1 biomes 5, chapters ≤ 9); D) Asterra internal-only; E) finale set {Hold, Weave, Open} as working names; F) WR-1..8, cast structure, Weaver silence/non-naming, memory-flag ceiling, finale structure, Wayfinder→Nox merge, unvoiced direction approved as baseline; canon scope not expanded. Closes the PD-017 canon gate; refines PD-018.
+- **PD-029** — Register of items that remain human-gated (informational, DEFERRED_TO_HUMAN).
+
+FILES_MODIFIED (this addendum's commits, all under AI-01 ownership):
+- `PRODUCT_DECISION_REGISTER.md` → v1.2.0 (PD-025..029; HUMAN_DECIDED vocabulary; `Superseded by` pointers on PD-013/014; canon-gate pointer on PD-017; resolved-by pointer on PD-001 note)
+- `PRODUCT_LOCK_V1.md` → v1.1.0 (§5 engine row, §6.3 vocabulary incl. `CC.` row, §6.4 conflicts RESOLVED, §7.3 Later, §11 status table)
+- `CUT_LIST_AND_COMPLEXITY_BUDGET.md` → v1.1.0 (CUT-030 LATER by human decision; biomes 5; chapters ≤ 9; monetization surfaces cap 0; growth log)
+- `PROGRESSION_ANTI_GRIND_AND_EXPRESSION_POLICY.md` → v1.0.1 (canon gate closed; PD-027 backing)
+- `INVESTMENT_GATE_METRICS.md` → v1.0.2 (Gate D decided; IGM-008 note)
+- `validate_product_lock.py` (HUMAN_DECIDED verdict; supersession chain; PD-025..028 consistency checks)
+- `evidence/validate_product_lock_run_phase00_closure.log` (new)
+- `00_CONTROL/PROGRESS.md` (AI-01 section only)
+
+VALIDATOR RESULT: `python3 01_PREPRODUCTION/PRODUCT/validate_product_lock.py` → SUMMARY pass=14 fail=0, exit 0. Nine negative self-tests exit 1 (see evidence log). PD-025..029 and `HUMAN_DECIDED` verified absent from every other `origin/*` branch. No live contradictory verdicts: PD-013/PD-014 point to their superseding entries; PD-009/PD-015 remain DEFERRED_TO_EVIDENCE by design.
+
+NOT DONE / NOT CLAIMED: no runtime code; no other track's files edited (AI-09 rename, AI-13 registry/OD closures, AI-12 flag/store notes are integration requests, not applied here); no trademark search; no toolchain versions; Phase 00 gate verdict not claimed.
+
+INTEGRATION REQUESTS (for AI-13 to route):
+1. AI-13: close OD-0002 ← PD-025; OD-0005 (product part) ← PD-026; re-rate RISK-0001 (now "provisioning pending, owner Human") and RISK-0008 (terminology resolved, pending AI-09 application); update `COMPLEXITY_BUDGET.md` biomes 6→5, chapters ≤ 9, currencies 0, monetization surfaces 0; record `CC.` prefix as title-independent in registry id-format notes.
+2. AI-09: apply S1 rename (`nar.chapter.07_silent_engine`, `loc.chapter.07.title` → Quiet Engine form) before Phase 01 freeze; mark Verdant Archive / `nar.chapter.08_*` IDs LATER; set Story Bible status to approved baseline citing PD-028; close OD-01/03/04/05 and OD-02/08.
+3. AI-12: RD-005 owner = Human Project Owner (pre-Phase 02); RD-006 keeps `TBD_applicationId`; RD-007 → premium, no ads/IAP SDK, telemetry stance unchanged.
+4. AI-02/AI-04/AI-06/AI-08: Unity-scoped decisions (input package, particles, middleware) may proceed; version numbers still forbidden until the technical freeze.
+5. AI-05/AI-03: no v1 spend on Verdant Archive.
+
+ROLLBACK: revert the commit range `d41f45a..9ef5d0a` on `ai-01-product` (or `git revert -m 1` of the PR merge on `integration`). Register history is additive; superseded entries are untouched.
