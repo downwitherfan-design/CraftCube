@@ -1,126 +1,1059 @@
 {
   "schema": "cc.narrative.canon_registry",
-  "schema_version": "0.1.0",
-  "status": "DRAFT",
+  "schema_version": "0.1.1",
+  "status": "APPROVED_BASELINE",
   "owner": "AI-09",
   "phase": "00",
   "notes": [
     "Machine-readable index of every stable narrative ID defined in 11_NARRATIVE/*.md and 01_PREPRODUCTION/STORY_BIBLE_V7.md.",
-    "This is a FIXTURE for downstream mocks. It is not a released contract. IDs become immutable only when the registry is marked FROZEN/RELEASED in Phase 01.",
+    "APPROVED_BASELINE per PD-028: canon content is human-approved; IDs are still pre-freeze (Phase 01) and therefore not yet immutable. Pre-freeze renames are recorded in superseded_ids for traceability.",
     "item_ref values are PROPOSED slugs for AI-02 ItemDefinition IDs; AI-02 owns the final item IDs and may map them differently.",
-    "Display text is never stored here; use loc keys from fixtures/loc/en.v0.1.0.json."
+    "Display text is never stored here; use loc keys from fixtures/loc/en.v0.1.1.json.",
+    "scope: 'v1' = required v1 content (Product Lock). 'LATER' = authored but deferred (PD-028 §C / CUT-030); must not appear in any v1 critical-path prerequisite."
   ],
   "acts": [
-    {"id": "nar.act.1", "title_key": "loc.act.1.title", "question_key": "loc.act.1.question", "chapters": ["nar.chapter.01_first_light", "nar.chapter.02_broken_path", "nar.chapter.03_echoes_in_stone"]},
-    {"id": "nar.act.2", "title_key": "loc.act.2.title", "question_key": "loc.act.2.question", "chapters": ["nar.chapter.04_glassroot", "nar.chapter.05_sunken_grid", "nar.chapter.06_ember_hollow", "nar.chapter.07_silent_engine"]},
-    {"id": "nar.act.3", "title_key": "loc.act.3.title", "question_key": "loc.act.3.question", "chapters": ["nar.chapter.08_unfinished_pattern", "nar.chapter.09_last_alignment", "nar.chapter.10_world_rewritten"]}
+    {
+      "id": "nar.act.1",
+      "title_key": "loc.act.1.title",
+      "question_key": "loc.act.1.question",
+      "chapters": [
+        "nar.chapter.01_first_light",
+        "nar.chapter.02_broken_path",
+        "nar.chapter.03_echoes_in_stone"
+      ],
+      "v1_chapters": [
+        "nar.chapter.01_first_light",
+        "nar.chapter.02_broken_path",
+        "nar.chapter.03_echoes_in_stone"
+      ]
+    },
+    {
+      "id": "nar.act.2",
+      "title_key": "loc.act.2.title",
+      "question_key": "loc.act.2.question",
+      "chapters": [
+        "nar.chapter.04_glassroot",
+        "nar.chapter.05_sunken_grid",
+        "nar.chapter.06_ember_hollow",
+        "nar.chapter.07_quiet_engine"
+      ],
+      "v1_chapters": [
+        "nar.chapter.04_glassroot",
+        "nar.chapter.05_sunken_grid",
+        "nar.chapter.06_ember_hollow",
+        "nar.chapter.07_quiet_engine"
+      ]
+    },
+    {
+      "id": "nar.act.3",
+      "title_key": "loc.act.3.title",
+      "question_key": "loc.act.3.question",
+      "chapters": [
+        "nar.chapter.08_unfinished_pattern",
+        "nar.chapter.09_last_alignment",
+        "nar.chapter.10_world_rewritten"
+      ],
+      "v1_chapters": [
+        "nar.chapter.09_last_alignment",
+        "nar.chapter.10_world_rewritten"
+      ]
+    }
   ],
   "chapters": [
-    {"id": "nar.chapter.01_first_light", "number": 1, "act": "nar.act.1", "title_key": "loc.chapter.01.title", "biome": "hearthwild", "flags_written": ["nar.flag.ch01_first_node_choice"], "mysteries_touched": ["nar.mystery.why_the_weaver", "nar.mystery.who_built_the_loom", "nar.mystery.loom_true_purpose", "nar.mystery.what_nox_is"], "item_lore": ["nar.item_lore.weaver_cube"]},
-    {"id": "nar.chapter.02_broken_path", "number": 2, "act": "nar.act.1", "title_key": "loc.chapter.02.title", "biome": "hearthwild", "flags_written": ["nar.flag.nox_trust_earned"], "mysteries_touched": ["nar.mystery.where_did_everyone_go", "nar.mystery.why_the_weaver", "nar.mystery.who_built_the_loom", "nar.mystery.what_nox_is"], "item_lore": ["nar.item_lore.tuning_fork", "nar.item_lore.nox_harness"]},
-    {"id": "nar.chapter.03_echoes_in_stone", "number": 3, "act": "nar.act.1", "title_key": "loc.chapter.03.title", "biome": "hearthwild", "flags_written": ["nar.flag.first_record_interpretation"], "mysteries_touched": ["nar.mystery.loom_true_purpose", "nar.mystery.who_built_the_loom", "nar.mystery.where_did_everyone_go", "nar.mystery.who_caused_misalignment"], "item_lore": ["nar.item_lore.archive_thread"]},
-    {"id": "nar.chapter.04_glassroot", "number": 4, "act": "nar.act.2", "title_key": "loc.chapter.04.title", "biome": "glassroot", "flags_written": [], "mysteries_touched": ["nar.mystery.what_nox_is", "nar.mystery.loom_true_purpose", "nar.mystery.where_did_everyone_go", "nar.mystery.why_the_weaver"], "item_lore": ["nar.item_lore.memory_lens"]},
-    {"id": "nar.chapter.05_sunken_grid", "number": 5, "act": "nar.act.2", "title_key": "loc.chapter.05.title", "biome": "sunken_grid", "flags_written": ["nar.flag.vault_record_kept"], "mysteries_touched": ["nar.mystery.who_caused_misalignment", "nar.mystery.where_did_everyone_go", "nar.mystery.who_built_the_loom"], "item_lore": ["nar.item_lore.echo_compass"]},
-    {"id": "nar.chapter.06_ember_hollow", "number": 6, "act": "nar.act.2", "title_key": "loc.chapter.06.title", "biome": "ember_hollow", "flags_written": ["nar.flag.nox_ember_awakening"], "mysteries_touched": ["nar.mystery.loom_true_purpose", "nar.mystery.who_caused_misalignment"], "item_lore": ["nar.item_lore.ember_dial"]},
-    {"id": "nar.chapter.07_silent_engine", "number": 7, "act": "nar.act.2", "title_key": "loc.chapter.07.title", "biome": "quiet_engine", "flags_written": ["nar.flag.orin_accepts_design"], "mysteries_touched": ["nar.mystery.what_happens_if_completed", "nar.mystery.who_built_the_loom", "nar.mystery.who_caused_misalignment", "nar.mystery.loom_true_purpose"], "item_lore": ["nar.item_lore.quiet_coil"]},
-    {"id": "nar.chapter.08_unfinished_pattern", "number": 8, "act": "nar.act.3", "title_key": "loc.chapter.08.title", "biome": "verdant_archive", "flags_written": ["nar.flag.mira_stops_mapping", "nar.flag.nox_memory_unlocked"], "mysteries_touched": ["nar.mystery.what_nox_is", "nar.mystery.why_the_weaver", "nar.mystery.what_happens_if_completed"], "item_lore": ["nar.item_lore.rootweave_gauntlet", "nar.item_lore.lumen_seed"]},
-    {"id": "nar.chapter.09_last_alignment", "number": 9, "act": "nar.act.3", "title_key": "loc.chapter.09.title", "biome": "quiet_engine", "flags_written": [], "mysteries_touched": ["nar.mystery.who_caused_misalignment", "nar.mystery.what_happens_if_completed", "nar.mystery.where_did_everyone_go"], "item_lore": ["nar.item_lore.prism_key", "nar.item_lore.fracture_seal"]},
-    {"id": "nar.chapter.10_world_rewritten", "number": 10, "act": "nar.act.3", "title_key": "loc.chapter.10.title", "biome": "all", "flags_written": ["nar.flag.final_configuration", "nar.flag.epilogue_seen"], "mysteries_touched": ["nar.mystery.loom_true_purpose", "nar.mystery.why_the_weaver", "nar.mystery.who_built_the_loom", "nar.mystery.what_nox_is", "nar.mystery.what_happens_if_completed"], "item_lore": []}
+    {
+      "id": "nar.chapter.01_first_light",
+      "number": 1,
+      "act": "nar.act.1",
+      "title_key": "loc.chapter.01.title",
+      "biome": "hearthwild",
+      "flags_written": [
+        "nar.flag.ch01_first_node_choice"
+      ],
+      "mysteries_touched": [
+        "nar.mystery.why_the_weaver",
+        "nar.mystery.who_built_the_loom",
+        "nar.mystery.loom_true_purpose",
+        "nar.mystery.what_nox_is"
+      ],
+      "item_lore": [
+        "nar.item_lore.weaver_cube"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.chapter.02_broken_path",
+      "number": 2,
+      "act": "nar.act.1",
+      "title_key": "loc.chapter.02.title",
+      "biome": "hearthwild",
+      "flags_written": [
+        "nar.flag.nox_trust_earned"
+      ],
+      "mysteries_touched": [
+        "nar.mystery.where_did_everyone_go",
+        "nar.mystery.why_the_weaver",
+        "nar.mystery.who_built_the_loom",
+        "nar.mystery.what_nox_is"
+      ],
+      "item_lore": [
+        "nar.item_lore.tuning_fork",
+        "nar.item_lore.nox_harness"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.chapter.03_echoes_in_stone",
+      "number": 3,
+      "act": "nar.act.1",
+      "title_key": "loc.chapter.03.title",
+      "biome": "hearthwild",
+      "flags_written": [
+        "nar.flag.first_record_interpretation"
+      ],
+      "mysteries_touched": [
+        "nar.mystery.loom_true_purpose",
+        "nar.mystery.who_built_the_loom",
+        "nar.mystery.where_did_everyone_go",
+        "nar.mystery.who_caused_misalignment"
+      ],
+      "item_lore": [
+        "nar.item_lore.archive_thread"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.chapter.04_glassroot",
+      "number": 4,
+      "act": "nar.act.2",
+      "title_key": "loc.chapter.04.title",
+      "biome": "glassroot",
+      "flags_written": [],
+      "mysteries_touched": [
+        "nar.mystery.what_nox_is",
+        "nar.mystery.loom_true_purpose",
+        "nar.mystery.where_did_everyone_go",
+        "nar.mystery.why_the_weaver"
+      ],
+      "item_lore": [
+        "nar.item_lore.memory_lens"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.chapter.05_sunken_grid",
+      "number": 5,
+      "act": "nar.act.2",
+      "title_key": "loc.chapter.05.title",
+      "biome": "sunken_grid",
+      "flags_written": [
+        "nar.flag.vault_record_kept"
+      ],
+      "mysteries_touched": [
+        "nar.mystery.who_caused_misalignment",
+        "nar.mystery.where_did_everyone_go",
+        "nar.mystery.who_built_the_loom"
+      ],
+      "item_lore": [
+        "nar.item_lore.echo_compass"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.chapter.06_ember_hollow",
+      "number": 6,
+      "act": "nar.act.2",
+      "title_key": "loc.chapter.06.title",
+      "biome": "ember_hollow",
+      "flags_written": [
+        "nar.flag.nox_ember_awakening"
+      ],
+      "mysteries_touched": [
+        "nar.mystery.loom_true_purpose",
+        "nar.mystery.who_caused_misalignment"
+      ],
+      "item_lore": [
+        "nar.item_lore.ember_dial"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.chapter.07_quiet_engine",
+      "number": 7,
+      "act": "nar.act.2",
+      "title_key": "loc.chapter.07.title",
+      "biome": "quiet_engine",
+      "flags_written": [
+        "nar.flag.orin_accepts_design"
+      ],
+      "mysteries_touched": [
+        "nar.mystery.what_happens_if_completed",
+        "nar.mystery.who_built_the_loom",
+        "nar.mystery.who_caused_misalignment",
+        "nar.mystery.loom_true_purpose"
+      ],
+      "item_lore": [
+        "nar.item_lore.quiet_coil"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.chapter.08_unfinished_pattern",
+      "number": 8,
+      "act": "nar.act.3",
+      "title_key": "loc.chapter.08.title",
+      "biome": "verdant_archive",
+      "flags_written": [
+        "nar.flag.mira_stops_mapping",
+        "nar.flag.nox_memory_unlocked"
+      ],
+      "mysteries_touched": [
+        "nar.mystery.what_nox_is",
+        "nar.mystery.why_the_weaver",
+        "nar.mystery.what_happens_if_completed"
+      ],
+      "item_lore": [
+        "nar.item_lore.rootweave_gauntlet",
+        "nar.item_lore.lumen_seed"
+      ],
+      "scope": "LATER",
+      "later_decision": "PD-028 §C / CUT-030",
+      "later_note": "Authored content retained for future restoration. Not v1 MUST. Flags written here fall back to default in v1 (see flags[].scope)."
+    },
+    {
+      "id": "nar.chapter.09_last_alignment",
+      "number": 9,
+      "act": "nar.act.3",
+      "title_key": "loc.chapter.09.title",
+      "biome": "quiet_engine",
+      "flags_written": [],
+      "mysteries_touched": [
+        "nar.mystery.who_caused_misalignment",
+        "nar.mystery.what_happens_if_completed",
+        "nar.mystery.where_did_everyone_go"
+      ],
+      "item_lore": [
+        "nar.item_lore.prism_key",
+        "nar.item_lore.fracture_seal"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.chapter.10_world_rewritten",
+      "number": 10,
+      "act": "nar.act.3",
+      "title_key": "loc.chapter.10.title",
+      "biome": "all",
+      "flags_written": [
+        "nar.flag.final_configuration",
+        "nar.flag.epilogue_seen"
+      ],
+      "mysteries_touched": [
+        "nar.mystery.loom_true_purpose",
+        "nar.mystery.why_the_weaver",
+        "nar.mystery.who_built_the_loom",
+        "nar.mystery.what_nox_is",
+        "nar.mystery.what_happens_if_completed"
+      ],
+      "item_lore": [],
+      "scope": "v1"
+    }
   ],
   "beats": [
-    {"id": "nar.beat.01.cube_in_moss", "chapter": "nar.chapter.01_first_light", "order": 1, "dialogue_keys": []},
-    {"id": "nar.beat.01.cube_answers", "chapter": "nar.chapter.01_first_light", "order": 2, "dialogue_keys": []},
-    {"id": "nar.beat.01.nox_appears", "chapter": "nar.chapter.01_first_light", "order": 3, "dialogue_keys": []},
-    {"id": "nar.beat.01.mira_arrives", "chapter": "nar.chapter.01_first_light", "order": 4, "dialogue_keys": ["loc.dlg.ch01.mira.arrive.1", "loc.dlg.ch01.mira.arrive.2", "loc.dlg.ch01.mira.arrive.3", "loc.dlg.ch01.mira.arrive.4"]},
-    {"id": "nar.beat.01.broken_path_shown", "chapter": "nar.chapter.01_first_light", "order": 5, "dialogue_keys": ["loc.dlg.ch01.mira.path.1", "loc.dlg.ch01.mira.path.2"]},
-    {"id": "nar.beat.01.walkway_restores", "chapter": "nar.chapter.01_first_light", "order": 6, "dialogue_keys": ["loc.dlg.ch01.mira.radiate.1"]},
-    {"id": "nar.beat.01.orin_threshold", "chapter": "nar.chapter.01_first_light", "order": 7, "dialogue_keys": ["loc.dlg.ch01.orin.threshold.1", "loc.dlg.ch01.orin.threshold.2", "loc.dlg.ch01.orin.threshold.3", "loc.dlg.ch01.orin.threshold.4"]}
+    {
+      "id": "nar.beat.01.cube_in_moss",
+      "chapter": "nar.chapter.01_first_light",
+      "order": 1,
+      "dialogue_keys": []
+    },
+    {
+      "id": "nar.beat.01.cube_answers",
+      "chapter": "nar.chapter.01_first_light",
+      "order": 2,
+      "dialogue_keys": []
+    },
+    {
+      "id": "nar.beat.01.nox_appears",
+      "chapter": "nar.chapter.01_first_light",
+      "order": 3,
+      "dialogue_keys": []
+    },
+    {
+      "id": "nar.beat.01.mira_arrives",
+      "chapter": "nar.chapter.01_first_light",
+      "order": 4,
+      "dialogue_keys": [
+        "loc.dlg.ch01.mira.arrive.1",
+        "loc.dlg.ch01.mira.arrive.2",
+        "loc.dlg.ch01.mira.arrive.3",
+        "loc.dlg.ch01.mira.arrive.4"
+      ]
+    },
+    {
+      "id": "nar.beat.01.broken_path_shown",
+      "chapter": "nar.chapter.01_first_light",
+      "order": 5,
+      "dialogue_keys": [
+        "loc.dlg.ch01.mira.path.1",
+        "loc.dlg.ch01.mira.path.2"
+      ]
+    },
+    {
+      "id": "nar.beat.01.walkway_restores",
+      "chapter": "nar.chapter.01_first_light",
+      "order": 6,
+      "dialogue_keys": [
+        "loc.dlg.ch01.mira.radiate.1"
+      ]
+    },
+    {
+      "id": "nar.beat.01.orin_threshold",
+      "chapter": "nar.chapter.01_first_light",
+      "order": 7,
+      "dialogue_keys": [
+        "loc.dlg.ch01.orin.threshold.1",
+        "loc.dlg.ch01.orin.threshold.2",
+        "loc.dlg.ch01.orin.threshold.3",
+        "loc.dlg.ch01.orin.threshold.4"
+      ]
+    }
   ],
   "characters": [
-    {"id": "nar.character.weaver", "name_key": "loc.char.weaver.name", "role": "player", "speaks": false, "companion": false},
-    {"id": "nar.character.mira", "name_key": "loc.char.mira.name", "role": "cartographer", "speaks": true, "companion": false, "flags_written": ["nar.flag.mira_stops_mapping"], "flags_read": ["nar.flag.ch01_first_node_choice", "nar.flag.first_record_interpretation", "nar.flag.vault_record_kept", "nar.flag.final_configuration"]},
-    {"id": "nar.character.orin", "name_key": "loc.char.orin.name", "role": "keeper", "speaks": true, "companion": false, "flags_written": ["nar.flag.orin_accepts_design"], "flags_read": ["nar.flag.first_record_interpretation", "nar.flag.vault_record_kept", "nar.flag.nox_ember_awakening", "nar.flag.final_configuration"]},
-    {"id": "nar.character.nox", "name_key": "loc.char.nox.name", "role": "companion", "speaks": false, "companion": true, "flags_written": ["nar.flag.nox_trust_earned", "nar.flag.nox_ember_awakening", "nar.flag.nox_memory_unlocked"], "flags_read": ["nar.flag.nox_trust_earned", "nar.flag.nox_ember_awakening", "nar.flag.nox_memory_unlocked", "nar.flag.final_configuration"]},
-    {"id": "nar.character.quiet_architect", "name_key": "loc.char.quiet_architect.name", "role": "absent_builder", "speaks": false, "companion": false}
+    {
+      "id": "nar.character.weaver",
+      "name_key": "loc.char.weaver.name",
+      "role": "player",
+      "speaks": false,
+      "companion": false
+    },
+    {
+      "id": "nar.character.mira",
+      "name_key": "loc.char.mira.name",
+      "role": "cartographer",
+      "speaks": true,
+      "companion": false,
+      "flags_written": [
+        "nar.flag.mira_stops_mapping"
+      ],
+      "flags_read": [
+        "nar.flag.ch01_first_node_choice",
+        "nar.flag.first_record_interpretation",
+        "nar.flag.vault_record_kept",
+        "nar.flag.final_configuration"
+      ]
+    },
+    {
+      "id": "nar.character.orin",
+      "name_key": "loc.char.orin.name",
+      "role": "keeper",
+      "speaks": true,
+      "companion": false,
+      "flags_written": [
+        "nar.flag.orin_accepts_design"
+      ],
+      "flags_read": [
+        "nar.flag.first_record_interpretation",
+        "nar.flag.vault_record_kept",
+        "nar.flag.nox_ember_awakening",
+        "nar.flag.final_configuration"
+      ]
+    },
+    {
+      "id": "nar.character.nox",
+      "name_key": "loc.char.nox.name",
+      "role": "companion",
+      "speaks": false,
+      "companion": true,
+      "flags_written": [
+        "nar.flag.nox_trust_earned",
+        "nar.flag.nox_ember_awakening",
+        "nar.flag.nox_memory_unlocked"
+      ],
+      "flags_read": [
+        "nar.flag.nox_trust_earned",
+        "nar.flag.nox_ember_awakening",
+        "nar.flag.nox_memory_unlocked",
+        "nar.flag.final_configuration"
+      ]
+    },
+    {
+      "id": "nar.character.quiet_architect",
+      "name_key": "loc.char.quiet_architect.name",
+      "role": "absent_builder",
+      "speaks": false,
+      "companion": false
+    }
   ],
   "flags": [
-    {"id": "nar.flag.ch01_first_node_choice", "type": "enum", "values": ["unset", "near", "far"], "default": "unset", "written_in": "nar.chapter.01_first_light", "read_in": ["nar.chapter.01_first_light", "nar.chapter.02_broken_path"]},
-    {"id": "nar.flag.nox_trust_earned", "type": "bool", "values": [false, true], "default": false, "written_in": "nar.chapter.02_broken_path", "read_in": ["nar.chapter.04_glassroot", "nar.chapter.10_world_rewritten"]},
-    {"id": "nar.flag.first_record_interpretation", "type": "enum", "values": ["unset", "orin", "mira"], "default": "unset", "written_in": "nar.chapter.03_echoes_in_stone", "read_in": ["nar.chapter.05_sunken_grid", "nar.chapter.09_last_alignment"]},
-    {"id": "nar.flag.vault_record_kept", "type": "enum", "values": ["unset", "mira", "orin"], "default": "unset", "written_in": "nar.chapter.05_sunken_grid", "read_in": ["nar.chapter.09_last_alignment"]},
-    {"id": "nar.flag.nox_ember_awakening", "type": "bool", "values": [false, true], "default": false, "written_in": "nar.chapter.06_ember_hollow", "read_in": ["nar.chapter.07_silent_engine", "nar.chapter.10_world_rewritten"]},
-    {"id": "nar.flag.orin_accepts_design", "type": "bool", "values": [false, true], "default": false, "written_in": "nar.chapter.07_silent_engine", "read_in": ["nar.chapter.09_last_alignment", "nar.chapter.10_world_rewritten"]},
-    {"id": "nar.flag.mira_stops_mapping", "type": "bool", "values": [false, true], "default": false, "written_in": "nar.chapter.08_unfinished_pattern", "read_in": ["nar.chapter.09_last_alignment", "nar.chapter.10_world_rewritten"]},
-    {"id": "nar.flag.nox_memory_unlocked", "type": "bool", "values": [false, true], "default": false, "written_in": "nar.chapter.08_unfinished_pattern", "read_in": ["nar.chapter.10_world_rewritten"]},
-    {"id": "nar.flag.final_configuration", "type": "enum", "values": ["unset", "hold", "weave", "open"], "default": "unset", "written_in": "nar.chapter.10_world_rewritten", "read_in": ["nar.chapter.10_world_rewritten"]},
-    {"id": "nar.flag.epilogue_seen", "type": "bool", "values": [false, true], "default": false, "written_in": "nar.chapter.10_world_rewritten", "read_in": ["nar.chapter.10_world_rewritten"]}
+    {
+      "id": "nar.flag.ch01_first_node_choice",
+      "type": "enum",
+      "values": [
+        "unset",
+        "near",
+        "far"
+      ],
+      "default": "unset",
+      "written_in": "nar.chapter.01_first_light",
+      "read_in": [
+        "nar.chapter.01_first_light",
+        "nar.chapter.02_broken_path"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.flag.nox_trust_earned",
+      "type": "bool",
+      "values": [
+        false,
+        true
+      ],
+      "default": false,
+      "written_in": "nar.chapter.02_broken_path",
+      "read_in": [
+        "nar.chapter.04_glassroot",
+        "nar.chapter.10_world_rewritten"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.flag.first_record_interpretation",
+      "type": "enum",
+      "values": [
+        "unset",
+        "orin",
+        "mira"
+      ],
+      "default": "unset",
+      "written_in": "nar.chapter.03_echoes_in_stone",
+      "read_in": [
+        "nar.chapter.05_sunken_grid",
+        "nar.chapter.09_last_alignment"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.flag.vault_record_kept",
+      "type": "enum",
+      "values": [
+        "unset",
+        "mira",
+        "orin"
+      ],
+      "default": "unset",
+      "written_in": "nar.chapter.05_sunken_grid",
+      "read_in": [
+        "nar.chapter.09_last_alignment"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.flag.nox_ember_awakening",
+      "type": "bool",
+      "values": [
+        false,
+        true
+      ],
+      "default": false,
+      "written_in": "nar.chapter.06_ember_hollow",
+      "read_in": [
+        "nar.chapter.07_quiet_engine",
+        "nar.chapter.10_world_rewritten"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.flag.orin_accepts_design",
+      "type": "bool",
+      "values": [
+        false,
+        true
+      ],
+      "default": false,
+      "written_in": "nar.chapter.07_quiet_engine",
+      "read_in": [
+        "nar.chapter.09_last_alignment",
+        "nar.chapter.10_world_rewritten"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.flag.mira_stops_mapping",
+      "type": "bool",
+      "values": [
+        false,
+        true
+      ],
+      "default": false,
+      "written_in": "nar.chapter.08_unfinished_pattern",
+      "read_in": [
+        "nar.chapter.09_last_alignment",
+        "nar.chapter.10_world_rewritten"
+      ],
+      "scope": "LATER"
+    },
+    {
+      "id": "nar.flag.nox_memory_unlocked",
+      "type": "bool",
+      "values": [
+        false,
+        true
+      ],
+      "default": false,
+      "written_in": "nar.chapter.08_unfinished_pattern",
+      "read_in": [
+        "nar.chapter.10_world_rewritten"
+      ],
+      "scope": "LATER"
+    },
+    {
+      "id": "nar.flag.final_configuration",
+      "type": "enum",
+      "values": [
+        "unset",
+        "hold",
+        "weave",
+        "open"
+      ],
+      "default": "unset",
+      "written_in": "nar.chapter.10_world_rewritten",
+      "read_in": [
+        "nar.chapter.10_world_rewritten"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.flag.epilogue_seen",
+      "type": "bool",
+      "values": [
+        false,
+        true
+      ],
+      "default": false,
+      "written_in": "nar.chapter.10_world_rewritten",
+      "read_in": [
+        "nar.chapter.10_world_rewritten"
+      ],
+      "scope": "v1"
+    }
   ],
-  "flag_budget": 12,
+  "flag_budget": 60,
   "mysteries": [
-    {"id": "nar.mystery.why_the_weaver", "layer": "personal", "status": "COMPLETE", "stages": {"setup": "nar.chapter.01_first_light", "reinforcement": "nar.chapter.02_broken_path", "false_lead": "nar.chapter.04_glassroot", "partial": "nar.chapter.08_unfinished_pattern", "final": "nar.chapter.10_world_rewritten"}, "motifs": []},
-    {"id": "nar.mystery.who_built_the_loom", "layer": "who", "status": "INTENTIONALLY_UNRESOLVED", "unresolved_component": "identity", "stages": {"setup": "nar.chapter.01_first_light", "reinforcement": "nar.chapter.03_echoes_in_stone", "false_lead": "nar.chapter.05_sunken_grid", "partial": "nar.chapter.07_silent_engine", "final": "nar.chapter.10_world_rewritten"}, "motifs": ["nar.motif.three_notch_mark", "nar.motif.fourth_notch", "nar.motif.alignment_chord"]},
-    {"id": "nar.mystery.where_did_everyone_go", "layer": "what", "status": "COMPLETE", "stages": {"setup": "nar.chapter.02_broken_path", "reinforcement": "nar.chapter.03_echoes_in_stone", "false_lead": "nar.chapter.04_glassroot", "partial": "nar.chapter.05_sunken_grid", "final": "nar.chapter.09_last_alignment"}, "motifs": ["nar.motif.neat_toolline"]},
-    {"id": "nar.mystery.loom_true_purpose", "layer": "designed_to_become", "status": "COMPLETE", "spine": true, "stages": {"setup": "nar.chapter.01_first_light", "reinforcement": "nar.chapter.03_echoes_in_stone", "false_lead": "nar.chapter.04_glassroot", "partial": "nar.chapter.07_silent_engine", "final": "nar.chapter.10_world_rewritten"}, "motifs": ["nar.motif.growth_not_reversion", "nar.motif.orin_phrase"]},
-    {"id": "nar.mystery.who_caused_misalignment", "layer": "who", "status": "COMPLETE", "stages": {"setup": "nar.chapter.03_echoes_in_stone", "reinforcement": "nar.chapter.05_sunken_grid", "false_lead": "nar.chapter.05_sunken_grid", "partial": "nar.chapter.07_silent_engine", "final": "nar.chapter.09_last_alignment"}, "motifs": ["nar.motif.scratched_mark"]},
-    {"id": "nar.mystery.what_nox_is", "layer": "personal", "status": "COMPLETE", "stages": {"setup": "nar.chapter.01_first_light", "reinforcement": "nar.chapter.02_broken_path", "false_lead": "nar.chapter.04_glassroot", "partial": "nar.chapter.08_unfinished_pattern", "final": "nar.chapter.10_world_rewritten"}, "motifs": ["nar.motif.nox_call"]},
-    {"id": "nar.mystery.what_happens_if_completed", "layer": "designed_to_become", "status": "COMPLETE", "stages": {"setup": "nar.chapter.07_silent_engine", "reinforcement": "nar.chapter.08_unfinished_pattern", "false_lead": "nar.chapter.09_last_alignment", "partial": "nar.chapter.09_last_alignment", "final": "nar.chapter.10_world_rewritten"}, "motifs": ["nar.motif.empty_slot"]}
+    {
+      "id": "nar.mystery.why_the_weaver",
+      "layer": "personal",
+      "status": "COMPLETE",
+      "stages": {
+        "setup": "nar.chapter.01_first_light",
+        "reinforcement": "nar.chapter.02_broken_path",
+        "false_lead": "nar.chapter.04_glassroot",
+        "partial": "nar.chapter.08_unfinished_pattern",
+        "final": "nar.chapter.10_world_rewritten"
+      },
+      "motifs": [],
+      "later_dependent_stages": [
+        "partial"
+      ],
+      "v1_note": "stage(s) hosted by LATER chapter 08; v1 coverage of this stage is OPEN until relocated or Ch.08 reinstated (see CHAPTER_BEAT_MAP.md LATER section)."
+    },
+    {
+      "id": "nar.mystery.who_built_the_loom",
+      "layer": "who",
+      "status": "INTENTIONALLY_UNRESOLVED",
+      "unresolved_component": "identity",
+      "stages": {
+        "setup": "nar.chapter.01_first_light",
+        "reinforcement": "nar.chapter.03_echoes_in_stone",
+        "false_lead": "nar.chapter.05_sunken_grid",
+        "partial": "nar.chapter.07_quiet_engine",
+        "final": "nar.chapter.10_world_rewritten"
+      },
+      "motifs": [
+        "nar.motif.three_notch_mark",
+        "nar.motif.fourth_notch",
+        "nar.motif.alignment_chord"
+      ]
+    },
+    {
+      "id": "nar.mystery.where_did_everyone_go",
+      "layer": "what",
+      "status": "COMPLETE",
+      "stages": {
+        "setup": "nar.chapter.02_broken_path",
+        "reinforcement": "nar.chapter.03_echoes_in_stone",
+        "false_lead": "nar.chapter.04_glassroot",
+        "partial": "nar.chapter.05_sunken_grid",
+        "final": "nar.chapter.09_last_alignment"
+      },
+      "motifs": [
+        "nar.motif.neat_toolline"
+      ]
+    },
+    {
+      "id": "nar.mystery.loom_true_purpose",
+      "layer": "designed_to_become",
+      "status": "COMPLETE",
+      "spine": true,
+      "stages": {
+        "setup": "nar.chapter.01_first_light",
+        "reinforcement": "nar.chapter.03_echoes_in_stone",
+        "false_lead": "nar.chapter.04_glassroot",
+        "partial": "nar.chapter.07_quiet_engine",
+        "final": "nar.chapter.10_world_rewritten"
+      },
+      "motifs": [
+        "nar.motif.growth_not_reversion",
+        "nar.motif.orin_phrase"
+      ]
+    },
+    {
+      "id": "nar.mystery.who_caused_misalignment",
+      "layer": "who",
+      "status": "COMPLETE",
+      "stages": {
+        "setup": "nar.chapter.03_echoes_in_stone",
+        "reinforcement": "nar.chapter.05_sunken_grid",
+        "false_lead": "nar.chapter.05_sunken_grid",
+        "partial": "nar.chapter.07_quiet_engine",
+        "final": "nar.chapter.09_last_alignment"
+      },
+      "motifs": [
+        "nar.motif.scratched_mark"
+      ]
+    },
+    {
+      "id": "nar.mystery.what_nox_is",
+      "layer": "personal",
+      "status": "COMPLETE",
+      "stages": {
+        "setup": "nar.chapter.01_first_light",
+        "reinforcement": "nar.chapter.02_broken_path",
+        "false_lead": "nar.chapter.04_glassroot",
+        "partial": "nar.chapter.08_unfinished_pattern",
+        "final": "nar.chapter.10_world_rewritten"
+      },
+      "motifs": [
+        "nar.motif.nox_call"
+      ],
+      "later_dependent_stages": [
+        "partial"
+      ],
+      "v1_note": "stage(s) hosted by LATER chapter 08; v1 coverage of this stage is OPEN until relocated or Ch.08 reinstated (see CHAPTER_BEAT_MAP.md LATER section)."
+    },
+    {
+      "id": "nar.mystery.what_happens_if_completed",
+      "layer": "designed_to_become",
+      "status": "COMPLETE",
+      "stages": {
+        "setup": "nar.chapter.07_quiet_engine",
+        "reinforcement": "nar.chapter.08_unfinished_pattern",
+        "false_lead": "nar.chapter.09_last_alignment",
+        "partial": "nar.chapter.09_last_alignment",
+        "final": "nar.chapter.10_world_rewritten"
+      },
+      "motifs": [
+        "nar.motif.empty_slot"
+      ],
+      "later_dependent_stages": [
+        "reinforcement"
+      ],
+      "v1_note": "stage(s) hosted by LATER chapter 08; v1 coverage of this stage is OPEN until relocated or Ch.08 reinstated (see CHAPTER_BEAT_MAP.md LATER section)."
+    }
   ],
   "item_lore": [
-    {"id": "nar.item_lore.weaver_cube", "item_ref": "PROPOSED", "proposed_item_slug": "weaver_cube", "family": "relic", "tier": "chapter_relic", "chapter": "nar.chapter.01_first_light", "companion_reaction_eligible": true, "mysteries": ["nar.mystery.why_the_weaver", "nar.mystery.where_did_everyone_go"]},
-    {"id": "nar.item_lore.tuning_fork", "item_ref": "PROPOSED", "proposed_item_slug": "tuning_fork", "family": "tool", "tier": "named_artifact", "chapter": "nar.chapter.02_broken_path", "companion_reaction_eligible": true, "mysteries": ["nar.mystery.who_built_the_loom", "nar.mystery.where_did_everyone_go"]},
-    {"id": "nar.item_lore.archive_thread", "item_ref": "PROPOSED", "proposed_item_slug": "archive_thread", "family": "memory_collectible", "tier": "common_utility", "chapter": "nar.chapter.03_echoes_in_stone", "companion_reaction_eligible": false, "mysteries": []},
-    {"id": "nar.item_lore.memory_lens", "item_ref": "PROPOSED", "proposed_item_slug": "memory_lens", "family": "resonator", "tier": "chapter_relic", "chapter": "nar.chapter.04_glassroot", "companion_reaction_eligible": true, "mysteries": ["nar.mystery.loom_true_purpose", "nar.mystery.why_the_weaver"]},
-    {"id": "nar.item_lore.echo_compass", "item_ref": "PROPOSED", "proposed_item_slug": "echo_compass", "family": "tool", "tier": "named_artifact", "chapter": "nar.chapter.05_sunken_grid", "companion_reaction_eligible": false, "mysteries": ["nar.mystery.who_caused_misalignment"]},
-    {"id": "nar.item_lore.ember_dial", "item_ref": "PROPOSED", "proposed_item_slug": "ember_dial", "family": "field_module", "tier": "chapter_relic", "chapter": "nar.chapter.06_ember_hollow", "companion_reaction_eligible": true, "mysteries": ["nar.mystery.loom_true_purpose"]},
-    {"id": "nar.item_lore.quiet_coil", "item_ref": "PROPOSED", "proposed_item_slug": "quiet_coil", "family": "resonator", "tier": "chapter_relic", "chapter": "nar.chapter.07_silent_engine", "companion_reaction_eligible": true, "mysteries": ["nar.mystery.who_caused_misalignment", "nar.mystery.what_happens_if_completed"]},
-    {"id": "nar.item_lore.rootweave_gauntlet", "item_ref": "PROPOSED", "proposed_item_slug": "rootweave_gauntlet", "family": "tool", "tier": "chapter_relic", "chapter": "nar.chapter.08_unfinished_pattern", "companion_reaction_eligible": true, "mysteries": ["nar.mystery.why_the_weaver"]},
-    {"id": "nar.item_lore.lumen_seed", "item_ref": "PROPOSED", "proposed_item_slug": "lumen_seed", "family": "relic", "tier": "mastery_relic", "optional": true, "chapter": "nar.chapter.08_unfinished_pattern", "companion_reaction_eligible": true, "mysteries": ["nar.mystery.what_happens_if_completed"]},
-    {"id": "nar.item_lore.prism_key", "item_ref": "PROPOSED", "proposed_item_slug": "prism_key", "family": "relic", "tier": "mastery_relic", "optional": true, "chapter": "nar.chapter.09_last_alignment", "companion_reaction_eligible": false, "mysteries": ["nar.mystery.who_built_the_loom"]},
-    {"id": "nar.item_lore.fracture_seal", "item_ref": "PROPOSED", "proposed_item_slug": "fracture_seal", "family": "field_module", "tier": "chapter_relic", "chapter": "nar.chapter.09_last_alignment", "companion_reaction_eligible": true, "mysteries": ["nar.mystery.where_did_everyone_go", "nar.mystery.who_caused_misalignment"]},
-    {"id": "nar.item_lore.nox_harness", "item_ref": "PROPOSED", "proposed_item_slug": "nox_harness", "family": "companion_gear", "tier": "named_artifact", "chapter": "nar.chapter.02_broken_path", "companion_reaction_eligible": true, "mysteries": []}
+    {
+      "id": "nar.item_lore.weaver_cube",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "weaver_cube",
+      "family": "relic",
+      "tier": "chapter_relic",
+      "chapter": "nar.chapter.01_first_light",
+      "companion_reaction_eligible": true,
+      "mysteries": [
+        "nar.mystery.why_the_weaver",
+        "nar.mystery.where_did_everyone_go"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.item_lore.tuning_fork",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "tuning_fork",
+      "family": "tool",
+      "tier": "named_artifact",
+      "chapter": "nar.chapter.02_broken_path",
+      "companion_reaction_eligible": true,
+      "mysteries": [
+        "nar.mystery.who_built_the_loom",
+        "nar.mystery.where_did_everyone_go"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.item_lore.archive_thread",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "archive_thread",
+      "family": "memory_collectible",
+      "tier": "common_utility",
+      "chapter": "nar.chapter.03_echoes_in_stone",
+      "companion_reaction_eligible": false,
+      "mysteries": [],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.item_lore.memory_lens",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "memory_lens",
+      "family": "resonator",
+      "tier": "chapter_relic",
+      "chapter": "nar.chapter.04_glassroot",
+      "companion_reaction_eligible": true,
+      "mysteries": [
+        "nar.mystery.loom_true_purpose",
+        "nar.mystery.why_the_weaver"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.item_lore.echo_compass",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "echo_compass",
+      "family": "tool",
+      "tier": "named_artifact",
+      "chapter": "nar.chapter.05_sunken_grid",
+      "companion_reaction_eligible": false,
+      "mysteries": [
+        "nar.mystery.who_caused_misalignment"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.item_lore.ember_dial",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "ember_dial",
+      "family": "field_module",
+      "tier": "chapter_relic",
+      "chapter": "nar.chapter.06_ember_hollow",
+      "companion_reaction_eligible": true,
+      "mysteries": [
+        "nar.mystery.loom_true_purpose"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.item_lore.quiet_coil",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "quiet_coil",
+      "family": "resonator",
+      "tier": "chapter_relic",
+      "chapter": "nar.chapter.07_quiet_engine",
+      "companion_reaction_eligible": true,
+      "mysteries": [
+        "nar.mystery.who_caused_misalignment",
+        "nar.mystery.what_happens_if_completed"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.item_lore.rootweave_gauntlet",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "rootweave_gauntlet",
+      "family": "tool",
+      "tier": "chapter_relic",
+      "chapter": "nar.chapter.08_unfinished_pattern",
+      "companion_reaction_eligible": true,
+      "mysteries": [
+        "nar.mystery.why_the_weaver"
+      ],
+      "scope": "LATER"
+    },
+    {
+      "id": "nar.item_lore.lumen_seed",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "lumen_seed",
+      "family": "relic",
+      "tier": "mastery_relic",
+      "optional": true,
+      "chapter": "nar.chapter.08_unfinished_pattern",
+      "companion_reaction_eligible": true,
+      "mysteries": [
+        "nar.mystery.what_happens_if_completed"
+      ],
+      "scope": "LATER"
+    },
+    {
+      "id": "nar.item_lore.prism_key",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "prism_key",
+      "family": "relic",
+      "tier": "mastery_relic",
+      "optional": true,
+      "chapter": "nar.chapter.09_last_alignment",
+      "companion_reaction_eligible": false,
+      "mysteries": [
+        "nar.mystery.who_built_the_loom"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.item_lore.fracture_seal",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "fracture_seal",
+      "family": "field_module",
+      "tier": "chapter_relic",
+      "chapter": "nar.chapter.09_last_alignment",
+      "companion_reaction_eligible": true,
+      "mysteries": [
+        "nar.mystery.where_did_everyone_go",
+        "nar.mystery.who_caused_misalignment"
+      ],
+      "scope": "v1"
+    },
+    {
+      "id": "nar.item_lore.nox_harness",
+      "item_ref": "PROPOSED",
+      "proposed_item_slug": "nox_harness",
+      "family": "companion_gear",
+      "tier": "named_artifact",
+      "chapter": "nar.chapter.02_broken_path",
+      "companion_reaction_eligible": true,
+      "mysteries": [],
+      "scope": "v1"
+    }
   ],
   "item_lore_rejected": [
-    {"seed_candidate": "Wayfinder Shard", "decision": "MERGED", "into": "nar.character.nox", "reason": "duplicate semantic responsibility (companion discovery sensing)", "reopen_decision": "OD-05"}
+    {
+      "seed_candidate": "Wayfinder Shard",
+      "decision": "MERGED",
+      "into": "nar.character.nox",
+      "reason": "duplicate semantic responsibility (companion discovery sensing)",
+      "reopen_decision": "OD-05"
+    }
   ],
   "motifs": [
-    {"id": "nar.motif.three_notch_mark", "channel": "visual"},
-    {"id": "nar.motif.fourth_notch", "channel": "visual"},
-    {"id": "nar.motif.scratched_mark", "channel": "visual"},
-    {"id": "nar.motif.loom_hum", "channel": "audio"},
-    {"id": "nar.motif.alignment_chord", "channel": "audio"},
-    {"id": "nar.motif.misalignment_tone", "channel": "audio"},
-    {"id": "nar.motif.nox_call", "channel": "audio"},
-    {"id": "nar.motif.mira_phrase", "channel": "audio"},
-    {"id": "nar.motif.orin_phrase", "channel": "audio"},
-    {"id": "nar.motif.neat_toolline", "channel": "visual"},
-    {"id": "nar.motif.echo_state", "channel": "visual"},
-    {"id": "nar.motif.growth_not_reversion", "channel": "visual"},
-    {"id": "nar.motif.empty_slot", "channel": "visual"},
-    {"id": "nar.motif.creature_return", "channel": "visual_audio"}
+    {
+      "id": "nar.motif.three_notch_mark",
+      "channel": "visual"
+    },
+    {
+      "id": "nar.motif.fourth_notch",
+      "channel": "visual"
+    },
+    {
+      "id": "nar.motif.scratched_mark",
+      "channel": "visual"
+    },
+    {
+      "id": "nar.motif.loom_hum",
+      "channel": "audio"
+    },
+    {
+      "id": "nar.motif.alignment_chord",
+      "channel": "audio"
+    },
+    {
+      "id": "nar.motif.misalignment_tone",
+      "channel": "audio"
+    },
+    {
+      "id": "nar.motif.nox_call",
+      "channel": "audio"
+    },
+    {
+      "id": "nar.motif.mira_phrase",
+      "channel": "audio"
+    },
+    {
+      "id": "nar.motif.orin_phrase",
+      "channel": "audio"
+    },
+    {
+      "id": "nar.motif.neat_toolline",
+      "channel": "visual"
+    },
+    {
+      "id": "nar.motif.echo_state",
+      "channel": "visual"
+    },
+    {
+      "id": "nar.motif.growth_not_reversion",
+      "channel": "visual"
+    },
+    {
+      "id": "nar.motif.empty_slot",
+      "channel": "visual"
+    },
+    {
+      "id": "nar.motif.creature_return",
+      "channel": "visual_audio"
+    }
   ],
   "terms": [
-    {"id": "nar.term.asterra", "loc_key": "loc.term.asterra", "dnt": true},
-    {"id": "nar.term.axis_loom", "loc_key": "loc.term.axis_loom", "dnt": true},
-    {"id": "nar.term.great_misalignment", "loc_key": "loc.term.great_misalignment", "dnt": false},
-    {"id": "nar.term.weaver", "loc_key": "loc.term.weaver", "dnt": false},
-    {"id": "nar.term.node", "loc_key": "loc.term.node", "dnt": false},
-    {"id": "nar.term.alignment", "loc_key": "loc.term.alignment", "dnt": false},
-    {"id": "nar.term.misalignment", "loc_key": "loc.term.misalignment", "dnt": false},
-    {"id": "nar.term.echo", "loc_key": "loc.term.echo", "dnt": false},
-    {"id": "nar.term.record", "loc_key": "loc.term.record", "dnt": false},
-    {"id": "nar.term.relic", "loc_key": "loc.term.relic", "dnt": false},
-    {"id": "nar.term.keeper", "loc_key": "loc.term.keeper", "dnt": false},
-    {"id": "nar.term.cartographer", "loc_key": "loc.term.cartographer", "dnt": false},
-    {"id": "nar.term.quiet_architect", "loc_key": "loc.term.quiet_architect", "dnt": false},
-    {"id": "nar.term.three_notch_mark", "loc_key": "loc.term.three_notch_mark", "dnt": false},
-    {"id": "nar.term.hearthwild", "loc_key": "loc.term.hearthwild", "dnt": true},
-    {"id": "nar.term.glassroot", "loc_key": "loc.term.glassroot", "dnt": true},
-    {"id": "nar.term.sunken_grid", "loc_key": "loc.term.sunken_grid", "dnt": false},
-    {"id": "nar.term.ember_hollow", "loc_key": "loc.term.ember_hollow", "dnt": false},
-    {"id": "nar.term.verdant_archive", "loc_key": "loc.term.verdant_archive", "dnt": false},
-    {"id": "nar.term.quiet_engine", "loc_key": "loc.term.quiet_engine", "dnt": false},
-    {"id": "nar.term.hold", "loc_key": "loc.term.hold", "dnt": false, "status": "PROPOSED", "decision": "OD-04"},
-    {"id": "nar.term.weave", "loc_key": "loc.term.weave", "dnt": false, "status": "PROPOSED", "decision": "OD-04"},
-    {"id": "nar.term.open", "loc_key": "loc.term.open", "dnt": false, "status": "PROPOSED", "decision": "OD-04"}
-  ]
+    {
+      "id": "nar.term.asterra",
+      "loc_key": "loc.term.asterra",
+      "dnt": true,
+      "public_status": "INTERNAL_ONLY_UNTIL_LEGAL_CLEARANCE",
+      "decision": "PD-026 §3 / PD-028 §D"
+    },
+    {
+      "id": "nar.term.axis_loom",
+      "loc_key": "loc.term.axis_loom",
+      "dnt": true
+    },
+    {
+      "id": "nar.term.great_misalignment",
+      "loc_key": "loc.term.great_misalignment",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.weaver",
+      "loc_key": "loc.term.weaver",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.node",
+      "loc_key": "loc.term.node",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.alignment",
+      "loc_key": "loc.term.alignment",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.misalignment",
+      "loc_key": "loc.term.misalignment",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.echo",
+      "loc_key": "loc.term.echo",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.record",
+      "loc_key": "loc.term.record",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.relic",
+      "loc_key": "loc.term.relic",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.keeper",
+      "loc_key": "loc.term.keeper",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.cartographer",
+      "loc_key": "loc.term.cartographer",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.quiet_architect",
+      "loc_key": "loc.term.quiet_architect",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.three_notch_mark",
+      "loc_key": "loc.term.three_notch_mark",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.hearthwild",
+      "loc_key": "loc.term.hearthwild",
+      "dnt": true
+    },
+    {
+      "id": "nar.term.glassroot",
+      "loc_key": "loc.term.glassroot",
+      "dnt": true
+    },
+    {
+      "id": "nar.term.sunken_grid",
+      "loc_key": "loc.term.sunken_grid",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.ember_hollow",
+      "loc_key": "loc.term.ember_hollow",
+      "dnt": false
+    },
+    {
+      "id": "nar.term.verdant_archive",
+      "loc_key": "loc.term.verdant_archive",
+      "dnt": false,
+      "scope": "LATER",
+      "decision": "PD-028 §C"
+    },
+    {
+      "id": "nar.term.quiet_engine",
+      "loc_key": "loc.term.quiet_engine",
+      "dnt": false,
+      "canonical_for": "engine biome/chapter concept",
+      "decision": "PD-028 §B"
+    },
+    {
+      "id": "nar.term.hold",
+      "loc_key": "loc.term.hold",
+      "dnt": false,
+      "status": "APPROVED_WORKING_NAME",
+      "decision": "PD-018 / PD-028 §E",
+      "note": "three-option structure stable; EN label may be refined via loc key without ID change"
+    },
+    {
+      "id": "nar.term.weave",
+      "loc_key": "loc.term.weave",
+      "dnt": false,
+      "status": "APPROVED_WORKING_NAME",
+      "decision": "PD-018 / PD-028 §E",
+      "note": "three-option structure stable; EN label may be refined via loc key without ID change"
+    },
+    {
+      "id": "nar.term.open",
+      "loc_key": "loc.term.open",
+      "dnt": false,
+      "status": "APPROVED_WORKING_NAME",
+      "decision": "PD-018 / PD-028 §E",
+      "note": "three-option structure stable; EN label may be refined via loc key without ID change"
+    }
+  ],
+  "approval": {
+    "decision": "PD-028",
+    "authority": "Human Product Authority via AI-01",
+    "register": "01_PREPRODUCTION/PRODUCT/PRODUCT_DECISION_REGISTER.md (branch ai-01-product, v1.2.0)",
+    "approved_version": "0.1.0",
+    "note": "v0.1.1 applies the PD-028 resolutions (S1 Quiet Engine rename, S2 Verdant Archive/Ch.08 LATER) to the approved v0.1.0 baseline. No canon added."
+  },
+  "superseded_ids": [
+    {
+      "old": "nar.chapter.07_silent_engine",
+      "new": "nar.chapter.07_quiet_engine",
+      "decision": "PD-028 §B",
+      "kind": "pre-freeze rename (DRAFT, no migration)",
+      "reason": "one canonical engine term: Quiet Engine"
+    }
+  ],
+  "scope_summary": {
+    "v1_chapter_count": 9,
+    "v1_chapter_ceiling": 9,
+    "later_chapters": [
+      "nar.chapter.08_unfinished_pattern"
+    ],
+    "v1_biomes": [
+      "hearthwild",
+      "glassroot",
+      "sunken_grid",
+      "ember_hollow",
+      "quiet_engine"
+    ],
+    "later_biomes": [
+      "verdant_archive"
+    ],
+    "v1_biome_count": 5,
+    "decision": "PD-028 §C"
+  },
+  "flag_budget_per_chapter": 6,
+  "flag_budget_decision": "PD-003 / PD-028 §F (replaces AI-09 provisional ceiling of 12)"
 }
