@@ -35,6 +35,7 @@ func _initialize() -> void:
 	_test_completion_idempotency()
 	_test_level_advancement()
 	_test_content_id_consistency()
+	_test_scene_integration()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
 		print("  - ", f)
@@ -325,6 +326,39 @@ func _test_content_id_consistency() -> void:
 	_check("nox_meets grants resolvable equipment",
 			StoryContent.equipment_id_for("reward.01.nox_meets") != ""
 			and not StoryContent.equipment_for("reward.01.nox_meets").is_empty())
+
+func _test_scene_integration() -> void:
+	print("[scene integration]")
+	# Load the real Main scene and drive the wired controller -> view -> domain loop,
+	# so the test exercises the actual scene graph (nodes, HUD bind, cube view build),
+	# not a hand-assembled controller.
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	var packed: PackedScene = load("res://scenes/Main.tscn")
+	_check("Main.tscn loads as PackedScene", packed != null)
+	if packed == null:
+		return
+	var main = packed.instantiate()
+	main._ready()  # run the real wiring: HUD bind, world + cube build, level load
+	_check("cube view builds facelets for 2x2", main.cube_view != null and main.cube_view.get_child_count() == 6 * 2 * 2)
+	_check("HUD is bound to the controller", main.get_node_or_null("HUD").controller == main)
+	_check("world view built its markers", main.world_view != null and main.world_view.lit_count() == 0)
+	main.try_move("U", true)  # exercise the input -> domain -> view path
+	main.undo()               # restore the exact scrambled state before replay
+	# Solve level 1 by reverse-replaying its scramble, then complete it once.
+	for i in range(main.engine._scramble_moves.size() - 1, -1, -1):
+		main.engine.apply_move(MoveTable.inverse(main.engine._scramble_moves[i]))
+	_check("level 1 solved through the controller", main.engine.is_solved())
+	_check("confirm_solve succeeds in the real scene", main.confirm_solve())
+	get_root().remove_child(main)
+	main.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
 
 func _colour_histogram(c: CubeState) -> Dictionary:
 	var h := {}

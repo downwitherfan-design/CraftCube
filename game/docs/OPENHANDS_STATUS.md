@@ -7,7 +7,7 @@ Compact, factual status for external reviewers. Companion to
 |---|---|
 | Last verified (UTC) | 2026-10-10T17:23:09Z |
 | Working branch | `godot-migration` |
-| Last commit (pushed) | `acb8951` (remote: **not pushed** — write access blocked, see below) |
+| Last commit (pushed) | `1f1d099` (remote: **not pushed** — write access blocked, see below) |
 | Engine | Godot 4.7.2-stable + GDScript, Android-first |
 | Milestone | M1 — delivery path + deep audit + hardening + verified Android build |
 | Phase 00 gate | **NOT PASSED** (CR-0012 fix not yet on `integration`; CR-0013 + human ODs open) |
@@ -44,13 +44,13 @@ Compact, factual status for external reviewers. Companion to
 | Artifact field | Value |
 |---|---|
 | Size | 28,338,657 bytes |
-| SHA-256 | `110e106ad9e66c1fe926e15fbe0fba85bf03db47baef70ae34035645b3f1b486` |
+| SHA-256 | `d0e6fc1b3d42c64d3ec7d5985796f9652a245903944965afd31471a6a470f757` |
 | Package / version | `com.downwitherfandesign.craftcube` / 0.1.0 (code 1) |
 | min / target SDK | 24 / 36 |
 | ABI | arm64-v8a |
 | Signature | verified (`CN=Android Debug`) — throwaway debug key, not committed |
 
-6. **Tests.** Domain suite **116 passed / 0 failed**; main scene headless boot clean.
+6. **Tests.** Domain suite **132 passed / 0 failed**; main scene headless boot clean.
    Evidence logs in `game/docs/evidence/`.
 
 ## Current failures / blockers

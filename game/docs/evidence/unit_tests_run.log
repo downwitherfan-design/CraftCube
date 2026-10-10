@@ -12,7 +12,7 @@ WARNING: SaveManager: save version 9999 is newer than supported 1
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:56)
-         [1] _test_save_load (res://tests/run_tests.gd:154)
+         [1] _test_save_load (res://tests/run_tests.gd:155)
          [2] _initialize (res://tests/run_tests.gd:30)
 [level catalog]
 [end-to-end solve]
@@ -22,15 +22,21 @@ ERROR: Parse JSON failed. Error at line 0: Expected key
    at: parse_string (core/io/json.cpp:629)
    GDScript backtrace (most recent call first):
        [0] load_from_path (res://scripts/game/save_manager.gd:45)
-       [1] _test_save_hardening (res://tests/run_tests.gd:246)
+       [1] _test_save_hardening (res://tests/run_tests.gd:247)
        [2] _initialize (res://tests/run_tests.gd:34)
 WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:47)
-         [1] _test_save_hardening (res://tests/run_tests.gd:246)
+         [1] _test_save_hardening (res://tests/run_tests.gd:247)
          [2] _initialize (res://tests/run_tests.gd:34)
 [completion idempotency]
 [level advancement]
 [content id consistency]
-== Summary: 126 passed, 0 failed ==
+[scene integration]
+ERROR: Condition "p_child->data.parent != this" is true.
+   at: remove_child (scene/main/node.cpp:1751)
+   GDScript backtrace (most recent call first):
+       [0] _test_scene_integration (res://tests/run_tests.gd:354)
+       [1] _initialize (res://tests/run_tests.gd:38)
+== Summary: 132 passed, 0 failed ==

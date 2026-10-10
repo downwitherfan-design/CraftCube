@@ -15,6 +15,12 @@ Could not find version of build tools that matches Target SDK, using 34.0.0
 [  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
 [92m[ DONE ][39m [1mfirst_scan_filesystem[22m
 [0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (3 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | GameController[39m[0m
+[  25% ] [90m[1mupdate_scripts_classes[22m | StoryContent[39m[0m
+[  50% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[92m[ DONE ][39m [1mupdate_scripts_classes[22m
+[0m
 [   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
 [   0% ] [90m[1mloading_editor_layout[22m | Loading editor layout...[39m[0m
 [  16% ] [90m[1mloading_editor_layout[22m | Loading docks...[39m[0m
@@ -37,7 +43,7 @@ WARNING: SaveManager: save version 9999 is newer than supported 1
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:56)
-         [1] _test_save_load (res://tests/run_tests.gd:153)
+         [1] _test_save_load (res://tests/run_tests.gd:155)
          [2] _initialize (res://tests/run_tests.gd:30)
 [level catalog]
 [end-to-end solve]
@@ -47,17 +53,24 @@ ERROR: Parse JSON failed. Error at line 0: Expected key
    at: parse_string (core/io/json.cpp:629)
    GDScript backtrace (most recent call first):
        [0] load_from_path (res://scripts/game/save_manager.gd:45)
-       [1] _test_save_hardening (res://tests/run_tests.gd:245)
+       [1] _test_save_hardening (res://tests/run_tests.gd:247)
        [2] _initialize (res://tests/run_tests.gd:34)
 WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:47)
-         [1] _test_save_hardening (res://tests/run_tests.gd:245)
+         [1] _test_save_hardening (res://tests/run_tests.gd:247)
          [2] _initialize (res://tests/run_tests.gd:34)
 [completion idempotency]
 [level advancement]
-== Summary: 116 passed, 0 failed ==
+[content id consistency]
+[scene integration]
+ERROR: Condition "p_child->data.parent != this" is true.
+   at: remove_child (scene/main/node.cpp:1751)
+   GDScript backtrace (most recent call first):
+       [0] _test_scene_integration (res://tests/run_tests.gd:354)
+       [1] _initialize (res://tests/run_tests.gd:38)
+== Summary: 132 passed, 0 failed ==
 
 === main scene smoke boot ===
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
@@ -197,7 +210,7 @@ Signed
 [0m
 cannot connect to daemon at tcp:5037: Cannot assign requested address
 APK produced:
--rw-r--r-- 1 openhands openhands 28338657 Oct 10 17:22 /workspace/project/CraftCube/dist/CraftCube.apk
-110e106ad9e66c1fe926e15fbe0fba85bf03db47baef70ae34035645b3f1b486  /workspace/project/CraftCube/dist/CraftCube.apk
+-rw-r--r-- 1 openhands openhands 28338657 Oct 10 17:26 /workspace/project/CraftCube/dist/CraftCube.apk
+d0e6fc1b3d42c64d3ec7d5985796f9652a245903944965afd31471a6a470f757  /workspace/project/CraftCube/dist/CraftCube.apk
 
 CI: PASS
