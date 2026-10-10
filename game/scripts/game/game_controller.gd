@@ -20,6 +20,7 @@ var current_index := 0
 
 var cube_view: CubeView
 var world_view: WorldView
+var camera: OrbitCamera
 
 # When an animated turn ends the truth layer is advanced; this holds the in-flight move.
 var _pending_move: Dictionary = {}
@@ -34,6 +35,9 @@ func _ready() -> void:
 	levels = LevelCatalog.chapter_one()
 	cube_view = get_node_or_null("CubeView")
 	world_view = get_node_or_null("WorldView")
+	camera = get_node_or_null("Camera3D")
+	if camera:
+		camera.reset_view()
 	if world_view:
 		world_view.build()
 	var hud := get_node_or_null("HUD")

@@ -21,3 +21,15 @@ xvfb-run -a -s "-screen 0 720x1280x24" \
 
 Note: this validates on-screen rendering of the slice. There is still no physical Android
 device in this environment, so it is NOT a device playtest.
+
+## Session 10 addendum (2026-10-10) — Milestone B: interactive camera
+
+- `session10_initial.png` — default readable framing of the cube + full HUD (now including
+  the Hint and Guide: next step controls).
+- `session10_orbit.png` — after an orbit (yaw +0.7, pitch −0.2) and a zoom-in (−1.0): the
+  camera angle and distance genuinely changed, and the cube stays centred on its target.
+- `session10_hint.png` — after pressing Hint: the guide line names the next reliable step
+  (face + direction) and the remaining step count.
+
+Reproduced with `game/tests/capture_frames.gd` under Xvfb (same command as above). Rendering
+only — NOT a physical device playtest.

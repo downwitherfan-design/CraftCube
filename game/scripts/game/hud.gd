@@ -46,6 +46,8 @@ func _label(text: String, size: int) -> Label:
 	l.text = text
 	l.add_theme_font_size_override("font_size", size)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# Labels must not eat mouse events; empty-space drags should reach the orbit camera.
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return l
 
 func _button(text: String) -> Button:

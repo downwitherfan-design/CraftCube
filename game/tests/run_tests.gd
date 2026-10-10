@@ -41,6 +41,7 @@ func _initialize() -> void:
 	_test_scene_integration()
 	_test_completion_feedback()
 	_test_camera_framing()
+	_test_orbit_camera()
 	_test_resume_selection()
 	_test_chapter_playthrough()
 	_test_face_orientation()
@@ -579,6 +580,7 @@ func _test_camera_framing() -> void:
 		return
 	var main = packed.instantiate()
 	root.add_child(main)
+	main._ready()  # camera transform is computed at runtime by OrbitCamera._ready
 	var cam = main.get_node_or_null("Camera3D")
 	_check("camera exists", cam != null)
 	if cam != null:
@@ -599,6 +601,7 @@ func _test_camera_framing() -> void:
 				for sz in [-1.0, 1.0]:
 					var local: Vector3 = inv * Vector3(sx, sy, sz)
 					var h_ang: float = rad_to_deg(atan2(local.x, -local.z))
+
 					var v_ang: float = rad_to_deg(atan2(local.y, -local.z))
 					max_h = maxf(max_h, absf(h_ang))
 					max_v = maxf(max_v, absf(v_ang))
@@ -617,6 +620,86 @@ func _test_camera_framing() -> void:
 	if main.get_parent() != null:
 		main.get_parent().remove_child(main)
 	main.free()
+
+## Milestone B: the interactive camera must genuinely change the rendered transform, respect
+## its bounds, reset to a readable default, and never be driven by a HUD button tap.
+func _test_orbit_camera() -> void:
+	print("[orbit camera]")
+	var m = load("res://scenes/Main.tscn").instantiate()
+	root.add_child(m)
+	m._ready()
+	var cam = m.get_node_or_null("Camera3D")
+	_check("orbit camera is wired into the scene", cam != null)
+	if cam == null:
+		m.free()
+		return
+	_check("camera starts at default distance", absf(cam.get_distance() - 7.3) < 0.01)
+	var default_pos: Vector3 = cam.transform.origin
+	var default_basis: Basis = cam.transform.basis
+	cam.orbit(0.5, 0.0)
+	for _i in range(40):
+		cam._process(0.05)
+	_check("horizontal orbit changes the camera position", cam.transform.origin.distance_to(default_pos) > 0.2)
+	_check("horizontal orbit changes the camera orientation", not cam.transform.basis.is_equal_approx(default_basis))
+	var to_target: Vector3 = (Vector3.ZERO - cam.transform.origin).normalized()
+	_check("camera still looks at the cube centre", to_target.dot(cam.transform.basis.z) < -0.99)
+	var before_zoom: float = cam.get_distance()
+	cam.zoom(-1.5)
+	for _i in range(40):
+		cam._process(0.05)
+	_check("zoom-in changes viewing distance", cam.get_distance() < before_zoom - 0.5)
+	cam.zoom(-100.0)
+	for _i in range(80):
+		cam._process(0.05)
+	_check("zoom cannot go below the minimum distance", cam.get_distance() >= 4.2 - 0.001)
+	cam.zoom(100.0)
+	for _i in range(80):
+		cam._process(0.05)
+	_check("zoom cannot exceed the maximum distance", cam.get_distance() <= 12.0 + 0.001)
+	cam.orbit(0.0, 100.0)
+	for _i in range(60):
+		cam._process(0.05)
+	_check("pitch is clamped at the top", cam.get_pitch() <= 1.35 + 0.001)
+	cam.orbit(0.0, -100.0)
+	for _i in range(60):
+		cam._process(0.05)
+	_check("pitch is clamped at the bottom", cam.get_pitch() >= 0.12 - 0.001)
+	for _i in range(200):
+		cam.orbit(0.3, 0.2)
+	for _i in range(40):
+		cam._process(0.05)
+	_check("repeated orbit keeps the yaw finite", is_finite(cam.get_yaw()))
+	_check("repeated orbit keeps the pitch within bounds", cam.get_pitch() >= 0.12 - 0.001 and cam.get_pitch() <= 1.35 + 0.001)
+	cam.reset_view()
+	_check("reset restores the default distance", absf(cam.get_distance() - 7.3) < 0.01)
+	_check("reset restores the default orientation", cam.transform.basis.is_equal_approx(default_basis))
+	var hud = m.get_node_or_null("HUD")
+	_check("HUD exists", hud != null)
+	if hud != null:
+		var face_btn: Button = hud._face_buttons[0]["button"]
+		_check("face buttons consume input (no camera drag through them)", face_btn.mouse_filter == Control.MOUSE_FILTER_STOP)
+		_check("status label lets drags through to the camera", hud._status.mouse_filter == Control.MOUSE_FILTER_IGNORE)
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	cam._unhandled_input(press)
+	var release := InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.pressed = false
+	cam._unhandled_input(release)
+	for _i in range(10):
+		cam._process(0.05)
+	_check("a tap with no drag does not move the camera", absf(cam.get_yaw() - 0.62) < 0.001)
+	var wheel := InputEventMouseButton.new()
+	wheel.button_index = MOUSE_BUTTON_WHEEL_UP
+	wheel.pressed = true
+	cam._unhandled_input(wheel)
+	for _i in range(20):
+		cam._process(0.05)
+	_check("mouse wheel zooms the camera", cam.get_distance() < 7.3)
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
 
 ## Resume selection: relaunching after finishing a level must open the next unsolved
 ## level, not replay the one just completed. Regression for a real UX defect.

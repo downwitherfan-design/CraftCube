@@ -1,0 +1,16 @@
+CraftCube evidence — Session 10, Milestone B (interactive camera + HUD pass-through)
+Date: 2026-10-10  Branch: godot-migration  Engine: Godot 4.7.2-stable (headless/opengl3)
+
+Unit tests (godot --headless --path game --script res://tests/run_tests.gd):
+  == Summary: 296 passed, 0 failed ==   (was 277 after Milestone A)
+
+Main scene smoke boot (godot --headless --path game --quit-after 30):
+  exit 0, no SCRIPT ERROR.
+
+Rendered frames (xvfb-run, 720x1280, opengl3/Mesa llvmpipe) via res://tests/capture_frames.gd:
+  session10_initial.png  2f9ce36e86db01cc1240aa469b33acde447fa51e327854e609529d3b2b20ab73
+  session10_orbit.png    296e9d0baa5104469a47d8d16db42fc1162879c7fc19a6a4a7b34373b36fe636
+  session10_hint.png     848b42c2bdad21e9b56b791ac7b274e615d87ada42d932fefbd413762a2c1b68
+
+Scope: orbit/zoom/reset camera verified; HUD labels ignore mouse so empty-space drags reach
+the camera while buttons still consume taps. Rendering only — NOT a physical device playtest.
