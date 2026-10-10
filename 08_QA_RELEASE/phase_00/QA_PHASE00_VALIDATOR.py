@@ -23,6 +23,10 @@ Checks (deterministic, stdlib only, no network, read-only):
      C1 Parses; QAR IDs unique and well-formed; scopes/severities consistent.
      C2 Scan: IDENTIFIER-scope files for affirmative rejected terms -> FAIL;
         DESIGN_DOC-scope files -> INFO listing only (human review).
+        JSON IDENTIFIER files are scanned structurally: a rejected term inside a
+        declared forbidden-term list, a prose/description field, or a cut-list entry
+        marked REJECT is INFO (it is a declaration, not affirmative use); a term used as
+        a key, id, or ordinary value still FAILs.
         PLAYER_FACING_STRING scope reports SCOPE_EMPTY when no files match.
   D. Playtest session record schema + MOCK fixture
      D1 Schema parses; fixture validates against the schema (subset checker).
@@ -214,6 +218,84 @@ def _term_regex(term: str, mode: str) -> re.Pattern:
     return re.compile(esc, re.IGNORECASE)
 
 
+_FORBIDDEN_LIST_KEY_RE = re.compile(r"forbidden|disallow|banned|blocklist|denylist|prohibited", re.IGNORECASE)
+_PROSE_KEY_RE = re.compile(r"description|note|summary|rationale|comment|narrative|flavor|flavour|detail|"
+                           r"intent|purpose|context|explanation|example|body|text|title", re.IGNORECASE)
+_REJECT_STATUS_RE = re.compile(r"^\s*(REJECT|REJECTED|CUT|REMOVED|RETIRED)\b", re.IGNORECASE)
+
+
+def _walk_strings(node, keys=(), parent=None):
+    """Yield (parent_container, ancestor_keys, value) for every string in a parsed JSON value.
+
+    `ancestor_keys` is the tuple of mapping keys from the root to this value (list elements
+    inherit their list's key), so a term inside `ipForbiddenTerms.terms[]` is attributed to
+    both `ipForbiddenTerms` and `terms`; `parent_container` is the immediate dict, so a
+    cut-list entry's sibling `status` is visible."""
+    if isinstance(node, dict):
+        for k, v in node.items():
+            yield from _walk_strings(v, keys + (k,), node)
+    elif isinstance(node, list):
+        for it in node:
+            yield from _walk_strings(it, keys, node)
+    elif isinstance(node, str):
+        yield (parent, keys, node)
+
+
+# classification of a term occurrence, mirroring the C2 forbid-list/prose/cut-list rules.
+_DECLARATION, _PROSE, _REJECT_ENTRY, _AFFIRMATIVE = 0, 1, 2, 3
+
+
+def _classify_json_node(parent, keys, term: str) -> int:
+    """Classify the container that holds a match of `term`. A term inside a forbidden-term
+    list or a cut-list entry marked REJECT is a declaration; inside a prose field it is
+    human-review INFO; anywhere else (kept key, id, ordinary value) it is affirmative use.
+    Classification is per occurrence, so a declaration elsewhere in the document can never
+    exempt a term that is *also* used as an identifier."""
+    if isinstance(parent, dict) and isinstance(parent.get("status"), str) and _REJECT_STATUS_RE.match(parent["status"]):
+        return _REJECT_ENTRY
+    if any(_FORBIDDEN_LIST_KEY_RE.search(k) for k in keys):
+        return _DECLARATION
+    if any(_PROSE_KEY_RE.search(k) for k in keys):
+        return _PROSE
+    return _AFFIRMATIVE
+
+
+def _scan_json_identifier(text: str, rel: str, rules: dict) -> tuple[list[str], list[str]]:
+    """C2 scan for a JSON/structured file. Forbidden terms used as a *key*, an ID, or an
+    ordinary value still FAIL; a term inside a declared forbidden-term list, a prose
+    description field, or a cut-list entry marked REJECT is INFO (human review)."""
+    fails: list[str] = []
+    infos: list[str] = []
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        # Not parseable as JSON (YAML/CSV/JSONC): fall back to the raw text scan.
+        for rule in rules["rules"]:
+            for term in rule["terms"]:
+                rx = _term_regex(term, rule["matchMode"])
+                for m in rx.finditer(text):
+                    ln = text.count("\n", 0, m.start()) + 1
+                    fails.append(f"C2 IDENTIFIER {rule['id']} '{term}' in {rel}:{ln}")
+        return fails, infos
+
+    for rule in rules["rules"]:
+        for term in rule["terms"]:
+            term_rx = _term_regex(term, rule["matchMode"])
+            for parent, keys, value in _walk_strings(data):
+                m = term_rx.search(value)
+                if not m:
+                    continue
+                # report the line of the actual match, not the first identical value elsewhere
+                off = text.find(value)
+                line = text.count("\n", 0, off + m.start()) + 1 if off >= 0 else 0
+                msg = f"C2 IDENTIFIER {rule['id']} '{term}' in {rel}:{line}"
+                if _classify_json_node(parent, keys, term) != _AFFIRMATIVE:
+                    infos.append(msg + " [declaration/prose]")
+                else:
+                    fails.append(msg)
+    return fails, infos
+
+
 def check_term_rules(rules: dict) -> tuple[list[str], list[str]]:
     fails: list[str] = []
     infos: list[str] = []
@@ -249,6 +331,17 @@ def check_term_rules(rules: dict) -> tuple[list[str], list[str]]:
             try:
                 text = p.read_text(encoding="utf-8")
             except UnicodeDecodeError:
+                continue
+            if scope_name == "IDENTIFIER" and p.suffix == ".json":
+                # Structural scan: a forbidden term in a declared forbidden-term list,
+                # a prose field, or a REJECT cut-list entry is INFO; a term used as an
+                # ID/key/value still FAILs.
+                jf, ji = _scan_json_identifier(text, rel, rules)
+                if severity == "FAIL":
+                    fails.extend(jf)
+                else:
+                    infos.extend(jf)
+                infos.extend(ji)
                 continue
             for rule in rules["rules"]:
                 for term in rule["terms"]:
@@ -372,6 +465,15 @@ def check_schema_privacy(schema: dict) -> list[str]:
 
 
 # --------------------------------------------------------------------------- E
+_VERSION_RE = re.compile(r"(?<![0-9A-Za-z])v?([0-9]+\.[0-9]+\.[0-9]+)(?![0-9A-Za-z])")
+
+
+def _versions_in(text: str) -> list[tuple[int, int, int]]:
+    """Distinct semantic versions mentioned in a document (a leading `v` is allowed),
+    sorted ascending. Used to detect that a document legitimately advanced past a baseline."""
+    return sorted({tuple(int(x) for x in m.split(".")) for m in _VERSION_RE.findall(text)})
+
+
 def check_product_docs(reg: dict) -> tuple[list[str], list[str], list[str]]:
     fails: list[str] = []
     infos: list[str] = []
@@ -390,7 +492,19 @@ def check_product_docs(reg: dict) -> tuple[list[str], list[str], list[str]]:
             if not m:
                 infos.append(f"E3 {src['sourceId']}: version table row not found")
             elif m.group(1) != src["version"]:
-                fails.append(f"E3 {src['sourceId']}: document version {m.group(1)} != baseline {src['version']}")
+                cur = tuple(int(x) for x in m.group(1).split("."))
+                base = tuple(int(x) for x in src["version"].split("."))
+                versions = _versions_in(text)
+                # The document may legitimately advance past the baseline. Accept only when the
+                # baseline version is still recorded in the document, the document advanced
+                # forward, and the version-table value is the highest version present. A
+                # rollback (current < baseline) or an invented/never-recorded baseline FAILs.
+                advanced = (base in versions and cur > base and versions[-1] == cur)
+                if advanced:
+                    infos.append(f"E3 {src['sourceId']}: document advanced to {m.group(1)} "
+                                 f"(baseline {src['version']} is recorded as superseded)")
+                else:
+                    fails.append(f"E3 {src['sourceId']}: document version {m.group(1)} != baseline {src['version']}")
         # E1 IDs
         prefix = {"SRC-PD": "PD", "SRC-F10": "F10", "SRC-IGM": "IGM", "SRC-CUT": "CUT"}.get(src["sourceId"])
         if prefix:
@@ -418,12 +532,14 @@ def check_product_docs(reg: dict) -> tuple[list[str], list[str], list[str]]:
 
 
 # --------------------------------------------------------------------------- F
-def selftest(reg: dict, schema: dict, fixture: dict) -> list[str]:
-    """Negative cases on in-memory copies. Returns FAIL messages if a check
-    that should have failed did not."""
+def selftest(reg: dict, schema: dict, fixture: dict) -> tuple[list[str], int]:
+    """Negative cases on in-memory copies. Returns (FAIL messages, number of cases)."""
     problems: list[str] = []
+    checks = 0
 
     def expect_fail(name, fails_list):
+        nonlocal checks
+        checks += 1
         if not fails_list:
             problems.append(f"F selftest '{name}' did not produce a failure")
 
@@ -461,7 +577,59 @@ def selftest(reg: dict, schema: dict, fixture: dict) -> list[str]:
         problems.append("F selftest term regex matched inside 'CraftCube' / plural")
     if not rx.search("the crafter walks"):
         problems.append("F selftest term regex failed to match standalone word")
-    return problems
+
+    # C2 structural-scan negative cases (in-memory copies; no repository file is touched).
+    minirules = {"rules": [{"id": "QAR-001", "terms": ["minecraft"], "matchMode": "word"},
+                           {"id": "QAR-005", "terms": ["attack"], "matchMode": "word"}]}
+    bad_id = '{"id": "minecraft", "status": "APPROVED"}'
+    jf, _ = _scan_json_identifier(bad_id, "x.json", minirules)
+    if not jf:
+        problems.append("F selftest JSON structural scan did not FAIL on a forbidden term used as an id")
+    declared = '{"forbiddenTerms": ["minecraft", "attack"]}'
+    jf, ji = _scan_json_identifier(declared, "x.json", minirules)
+    if jf or not ji:
+        problems.append("F selftest JSON structural scan did not exempt a declared forbidden-term list")
+    nested = '{"ipForbiddenTerms": {"note": "x", "terms": ["minecraft"]}}'
+    jf, ji = _scan_json_identifier(nested, "x.json", minirules)
+    if jf or not ji:
+        problems.append("F selftest JSON structural scan did not exempt a nested forbidden-term list")
+    # Declared *and* also used as an identifier elsewhere in the same file -> must still FAIL.
+    both = '{"forbiddenTerms": ["minecraft"], "asset": {"id": "minecraft"}}'
+    jf, _ = _scan_json_identifier(both, "x.json", minirules)
+    if not jf:
+        problems.append("F selftest JSON structural scan let a declaration mask a real identifier use")
+    prose = '{"cues": [{"id": "cue.a", "status": "draft", "description": "a Loom attack cue"}]}'
+    jf, ji = _scan_json_identifier(prose, "x.json", minirules)
+    if jf or not ji:
+        problems.append("F selftest JSON structural scan did not exempt a prose description field")
+    reject = '{"domainCutList": [{"id": "CVX-CUT-001", "status": "REJECT", "item": "damage/attack sets"}]}'
+    jf, ji = _scan_json_identifier(reject, "x.json", minirules)
+    if jf or not ji:
+        problems.append("F selftest JSON structural scan did not exempt a REJECT cut-list entry")
+    # A term used as an ordinary value (not id, not declaration) must still FAIL.
+    value = '{"id": "cue.b", "status": "approved", "label": "attack"}'
+    jf, _ = _scan_json_identifier(value, "x.json", minirules)
+    if not jf:
+        problems.append("F selftest JSON structural scan did not FAIL on a forbidden term used as an ordinary value")
+    checks += 7  # bad_id, declared, nested, both, prose, reject, value
+
+    # E3 version-advance negative cases, exercising the exact predicate used by E3.
+    def _advanced(text: str, current: str, baseline: str) -> bool:
+        cur = tuple(int(x) for x in current.split("."))
+        base = tuple(int(x) for x in baseline.split("."))
+        versions = _versions_in(text)
+        return base in versions and cur > base and versions[-1] == cur
+
+    advance_doc = "| Version | 1.1.0 |\n\n(Originally v1.0.0.)\n"
+    if not _advanced(advance_doc, "1.1.0", "1.0.0"):
+        problems.append("F selftest E3 did not recognise a legitimate version advance")
+    if _advanced(advance_doc, "1.1.0", "9.9.9"):
+        problems.append("F selftest E3 accepted an invented baseline version")
+    rollback_doc = "| Version | 1.0.0 |\n\n(Was v1.1.0.)\n"
+    if _advanced(rollback_doc, "1.0.0", "1.1.0"):
+        problems.append("F selftest E3 accepted a rollback below the baseline")
+    checks += 3
+    return problems, checks
 
 
 # --------------------------------------------------------------------------- main
@@ -508,9 +676,9 @@ def main(argv: list[str]) -> int:
 
     # F
     if run_selftest:
-        f = selftest(reg, schema, fixture)
+        f, n_cases = selftest(reg, schema, fixture)
         for m in f: emit("FAIL", m)
-        if not f: emit("PASS", "F selftest: all 14 negative cases produced failures as expected")
+        if not f: emit("PASS", f"F selftest: all {n_cases} negative cases produced failures as expected")
 
     n_fail = sum(1 for lvl, _ in findings if lvl == "FAIL")
     n_info = sum(1 for lvl, _ in findings if lvl == "INFO")

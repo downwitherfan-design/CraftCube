@@ -1,0 +1,18 @@
+AI-10 QA Phase 00 evidence — CR-0012 fix verification
+Date: 2026-10-10
+Validator: 08_QA_RELEASE/phase_00/QA_PHASE00_VALIDATOR.py (post-CR-0012 fix)
+
+Run 1 — integrated Phase 00 tree (all 13 branches), the tree CR-0012 was reported on:
+  command: python3 08_QA_RELEASE/phase_00/QA_PHASE00_VALIDATOR.py
+  result: exit 0; SUMMARY fail=0 info=727 skip=0
+  (before the fix this run was exit 1, fail=20 — 16 C2 IDENTIFIER false positives + 4 E3 stale baselines)
+
+Run 2 — ai-10-qa branch in isolation (Product docs absent -> E3 SKIP):
+  result: exit 0; SUMMARY fail=0 info=556 skip=5
+
+Adversarial checks on the integrated tree (temporary fixtures, removed after each run):
+  - {"id":"minecraft","label":"weapon"}            -> FAIL x2 (exit 1)  [real violation still caught]
+  - {"assetId":"weapon",...}                         -> FAIL x1 (exit 1)  [ordinary value still caught]
+  - {"forbiddenTerms":["minecraft","weapon"]}        -> INFO x2 (exit 0)  [declaration exempted]
+
+Self-test: all 23 negative cases produced failures as expected.
