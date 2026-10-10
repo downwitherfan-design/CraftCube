@@ -98,6 +98,19 @@ func is_solved() -> bool:
 			return state.is_aligned(_face_indices(params.get("faces", [])))
 	return false
 
+## How many of the objective's required faces are currently solid, so the UI can show
+## progress instead of only a binary solved flag.
+func objective_progress() -> Dictionary:
+	var obj: Dictionary = level.get("objective", {})
+	if str(obj.get("family", "")) != "objective.align":
+		return {"aligned": 0, "total": 0}
+	var faces := _face_indices(obj.get("params", {}).get("faces", []))
+	var aligned := 0
+	for idx in faces:
+		if state.is_face_solid(int(idx)):
+			aligned += 1
+	return {"aligned": aligned, "total": faces.size()}
+
 func _face_indices(letters: Array) -> Array:
 	var out := []
 	for l in letters:

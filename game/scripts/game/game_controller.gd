@@ -51,6 +51,8 @@ func load_level(index: int) -> void:
 	engine.setup(lvl)
 	if cube_view:
 		cube_view.build(engine.state)
+	if world_view:
+		world_view.sync_lit(game_state.solved_levels.size())
 	level_loaded.emit(lvl)
 
 func restart_level() -> void:
@@ -99,6 +101,9 @@ func undo() -> bool:
 	if ok and cube_view:
 		cube_view.refresh(engine.state)
 	return ok
+
+func objective_progress() -> Dictionary:
+	return engine.objective_progress()
 
 func legal_faces() -> Array:
 	var faces := []

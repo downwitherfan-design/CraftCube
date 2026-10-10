@@ -43,16 +43,29 @@ func build() -> void:
 		add_child(m)
 		_growth.append({"node": m, "material": mat})
 
-## Light up the next growth marker; represents a world hook firing.
-func react() -> void:
-	if _growth.is_empty():
-		return
-	var g: Dictionary = _growth[_lit % _growth.size()]
-	var mat: StandardMaterial3D = g["material"]
-	mat.albedo_color = Color(0.45, 0.9, 0.5)
-	mat.emission_enabled = true
-	mat.emission = Color(0.3, 0.7, 0.35)
-	_lit += 1
+## Light up the next growth marker; represents a world hook firing. Idempotent in effect:
+## lighting is capped at the marker count so a repeated/extra call cannot exceed the ring.
+func react() -> bool:
+	if _growth.is_empty() or _lit >= _growth.size():
+		return false
+	sync_lit(_lit + 1)
+	return true
+
+## Set the number of lit markers from authoritative progression (e.g. on resume from a
+## save). The world must never show fewer reactions than the levels already completed.
+func sync_lit(count: int) -> void:
+	var target := clampi(count, 0, _growth.size())
+	for i in range(_growth.size()):
+		var lit := i < target
+		var mat: StandardMaterial3D = _growth[i]["material"]
+		if lit:
+			mat.albedo_color = Color(0.45, 0.9, 0.5)
+			mat.emission_enabled = true
+			mat.emission = Color(0.3, 0.7, 0.35)
+		else:
+			mat.albedo_color = Color(0.18, 0.2, 0.18)
+			mat.emission_enabled = false
+	_lit = target
 
 func lit_count() -> int:
 	return _lit

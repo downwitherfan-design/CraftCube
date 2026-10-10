@@ -146,7 +146,7 @@ func _on_level_loaded(level: Dictionary) -> void:
 	if controller.game_state.solved_levels.has(str(level["level_id"])):
 		_status.text = "Already solved — replay freely."
 	else:
-		_status.text = ""
+		_refresh_status()
 	# Onboarding guidance is shown only on the first level; the story panel below is
 	# cleared so completion feedback from a previous level never lingers.
 	_onboard.visible = int(level.get("ordinal", 1)) == 1
@@ -160,7 +160,13 @@ func _refresh_legal() -> void:
 		entry["button"].disabled = not legal.has(entry["face"])
 
 func _refresh_status() -> void:
-	_status.text = "Moves: %d" % controller.engine.move_count()
+	var prog: Dictionary = controller.objective_progress()
+	var total := int(prog.get("total", 0))
+	var aligned := int(prog.get("aligned", 0))
+	if total > 0:
+		_status.text = "Aligned %d/%d required faces · Moves: %d" % [aligned, total, controller.engine.move_count()]
+	else:
+		_status.text = "Moves: %d" % controller.engine.move_count()
 	# Live cue so the player knows when the required faces are aligned; the win is still
 	# confirmed by the domain predicate via "I solved it".
 	if controller.engine.is_solved():

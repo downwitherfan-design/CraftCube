@@ -46,6 +46,8 @@ func _initialize() -> void:
 	_test_face_orientation()
 	_test_layer_selection()
 	_test_animation_locks_and_syncs()
+	_test_world_state_and_resume()
+	_test_objective_progress()
 	_test_scramble_fuzz()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -816,6 +818,64 @@ func _test_layer_selection() -> void:
 		_eq("Y layer %d has the expected facelet count" % layer, got, expected)
 	_check("every facelet is in exactly one Y layer",
 			st.layer_indices(1, 0).size() + st.layer_indices(1, 1).size() + st.layer_indices(1, 2).size() == st.colours.size())
+
+## The world must reflect already-completed levels when the game resumes from a save, and a
+## repeated/extra reaction must never over-light the ring. Regression for a real defect where
+## the world always started empty even after progress was saved.
+func _test_world_state_and_resume() -> void:
+	print("[world state and resume]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	var gs := GameState.new()
+	gs.mark_solved("level.01.awaken")
+	gs.mark_solved("level.01.seed_bed")
+	gs.current_level_index = 2
+	SaveManager.save_to_path(gs)
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	_check("resume lit the world for two solved levels", m.world_view.lit_count() == 2)
+	_check("resume landed on the first unsolved level", m.current_index == 2)
+	# Idempotent lighting: reacting beyond the ring size cannot exceed the markers.
+	for i in range(20):
+		m.world_view.react()
+	_check("world reaction never over-lights the ring", m.world_view.lit_count() <= 12)
+	# A fresh state with no saves shows an unlit world.
+	SaveManager.delete_at_path(saved)
+	var f = load("res://scenes/Main.tscn").instantiate()
+	f._ready()
+	_check("fresh start has an unlit world", f.world_view.lit_count() == 0)
+	if f.get_parent() != null:
+		f.get_parent().remove_child(f)
+	f.free()
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## The UI progress readout must agree with the objective: a multi-face objective shows
+## partial progress and reaches full only when every required face is solid.
+func _test_objective_progress() -> void:
+	print("[objective progress]")
+	var e := PuzzleEngine.new()
+	e.setup(LevelCatalog.by_id("level.01.hollow_stone"))  # align U and F
+	var p0: Dictionary = e.objective_progress()
+	_eq("hollow_stone objective totals two faces", int(p0["total"]), 2)
+	_check("progress never exceeds total", int(p0["aligned"]) <= int(p0["total"]))
+	# Solved state: both faces aligned.
+	e.state.reset()
+	var p1: Dictionary = e.objective_progress()
+	_eq("solved state reports both faces aligned", int(p1["aligned"]), 2)
+	_check("progress agrees with is_solved", e.is_solved())
+	# Single-face objective on level 1.
+	var e2 := PuzzleEngine.new()
+	e2.setup(LevelCatalog.by_id("level.01.awaken"))
+	_eq("awaken objective totals one face", int(e2.objective_progress()["total"]), 1)
 
 func _colour_histogram(c: CubeState) -> Dictionary:
 	var h := {}
