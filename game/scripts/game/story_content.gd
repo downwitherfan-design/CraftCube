@@ -41,15 +41,26 @@ const REWARDS := {
 	},
 }
 
-## The optional Chapter 01 discovery (chapter-level, non-blocking).
-const DISCOVERY_FIRST_PULSE := {
-	"id": "discovery.01.first_pulse",
-	"name": "The First Pulse",
-	"text": "You notice the cube answers near-solutions with a soft pulse — a rhythm you can learn to read.",
+## Chapter 01 optional discoveries (chapter-level, non-blocking), keyed by ID so any
+## level's `discovery_id` resolves without hard-coding a single one in the controller.
+const DISCOVERIES := {
+	"discovery.01.first_pulse": {
+		"id": "discovery.01.first_pulse",
+		"name": "The First Pulse",
+		"text": "You notice the cube answers near-solutions with a soft pulse — a rhythm you can learn to read.",
+	},
+	"discovery.01.stone_mark": {
+		"id": "discovery.01.stone_mark",
+		"name": "The Stone Mark",
+		"text": "A pale groove runs along the sealed stone. It is not decoration — it is a tally of every layer you have brought home.",
+	},
 }
 
 static func reaction_for(hook: String) -> String:
 	return str(WORLD_REACTIONS.get(hook, ""))
+
+static func discovery_for(id: String) -> Dictionary:
+	return DISCOVERIES.get(id, {})
 
 static func reward_for(reward_id: String) -> Dictionary:
 	return REWARDS.get(reward_id, {})

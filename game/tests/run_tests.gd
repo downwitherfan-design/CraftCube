@@ -34,6 +34,7 @@ func _initialize() -> void:
 	_test_save_hardening()
 	_test_completion_idempotency()
 	_test_level_advancement()
+	_test_content_id_consistency()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
 		print("  - ", f)
@@ -306,6 +307,24 @@ func _test_level_advancement() -> void:
 	gs.mark_solved("level.01.seed_bed")
 	gs.mark_solved("level.01.hollow_stone")
 	_eq("first unsolved when all solved", gs.first_unsolved_index(levels), -1)
+
+func _test_content_id_consistency() -> void:
+	print("[content id consistency]")
+	for l in LevelCatalog.chapter_one():
+		var lid := str(l["level_id"])
+		var hook := str(l.get("world_hook", ""))
+		var rid := str(l.get("reward_id", ""))
+		var did := str(l.get("discovery_id", ""))
+		_check("%s world hook resolves" % lid, hook != "" and StoryContent.reaction_for(hook) != "")
+		_check("%s reward resolves" % lid, rid != "" and not StoryContent.reward_for(rid).is_empty())
+		# A discovery_id, when present, must resolve to a real discovery (catches the
+		# 'referenced but undefined' gap). Empty string is allowed (no discovery).
+		_check("%s discovery resolves or is empty" % lid,
+				did == "" or not StoryContent.discovery_for(did).is_empty())
+	# The one reward that grants equipment must resolve to real equipment.
+	_check("nox_meets grants resolvable equipment",
+			StoryContent.equipment_id_for("reward.01.nox_meets") != ""
+			and not StoryContent.equipment_for("reward.01.nox_meets").is_empty())
 
 func _colour_histogram(c: CubeState) -> Dictionary:
 	var h := {}

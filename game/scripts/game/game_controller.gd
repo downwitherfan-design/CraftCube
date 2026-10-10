@@ -101,11 +101,12 @@ func confirm_solve() -> bool:
 	else:
 		solved.emit(lvl, {})
 
-	# Optional, non-blocking discovery check (chapter-level).
+	# Optional, non-blocking discovery check (chapter-level), resolved by ID.
 	var disc_id := str(lvl.get("discovery_id", ""))
-	if disc_id == StoryContent.DISCOVERY_FIRST_PULSE["id"]:
-		if game_state.add_discovery(disc_id):
-			discovery_found.emit(StoryContent.DISCOVERY_FIRST_PULSE)
+	if disc_id != "":
+		var disc := StoryContent.discovery_for(disc_id)
+		if not disc.is_empty() and game_state.add_discovery(disc_id):
+			discovery_found.emit(disc)
 
 	game_state.current_level_index = current_index
 	SaveManager.save_to_path(game_state)
