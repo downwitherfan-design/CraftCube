@@ -1,0 +1,7 @@
+{
+  "_fixture_note": "NEGATIVE FIXTURE. schema_version has a higher MAJOR than the reader supports. Validator must REJECT; a runtime reader must refuse to apply, show a user-visible notice and use defaults (Save & Migration Policy: never silently deserialize a newer schema).",
+  "schema": "AccessibilityPreference",
+  "schema_version": "2.0.0",
+  "reduce_motion": true,
+  "some_future_field": "value"
+}

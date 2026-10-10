@@ -1,0 +1,18 @@
+{
+  "_fixture_note": "NEGATIVE FIXTURE. camera_comfort and text_scale carry out-of-set values. Validator must REJECT this file; a runtime reader must apply field defaults, log a typed failure and flag the block as degraded. Never silently accept.",
+  "schema": "AccessibilityPreference",
+  "schema_version": "0.1.0",
+  "reduce_motion": false,
+  "camera_comfort": "cinematic",
+  "screen_shake_intensity": 0.5,
+  "haptic_intensity": 0.5,
+  "audio_cue_redundancy": true,
+  "color_assist_indicators": false,
+  "large_touch_targets": false,
+  "handedness": "auto",
+  "safe_area_mode": "system",
+  "dialogue_text_speed": "normal",
+  "text_scale": 2.0,
+  "high_contrast_ui": false,
+  "hold_to_confirm_destructive": true
+}
