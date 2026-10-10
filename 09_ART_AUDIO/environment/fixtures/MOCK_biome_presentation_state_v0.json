@@ -1,0 +1,183 @@
+{
+  "_mock_notice": "TEMPORARY MOCK FIXTURE — NOT PRODUCTION DATA. Owner AI-05. This fixture represents the presentation-side view of biome state so downstream tracks (AI-02/03/04/06/08/10) can work before CC.BIOME.STATE / WorldState is frozen by AI-02. Field names are DRAFT and must be re-mapped to the frozen AI-02 schema in Phase 1. Do not ship. Must be mechanically detectable (see 'fixture_kind').",
+  "fixture_kind": "MOCK",
+  "fixture_id": "AI05-FIXTURE-BIOME-PRESENTATION-MOCK",
+  "schema_version": "0.1.0-draft",
+  "schema_status": "DRAFT",
+  "owner": "AI-05",
+  "source_documents": [
+    "09_ART_AUDIO/environment/ENVIRONMENT_ART_DIRECTION_LOCK_V1.md",
+    "09_ART_AUDIO/environment/BIOME_PRESENTATION_IDENTITY_MATRIX_V1.md",
+    "01_PREPRODUCTION/WORLD_BIOME_BIBLE_V7.md"
+  ],
+  "canonical_biome_id_binding": {
+    "status": "PENDING_AI02",
+    "note": "Each 'presentation_id' below must be bound to the canonical biome ID published by AI-02 in CC.BIOME.STATE. 'canonical_biome_id' is null until that contract is FROZEN."
+  },
+  "tier_semantics_source": "01_PREPRODUCTION/WORLD_BIOME_BIBLE_V7.md#Biome transformation tiers",
+  "tiers": [
+    { "tier": 0, "name": "dormant" },
+    { "tier": 1, "name": "awakened" },
+    { "tier": 2, "name": "recovering" },
+    { "tier": 3, "name": "flourishing" },
+    { "tier": 4, "name": "mastered_rare", "optional": true }
+  ],
+  "cue_kinds_allowed": ["shape", "motion", "emissive_intensity", "silhouette", "hue", "light"],
+  "non_hue_cue_kinds": ["shape", "motion", "emissive_intensity", "silhouette", "light"],
+  "shaders": [
+    { "presentation_id": "env.shader.opaque_stylised", "state_param_semantic": "_RestoreAmount" },
+    { "presentation_id": "env.shader.foliage_cut", "state_param_semantic": "_RestoreAmount" },
+    { "presentation_id": "env.shader.emissive_lattice", "state_param_semantic": "_RestoreAmount" },
+    { "presentation_id": "env.shader.water_glass", "state_param_semantic": "_RestoreAmount" },
+    { "presentation_id": "env.shader.terrain_blend", "state_param_semantic": "_RestoreAmount" },
+    { "presentation_id": "env.shader.decal", "state_param_semantic": "_MarkVisible" }
+  ],
+  "biomes": [
+    {
+      "presentation_id": "env.biome.hearthwild",
+      "canonical_biome_id": null,
+      "display_name_source": "01_PREPRODUCTION/WORLD_BIOME_BIBLE_V7.md#Biome 1",
+      "vertical_slice": true,
+      "beacon": {
+        "presentation_id": "env.biome.hearthwild.beacon",
+        "internal_label": "Hearth Loom Post"
+      },
+      "tier_looks": [
+        { "presentation_id": "env.biome.hearthwild.tier.0", "tier": 0, "cues": ["silhouette", "light"], "summary": "post leaning off-axis, dark, drifting fray" },
+        { "presentation_id": "env.biome.hearthwild.tier.1", "tier": 1, "cues": ["shape", "emissive_intensity", "light"], "summary": "post upright on axis, first seam glows" },
+        { "presentation_id": "env.biome.hearthwild.tier.2", "tier": 2, "cues": ["shape", "emissive_intensity", "hue"], "summary": "seam lit, first vine" },
+        { "presentation_id": "env.biome.hearthwild.tier.3", "tier": 3, "cues": ["shape", "motion", "hue", "light"], "summary": "woven vine canopy, warm key + bounce" },
+        { "presentation_id": "env.biome.hearthwild.tier.4", "tier": 4, "cues": ["shape", "emissive_intensity"], "summary": "flowering rare beacon variant (mesh swap)" }
+      ],
+      "memory_marks": [
+        { "presentation_id": "env.biome.hearthwild.memory.first_path", "cues": ["emissive_intensity", "shape"], "flag_semantic": "path_restored" },
+        { "presentation_id": "env.biome.hearthwild.memory.channel_opened", "cues": ["motion", "shape"], "flag_semantic": "channel_opened" },
+        { "presentation_id": "env.biome.hearthwild.memory.habitat_claimed", "cues": ["shape"], "flag_semantic": "habitat_claimed" }
+      ],
+      "shaders_used": ["env.shader.opaque_stylised", "env.shader.foliage_cut", "env.shader.terrain_blend", "env.shader.water_glass", "env.shader.decal"]
+    },
+    {
+      "presentation_id": "env.biome.glassroot",
+      "canonical_biome_id": null,
+      "display_name_source": "01_PREPRODUCTION/WORLD_BIOME_BIBLE_V7.md#Biome 2",
+      "vertical_slice": false,
+      "beacon": {
+        "presentation_id": "env.biome.glassroot.beacon",
+        "internal_label": "Echo Spire"
+      },
+      "tier_looks": [
+        { "presentation_id": "env.biome.glassroot.tier.0", "tier": 0, "cues": ["silhouette", "light"], "summary": "spire clouded/opaque" },
+        { "presentation_id": "env.biome.glassroot.tier.1", "tier": 1, "cues": ["shape", "emissive_intensity"], "summary": "first internal echo silhouette visible" },
+        { "presentation_id": "env.biome.glassroot.tier.2", "tier": 2, "cues": ["shape", "hue"], "summary": "echo aligns with outer shell" },
+        { "presentation_id": "env.biome.glassroot.tier.3", "tier": 3, "cues": ["shape", "light", "hue"], "summary": "spire refracts route-line onto ground" },
+        { "presentation_id": "env.biome.glassroot.tier.4", "tier": 4, "cues": ["shape", "emissive_intensity"], "summary": "fully clear spire, all echoes stacked" }
+      ],
+      "memory_marks": [
+        { "presentation_id": "env.biome.glassroot.memory.echo_recorded", "cues": ["shape"], "flag_semantic": "echo_recorded" },
+        { "presentation_id": "env.biome.glassroot.memory.route_revealed", "cues": ["light", "shape"], "flag_semantic": "route_revealed" },
+        { "presentation_id": "env.biome.glassroot.memory.spire_cleared", "cues": ["emissive_intensity", "shape"], "flag_semantic": "spire_cleared" }
+      ],
+      "shaders_used": ["env.shader.water_glass", "env.shader.emissive_lattice", "env.shader.opaque_stylised", "env.shader.decal"]
+    },
+    {
+      "presentation_id": "env.biome.sunken_grid",
+      "canonical_biome_id": null,
+      "display_name_source": "01_PREPRODUCTION/WORLD_BIOME_BIBLE_V7.md#Biome 3",
+      "vertical_slice": false,
+      "beacon": {
+        "presentation_id": "env.biome.sunken_grid.beacon",
+        "internal_label": "Grid Pump Tower"
+      },
+      "tier_looks": [
+        { "presentation_id": "env.biome.sunken_grid.tier.0", "tier": 0, "cues": ["silhouette", "light"], "summary": "tower submerged to roofline" },
+        { "presentation_id": "env.biome.sunken_grid.tier.1", "tier": 1, "cues": ["shape", "motion"], "summary": "water drops one step, wheel turns once" },
+        { "presentation_id": "env.biome.sunken_grid.tier.2", "tier": 2, "cues": ["shape", "motion"], "summary": "water at plaza level, bridge extends" },
+        { "presentation_id": "env.biome.sunken_grid.tier.3", "tier": 3, "cues": ["shape", "emissive_intensity", "light"], "summary": "elevator lit, conduits carry light" },
+        { "presentation_id": "env.biome.sunken_grid.tier.4", "tier": 4, "cues": ["emissive_intensity", "shape"], "summary": "full light network across zone" }
+      ],
+      "memory_marks": [
+        { "presentation_id": "env.biome.sunken_grid.memory.water_lowered", "cues": ["shape"], "flag_semantic": "water_lowered" },
+        { "presentation_id": "env.biome.sunken_grid.memory.bridge_raised", "cues": ["shape"], "flag_semantic": "bridge_raised" },
+        { "presentation_id": "env.biome.sunken_grid.memory.record_exposed", "cues": ["shape", "emissive_intensity"], "flag_semantic": "record_exposed" }
+      ],
+      "shaders_used": ["env.shader.water_glass", "env.shader.opaque_stylised", "env.shader.emissive_lattice", "env.shader.decal"]
+    },
+    {
+      "presentation_id": "env.biome.ember_hollow",
+      "canonical_biome_id": null,
+      "display_name_source": "01_PREPRODUCTION/WORLD_BIOME_BIBLE_V7.md#Biome 4",
+      "vertical_slice": false,
+      "beacon": {
+        "presentation_id": "env.biome.ember_hollow.beacon",
+        "internal_label": "Ember Forge Ring"
+      },
+      "tier_looks": [
+        { "presentation_id": "env.biome.ember_hollow.tier.0", "tier": 0, "cues": ["silhouette", "light"], "summary": "ring cold and cracked" },
+        { "presentation_id": "env.biome.ember_hollow.tier.1", "tier": 1, "cues": ["emissive_intensity", "shape"], "summary": "one channel glows" },
+        { "presentation_id": "env.biome.ember_hollow.tier.2", "tier": 2, "cues": ["shape", "motion"], "summary": "channels close into loop, ring pulses (<=2 Hz)" },
+        { "presentation_id": "env.biome.ember_hollow.tier.3", "tier": 3, "cues": ["shape", "hue"], "summary": "slag-bridge cools into route" },
+        { "presentation_id": "env.biome.ember_hollow.tier.4", "tier": 4, "cues": ["emissive_intensity", "motion"], "summary": "steady white, no flicker (control)" }
+      ],
+      "memory_marks": [
+        { "presentation_id": "env.biome.ember_hollow.memory.channel_tuned", "cues": ["emissive_intensity", "motion"], "flag_semantic": "channel_tuned" },
+        { "presentation_id": "env.biome.ember_hollow.memory.bridge_cooled", "cues": ["shape"], "flag_semantic": "bridge_cooled" },
+        { "presentation_id": "env.biome.ember_hollow.memory.overheat_scar", "cues": ["shape", "hue"], "flag_semantic": "overheat_scar" }
+      ],
+      "shaders_used": ["env.shader.emissive_lattice", "env.shader.opaque_stylised", "env.shader.decal"]
+    },
+    {
+      "presentation_id": "env.biome.verdant_archive",
+      "canonical_biome_id": null,
+      "display_name_source": "01_PREPRODUCTION/WORLD_BIOME_BIBLE_V7.md#Biome 5",
+      "vertical_slice": false,
+      "beacon": {
+        "presentation_id": "env.biome.verdant_archive.beacon",
+        "internal_label": "Archive Heart-Root"
+      },
+      "tier_looks": [
+        { "presentation_id": "env.biome.verdant_archive.tier.0", "tier": 0, "cues": ["silhouette", "light"], "summary": "heart-root withered and closed" },
+        { "presentation_id": "env.biome.verdant_archive.tier.1", "tier": 1, "cues": ["emissive_intensity", "shape"], "summary": "veins light along one planning line" },
+        { "presentation_id": "env.biome.verdant_archive.tier.2", "tier": 2, "cues": ["shape", "motion"], "summary": "pods open along lit lines" },
+        { "presentation_id": "env.biome.verdant_archive.tier.3", "tier": 3, "cues": ["shape", "light", "hue"], "summary": "canopy vault forms overhead" },
+        { "presentation_id": "env.biome.verdant_archive.tier.4", "tier": 4, "cues": ["shape", "emissive_intensity"], "summary": "heart-root exposes lattice core" }
+      ],
+      "memory_marks": [
+        { "presentation_id": "env.biome.verdant_archive.memory.pod_opened", "cues": ["shape"], "flag_semantic": "pod_opened" },
+        { "presentation_id": "env.biome.verdant_archive.memory.line_traced", "cues": ["emissive_intensity", "shape"], "flag_semantic": "line_traced" },
+        { "presentation_id": "env.biome.verdant_archive.memory.vault_grown", "cues": ["shape", "light"], "flag_semantic": "vault_grown" }
+      ],
+      "shaders_used": ["env.shader.foliage_cut", "env.shader.opaque_stylised", "env.shader.emissive_lattice", "env.shader.terrain_blend", "env.shader.decal"]
+    },
+    {
+      "presentation_id": "env.biome.quiet_engine",
+      "canonical_biome_id": null,
+      "display_name_source": "01_PREPRODUCTION/WORLD_BIOME_BIBLE_V7.md#Biome 6",
+      "naming_conflict": "DEP-03: Story Bible ch.7 says 'The Silent Engine'; World Biome Bible says 'The Quiet Engine'. Slug follows World Biome Bible pending AI-09 decision. Slug is mutable until Phase-1 freeze.",
+      "vertical_slice": false,
+      "beacon": {
+        "presentation_id": "env.biome.quiet_engine.beacon",
+        "internal_label": "Engine Axis"
+      },
+      "tier_looks": [
+        { "presentation_id": "env.biome.quiet_engine.tier.0", "tier": 0, "cues": ["silhouette", "light"], "summary": "frozen misaligned frames" },
+        { "presentation_id": "env.biome.quiet_engine.tier.1", "tier": 1, "cues": ["shape", "motion"], "summary": "one frame re-seats" },
+        { "presentation_id": "env.biome.quiet_engine.tier.2", "tier": 2, "cues": ["emissive_intensity", "shape"], "summary": "gantry track lights" },
+        { "presentation_id": "env.biome.quiet_engine.tier.3", "tier": 3, "cues": ["shape", "motion", "light"], "summary": "room reconfigures into coherent chamber" },
+        { "presentation_id": "env.biome.quiet_engine.tier.4", "tier": 4, "cues": ["shape", "emissive_intensity"], "summary": "axis reveals intended evolving form" }
+      ],
+      "memory_marks": [
+        { "presentation_id": "env.biome.quiet_engine.memory.frame_seated", "cues": ["shape"], "flag_semantic": "frame_seated" },
+        { "presentation_id": "env.biome.quiet_engine.memory.chamber_formed", "cues": ["shape", "light"], "flag_semantic": "chamber_formed" },
+        { "presentation_id": "env.biome.quiet_engine.memory.axis_revealed", "cues": ["shape", "emissive_intensity"], "flag_semantic": "axis_revealed" }
+      ],
+      "shaders_used": ["env.shader.opaque_stylised", "env.shader.emissive_lattice", "env.shader.decal"]
+    }
+  ],
+  "sample_states": {
+    "_note": "Example persisted-state inputs a consumer may feed to a presentation adapter. Field names DRAFT; AI-02 owns the real schema.",
+    "fresh_save": { "biome": "env.biome.hearthwild", "tier": 0, "memory_flags": {} },
+    "after_first_solve": { "biome": "env.biome.hearthwild", "tier": 1, "memory_flags": { "path_restored": true } },
+    "vertical_slice_end": { "biome": "env.biome.hearthwild", "tier": 3, "memory_flags": { "path_restored": true, "channel_opened": true, "habitat_claimed": true } },
+    "missing_state_case": { "biome": "env.biome.hearthwild", "tier": null, "memory_flags": null, "expected_presentation": "tier 0 + development-only MISSING_STATE marker; never a guessed tier" }
+  }
+}

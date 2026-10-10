@@ -79,3 +79,12 @@ This file is deliberately short. Each AI must update only its own section in the
 - Tests: `python3 04_AI_ACCOUNTS/AI-04/phase_00/scripts/validate_ai04_phase00.py` → 28 passed, 0 failed (evidence: `04_AI_ACCOUNTS/AI-04/phase_00/evidence/validate_ai04_phase00.output.txt`). No Unity build, no device test — none exist yet.
 - Known issues: no `integration` branch on remote (CONFLICT-04-01); ownership example files contradict account matrix (CONFLICT-04-02); 8 open decisions + 16 integration requests in `04_AI_ACCOUNTS/AI-04/phase_00/08_OPEN_DECISIONS_AND_INTEGRATION_REQUESTS.md`.
 - Next integration action: AI-13 to review PR #6 (`ai-04-gameplay` → `integration`, https://github.com/downwitherfan-design/CraftCube/pull/6) and register CC.INTERACTION.COMMAND as DRAFT; AI-02/AI-07 to answer IR-04-01..08 before Phase 01 freeze.
+### AI-05
+- Branch: `ai-05-world`
+- Task: PHASE00-AI05-ENV-DIRECTION-LOCK — Environment Art Direction Lock + Biome Presentation Identity Matrix + MOCK presentation fixture + fixture validator
+- Status: READY_FOR_REVIEW
+- Contract versions consumed: none FROZEN/RELEASED exist; World Biome Bible tier model (design intent); `CC.BIOME.STATE` name only (schema MISSING, mocked)
+- Contract versions changed: none
+- Tests: `python3 09_ART_AUDIO/environment/tools/validate_environment_fixtures.py` → exit 0, 9 passed / 0 failed; 7 negative mutations each exit 1
+- Known issues: DEP-03 "Quiet Engine" vs "Silent Engine" naming (AI-09); DEP-04 screen orientation UNKNOWN; DEP-05 legacy AI-05→UI ownership mappings in `07_GITHUB/*` and `08_QA_RELEASE/DEVICE_MATRIX_TEMPLATE.csv`; presentation IDs DRAFT until Phase-1 freeze
+- Next integration action: review/merge PR #2 `ai-05-world` → `integration`; AI-13 ratify `09_ART_AUDIO/environment/` as AI-05 path; AI-01 ratify boundaries/cut list. Handoff: `09_ART_AUDIO/environment/handoffs/AI-05_PHASE00_HANDOFF.md`
