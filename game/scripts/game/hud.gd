@@ -23,6 +23,7 @@ var _guide: Label
 var _hint_btn: Button
 var _step_btn: Button
 var _readiness: Label
+var _resonance: Label
 
 const BTN_MIN := Vector2(88, 64)
 
@@ -85,6 +86,7 @@ func _build() -> void:
 	_story = _label("", 22)
 	_guide = _label("", 20)
 	_readiness = _label("", 18)
+	_resonance = _label("", 18)
 	outer.add_child(_title)
 	outer.add_child(_status)
 
@@ -92,6 +94,7 @@ func _build() -> void:
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	outer.add_child(spacer)
 	outer.add_child(_readiness)
+	outer.add_child(_resonance)
 	outer.add_child(_onboard)
 	outer.add_child(_hint)
 	outer.add_child(_guide)
@@ -180,6 +183,7 @@ func _on_level_loaded(level: Dictionary) -> void:
 	_guide.text = ""
 	_refresh_legal()
 	_refresh_readiness()
+	_refresh_resonance()
 
 func _refresh_legal() -> void:
 	var legal: Array = controller.legal_faces()
@@ -200,6 +204,7 @@ func _refresh_status() -> void:
 	if controller.engine.is_solved():
 		_status.text = "All required faces aligned — press \"I solved it\"."
 	_refresh_readiness()
+	_refresh_resonance()
 
 ## Per-face mastery readout: for every face, say whether it is solid (a single colour) or
 ## still shows several shades, and mark the objective faces so the player can read progress
@@ -216,6 +221,23 @@ func _refresh_readiness() -> void:
 		var state := "solid" if bool(entry["solid"]) else "%d shades" % int(entry["distinct"])
 		parts.append("%s%s %s" % [names.get(face, face), mark, state])
 	_readiness.text = "Faces: " + " · ".join(parts) + "   (* = required)"
+
+## Equipment capability readout (PD-002: equipment changes what you can perceive, never
+## puzzle truth). The Rootweave Gauntlet's declared "perceive.resonance" capability surfaces
+## which faces are one turn from settling — a hint about the same truth, not a shortcut past it.
+func _refresh_resonance() -> void:
+	if not controller.game_state.has_capability("resonance"):
+		_resonance.text = ""
+		return
+	var names := {"U": "top", "D": "bottom", "L": "left", "R": "right", "F": "front", "B": "back"}
+	var near := PackedStringArray()
+	for entry in controller.face_readiness():
+		if not bool(entry["solid"]) and int(entry["distinct"]) == 2:
+			near.append(str(names.get(str(entry["face"]), str(entry["face"]))))
+	if near.is_empty():
+		_resonance.text = "Resonance: no face is one turn from settling."
+	else:
+		_resonance.text = "Resonance: one turn from settling — " + ", ".join(near) + "."
 
 ## Names the objective's required faces in player terms, so "Align U" reads as "top".
 func _objective_faces_text() -> String:
@@ -323,6 +345,7 @@ func _on_reward(reward_id: String, equipment: Dictionary) -> void:
 		_append_story(narrative)
 	if not equipment.is_empty():
 		_hint.text = "Equipment: %s — %s" % [str(equipment.get("name", "")), str(equipment.get("purpose", ""))]
+	_refresh_resonance()
 
 func _on_discovery(discovery: Dictionary) -> void:
 	_append_story("Discovery — %s: %s" % [str(discovery.get("name", "")), str(discovery.get("text", ""))])
@@ -333,8 +356,8 @@ func _on_solved(_level: Dictionary, _reward: Dictionary) -> void:
 func _on_big_text() -> void:
 	_big_text = not _big_text
 	var mult := 1.5 if _big_text else 1.0
-	for l in [_title, _status, _onboard, _hint, _story, _guide, _readiness]:
-		var base := 34 if l == _title else (22 if (l == _status or l == _story) else (18 if l == _readiness else 20))
+	for l in [_title, _status, _onboard, _hint, _story, _guide, _readiness, _resonance]:
+		var base := 34 if l == _title else (22 if (l == _status or l == _story) else (18 if (l == _readiness or l == _resonance) else 20))
 		l.add_theme_font_size_override("font_size", int(base * mult))
 	for entry in _face_buttons:
 		entry["button"].add_theme_font_size_override("font_size", int(24 * mult))

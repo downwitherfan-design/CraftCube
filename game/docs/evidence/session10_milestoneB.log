@@ -6,20 +6,21 @@ Unit tests (godot --headless --path game --script res://tests/run_tests.gd):
   Milestone B:          296 passed, 0 failed
   Milestone C:          310 passed, 0 failed
   Milestone D:          341 passed, 0 failed
+  Milestone E:          350 passed, 0 failed
 
 Full Android CI (GODOT_BIN=<godot 4.7.2> bash game/ci/build_android.sh): exit 0, CI: PASS
   - import: OK
-  - domain unit tests: 341 passed, 0 failed
+  - domain unit tests: 350 passed, 0 failed
   - main scene smoke boot (--quit-after 30): OK
   - android export (debug): APK produced 28,359,497 bytes
-      dist/CraftCube.apk sha256 3b4c96e27f7ba23e33fad391f3f4e5efa7e5768cd30b2d01448700e518e95e0e
+      dist/CraftCube.apk sha256 49d73570b29bde95c8dfcc64fe18e0473bdff3146d33b27b68df1c9fa5adddd7
   - NDK/ADB warnings ("cannot connect to daemon at tcp:5037") are expected: no device attached.
 
 Rendered frames (xvfb-run, 720x1280, opengl3/Mesa llvmpipe) via res://tests/capture_frames.gd:
-  session10_initial.png        a9fa533bcd6f8a699774c22e9daa73b55cfe6b43af7395970c294d6ba0c168a7
-  session10_orbit.png          3b6454c1fb9cebf590d92a16689298b74cfd02b52f02089baa944679b711e7a1
-  session10_hint.png           9752d3785df241d97d668404d6546ecfe448aaa1901b605539e0af39f1b40c18
-  session10_world_complete.png 01fa883857fb6987ab74a95ca7881d8f7fa4d811cade63a646651be766fe1d52
+  session10_initial.png        a57f7cd08ec7b90d12e05deaa4577e2ed9a48452ea293dc6e9e3e472678cb06a
+  session10_orbit.png          48440cd948a3de5a389a284fdb001b744bd66a122771f417e3e75db4a66bf70b
+  session10_hint.png           d480814828712abd2330453e7572a9c5ad6d93c9f55309b91fec4caf11a76001
+  session10_world_complete.png b0907083ff09e26f70051755646f3423c79d2d6a87ebcdd1182936ce2d5fb400
 
 Scope
   * Milestone B: orbit/zoom/reset camera verified; HUD labels ignore mouse so empty-space
@@ -30,6 +31,10 @@ Scope
   * Milestone D: per-face readiness readout — every face is named and shown as "solid" or
     "N shades", objective faces are marked, so the player can read puzzle mastery across the
     whole cube, not only the win condition.
+  * Milestone E: the granted Rootweave Gauntlet now delivers its declared capability. Its
+    "perceive.resonance" effect surfaces a HUD line naming faces one turn from settling
+    (distinct==2); the capability is keyed off the effect slot and appears only while the item
+    is equipped. Presentation only — it reads the same truth, it does not alter it.
   * capture_frames.gd preserves and restores the player save (it plays the chapter for real).
 
 Limitations: rendering on a virtual X server only. There is no physical Android device in

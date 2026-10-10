@@ -401,18 +401,24 @@ with ANIMATED turns; asserts render==truth after every turn + progression/reward
 - **D — per-face readiness readout.** `PuzzleEngine.face_readiness()` returns `{face, distinct, solid}` for all six
   faces (U,D,L,R,F,B); HUD shows "Faces: top* solid · …" marking objective faces, so partial mastery across the
   whole cube is visible, not only the win condition.
+- **E — equipment delivers its declared capability.** `GameState.has_capability(slot)` and
+  `StoryContent.effect_slot()/equipment_by_id()` close the protected loop `Reward → Equipment/Capability`.
+  The granted Rootweave Gauntlet's `perceive.resonance` effect surfaces a HUD line naming faces one turn from
+  settling (distinct==2). Capability is keyed off the effect slot, not the equipment id; appears only while
+  equipped (PD-002: perception, never puzzle truth).
 
 ### Verified results
-- Godot domain suite: **341 passed / 0 failed** (was 239 at Session 9 end; 277 after A, 296 after B, 310 after C).
-- `bash game/ci/build_android.sh` → **CI: PASS** on this tree. import 0, tests 341/0, main-scene boot 0, signed
-  debug APK (28,359,497 bytes, sha256 `3b4c96e2…`). Log: `game/docs/evidence/session10_build.log`.
+- Godot domain suite: **350 passed / 0 failed** (was 239 at Session 9 end; 277 after A, 296 after B, 310 after C,
+  341 after D).
+- `bash game/ci/build_android.sh` → **CI: PASS** on this tree. import 0, tests 350/0, main-scene boot 0, signed
+  debug APK (28,359,497 bytes, sha256 `49d73570…`). Log: `game/docs/evidence/session10_build.log`.
 - Rendered evidence (Xvfb/GL, 720x1280) via new `game/tests/capture_frames.gd`:
   `session10_initial/orbit/hint/world_complete.png`. The capture script now preserves/restores the player save it
   used to overwrite (found because a leftover save broke save-sensitive tests in a later run).
 
 ### New regressions (game/tests/run_tests.gd)
 `_test_guided_solver_domain`, `_test_guided_solver_controller`, `_test_orbit_camera`, `_test_world_progression_landmarks`,
-`_test_face_readiness`, `_test_hud_readiness_line`.
+`_test_face_readiness`, `_test_hud_readiness_line`, `_test_equipment_capability`, `_test_hud_resonance_line`.
 
 ### Next safe action
 - Continue Epic 0.3 with the remaining milestone tasks; keep PR #11 green.

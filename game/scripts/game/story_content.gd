@@ -65,6 +65,17 @@ static func discovery_for(id: String) -> Dictionary:
 static func reward_for(reward_id: String) -> Dictionary:
 	return REWARDS.get(reward_id, {})
 
+## Equipment record by its own id (id -> {name, purpose, effect}).
+static func equipment_by_id(id: String) -> Dictionary:
+	return EQUIPMENT.get(id, {})
+
+## A capability slot is the category after the last dot of an effect id, so
+## "perceive.resonance" -> "resonance". Owners and consumers key off the slot, never the
+## equipment id, so future equipment can grant the same capability.
+static func effect_slot(effect: String) -> String:
+	var parts := effect.split(".")
+	return parts[parts.size() - 1] if parts.size() >= 2 else effect
+
 ## The equipment id granted by a reward ("" if none). Single source of truth so callers
 ## never hard-code a reward->equipment mapping.
 static func equipment_id_for(reward_id: String) -> String:

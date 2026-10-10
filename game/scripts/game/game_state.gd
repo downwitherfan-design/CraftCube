@@ -45,6 +45,18 @@ func owns(id: String) -> bool:
 func is_equipped(id: String) -> bool:
 	return loadout.has(id)
 
+## True when an equipped item provides `slot` (e.g. "resonance"). Keyed off the effect
+## category, not the equipment id, so any future item granting the same capability counts.
+## The owning class is resolved through StoryContent, not hard-coded here.
+func has_capability(slot: String) -> bool:
+	if slot == "":
+		return false
+	for id in loadout:
+		var eff := str(StoryContent.equipment_by_id(str(id)).get("effect", ""))
+		if eff != "" and StoryContent.effect_slot(eff) == slot:
+			return true
+	return false
+
 func equip(id: String) -> bool:
 	if not owns(id):
 		return false

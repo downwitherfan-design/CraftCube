@@ -52,6 +52,8 @@ func _initialize() -> void:
 	_test_objective_progress()
 	_test_face_readiness()
 	_test_hud_readiness_line()
+	_test_equipment_capability()
+	_test_hud_resonance_line()
 	_test_animated_chapter_end_to_end()
 	_test_guided_solver_domain()
 	_test_guided_solver_controller()
@@ -1080,6 +1082,44 @@ func _test_hud_readiness_line() -> void:
 	_check("readiness marks the required face", text.find("top*") >= 0)
 	var needs_top_only := text.find("bottom*") < 0 and text.find("front*") < 0
 	_check("readiness does not mark non-required faces as required", needs_top_only)
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+
+## Milestone E: the Rootweave Gauntlet's declared capability must actually surface, keyed off
+## the effect slot (not the equipment id), and only when the item is equipped.
+func _test_equipment_capability() -> void:
+	print("[equipment capability]")
+	var g := GameState.new()
+	_check("no resonance before the gauntlet", not g.has_capability("resonance"))
+	g.grant_equipment("equipment.rootweave_gauntlet")
+	_check("granted gauntlet auto-equips into loadout", g.is_equipped("equipment.rootweave_gauntlet"))
+	_check("equipped gauntlet provides resonance", g.has_capability("resonance"))
+	_check("unknown capability is absent", not g.has_capability("not_a_slot"))
+	g.unequip("equipment.rootweave_gauntlet")
+	_check("unequipping removes the capability", not g.has_capability("resonance"))
+	# Slot is derived from the effect id, independent of the equipment id.
+	_eq("effect slot parses the effect id", StoryContent.effect_slot("perceive.resonance"), "resonance")
+
+## Milestone E: the HUD resonance line is invisible without the capability and, once the
+## gauntlet is equipped, names the face that is one turn from settling (distinct==2).
+func _test_hud_resonance_line() -> void:
+	print("[hud resonance line]")
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	var hud = m.get_node("HUD")
+	m.load_level(2)  # Hollow Stone: cube.2, align U+F
+	hud._refresh_resonance()
+	_check("no resonance line before the gauntlet", hud._resonance.text == "")
+	m.game_state.grant_equipment("equipment.rootweave_gauntlet")
+	# Force a face to exactly two shades (one turn from settling) deterministically: a
+	# quarter turn of F leaves F with 2 colours and keeps the cube unsolved.
+	m.engine.state.reset()
+	m.engine.apply_move(MoveTable.face_move("F", true))
+	hud._refresh_resonance()
+	_check("resonance line appears with the gauntlet", hud._resonance.text.begins_with("Resonance:"))
+	_check("resonance names the near-settled face in player terms",
+		hud._resonance.text.contains("front") or hud._resonance.text.contains("top"))
 	if m.get_parent() != null:
 		m.get_parent().remove_child(m)
 	m.free()
