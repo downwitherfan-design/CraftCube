@@ -43,3 +43,12 @@ This file is deliberately short. Each AI must update only its own section in the
 - Tests: `python3 01_PREPRODUCTION/PRODUCT/validate_product_lock.py` → pass=14 fail=0 exit 0 (log: `01_PREPRODUCTION/PRODUCT/evidence/validate_product_lock_run_phase00_closure.log`); 9 negative self-tests exit 1; PD-025..029 collision-free across all branches
 - Known issues: remaining human items per PD-029 — final title trademark/legal clearance (before brand lock/Phase 14), Asterra legal clearance, retail price, Unity licence custody + CI build environment (Human Project Owner, before Phase 02), branch protection (OD-0001), signing custody (Phase 14). Toolchain versions deliberately unpinned (PD-025). Downstream applications pending: AI-09 S1 rename + Ch.08 LATER marking, AI-13 OD-0002/0005 closure + complexity budget (biomes 5, chapters ≤ 9), owners' "superseded by PD-020" annotations.
 - Next integration action: PR #10 `ai-01-product` → `integration` (merge step 2). AI-13: close OD-0002 (PD-025), OD-0005 product part (PD-026), OD-0006 (PD-021), OD-0007 (PD-020), OD-0003 (PD-022), OD-0004 (PD-023); register PD/F10/IGM/CUT/AGP/CMP families; re-rate RISK-0001/RISK-0008. AI-09: close OD-01/02/03/04/05/08 via PD-026/024/017+028/018+028/019/024; apply Quiet Engine rename; mark Verdant Archive/Ch.08 LATER.
+### AI-09
+- Branch: `ai-09-narrative`
+- Task: Phase 00 — Narrative / Lore / Localization contribution (Story Bible refinement + narrative registers + fixtures)
+- Status: READY_FOR_REVIEW
+- Contract versions consumed: none released (all contract families in `06_CONTRACTS/` are unversioned names; PROGRESS baseline "TBD 1.0.0")
+- Contract versions changed: none. New DRAFT fixtures proposed for Phase 01 freeze: `cc.narrative.canon_registry` 0.1.0, `cc.loc.strings` 0.1.0 (both in `11_NARRATIVE/fixtures/`)
+- Tests: `python3 11_NARRATIVE/tools/validate_narrative_registry.py` → 24 pass groups, 0 failures (91 nar.* IDs, 85 loc.* keys, 10/12 flags)
+- Known issues: PR target `integration` does not exist (only `ai-13-integration`); 11 open Product/Human decisions in `11_NARRATIVE/OPEN_DECISIONS_AI09.md`; item lore keyed to PROPOSED slugs pending AI-02 item IDs
+- Next integration action: AI-13 review of PR from `ai-09-narrative` → `ai-13-integration`; AI-01 decision on OD-03 (Story Promise) and OD-04 (finale set)
