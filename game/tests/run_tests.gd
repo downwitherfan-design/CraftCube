@@ -54,6 +54,8 @@ func _initialize() -> void:
 	_test_hud_readiness_line()
 	_test_equipment_capability()
 	_test_hud_resonance_line()
+	_test_settings_persistence()
+	_test_hud_big_text_persistence()
 	_test_animated_chapter_end_to_end()
 	_test_guided_solver_domain()
 	_test_guided_solver_controller()
@@ -1123,6 +1125,55 @@ func _test_hud_resonance_line() -> void:
 	if m.get_parent() != null:
 		m.get_parent().remove_child(m)
 	m.free()
+
+## Milestone F: settings persist separately from progression and load defensively.
+func _test_settings_persistence() -> void:
+	print("[settings persistence]")
+	var p := "user://t_settings.json"
+	SaveManager.delete_settings(p)
+	_check("no settings file loads as empty", SaveManager.load_settings(p).is_empty())
+	_check("settings save succeeds", SaveManager.save_settings({"big_text": true}, p))
+	var loaded: Dictionary = SaveManager.load_settings(p)
+	_check("saved setting round-trips", bool(loaded.get("big_text", false)))
+	# A malformed file must not crash and must fall back to empty (defaults).
+	var f := FileAccess.open(p, FileAccess.WRITE)
+	f.store_string("{not json")
+	f.close()
+	var bad: Dictionary = SaveManager.load_settings(p)
+	_check("malformed settings fall back to empty", bad.is_empty())
+	SaveManager.delete_settings(p)
+	_check("delete_settings removes the file", not FileAccess.file_exists(p))
+
+## Milestone F: the large-text accessibility choice survives a restart (new HUD instance
+## reads it back from the settings file).
+func _test_hud_big_text_persistence() -> void:
+	print("[hud big-text persistence]")
+	var p := "user://t_hud_settings.json"
+	SaveManager.delete_settings(p)
+	SaveManager.delete_settings()  # ensure the default file cannot leak into this test
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	var hud = m.get_node("HUD")
+	hud.settings_path = p
+	hud._apply_saved_settings()
+	_check("big text is off by default", not hud._big_text)
+	hud._on_big_text()
+	_check("toggling big text turns it on", hud._big_text)
+	_check("big text was persisted", bool(SaveManager.load_settings(p).get("big_text", false)))
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+	# A fresh instance must restore the choice.
+	var m2 = load("res://scenes/Main.tscn").instantiate()
+	m2._ready()
+	var hud2 = m2.get_node("HUD")
+	hud2.settings_path = p
+	hud2._apply_saved_settings()
+	_check("a fresh HUD restores the persisted big-text choice", hud2._big_text)
+	if m2.get_parent() != null:
+		m2.get_parent().remove_child(m2)
+	m2.free()
+	SaveManager.delete_settings(p)
 
 ## Play the whole chapter through the real scene using ANIMATED turns (each turn started via
 ## the controller and settled through the tween path), asserting the rendered cube matches

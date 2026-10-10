@@ -25,6 +25,9 @@ var _step_btn: Button
 var _readiness: Label
 var _resonance: Label
 
+## Settings file used for accessibility persistence; tests override this to isolate.
+var settings_path := SaveManager.SETTINGS_PATH
+
 const BTN_MIN := Vector2(88, 64)
 
 ## On mobile, take the full screen so the game is not letterboxed and no system
@@ -36,12 +39,20 @@ func _ready() -> void:
 func bind(ctrl: Node3D) -> void:
 	controller = ctrl
 	_build()
+	_apply_saved_settings()
 	controller.level_loaded.connect(_on_level_loaded)
 	controller.world_reacted.connect(_on_world_reacted)
 	controller.reward_granted.connect(_on_reward)
 	controller.discovery_found.connect(_on_discovery)
 	controller.solved.connect(_on_solved)
 	controller.move_applied.connect(_on_move_applied)
+
+## Apply persisted accessibility preferences. Missing/ malformed settings fall back to the
+## default (normal text); loading must never fail or crash on a bad file.
+func _apply_saved_settings() -> void:
+	_big_text = false
+	if bool(SaveManager.load_settings(settings_path).get("big_text", false)):
+		_apply_big_text(true)
 
 func _label(text: String, size: int) -> Label:
 	var l := Label.new()
@@ -354,7 +365,13 @@ func _on_solved(_level: Dictionary, _reward: Dictionary) -> void:
 	_status.text = "Solved! The world answered. Saved."
 
 func _on_big_text() -> void:
-	_big_text = not _big_text
+	_apply_big_text(not _big_text)
+	SaveManager.save_settings({"big_text": _big_text}, settings_path)
+
+## Apply the accessibility text scale. Shared by the toggle and by settings restore, so the
+## restore path and the interactive path can never diverge.
+func _apply_big_text(on: bool) -> void:
+	_big_text = on
 	var mult := 1.5 if _big_text else 1.0
 	for l in [_title, _status, _onboard, _hint, _story, _guide, _readiness, _resonance]:
 		var base := 34 if l == _title else (22 if (l == _status or l == _story) else (18 if (l == _readiness or l == _resonance) else 20))
