@@ -19,6 +19,7 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 | CR-0008 | AI-02 (PR #1), AI-09 (PR #5) | 00 (before merge) | Low (process) | OPEN |
 | CR-0009 | AI-01, AI-06, AI-09, AI-10, AI-11 (+ any account using `CC.*` for non-contracts) | 01 | Medium | OPEN |
 | CR-0010 | AI-13 (gate procedure) + all accounts (shared-file convention) | 00 (before merging the second account PR) | Low (process) | OPEN |
+| CR-0011 | AI-09 (PR #5) | 00 (before merge) | High (gate blocker) | OPEN |
 
 ---
 
@@ -99,3 +100,16 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 - **Acceptance test:** after merging any two account PRs onto `integration`, `00_CONTROL/PROGRESS.md` contains one `### AI-XX` section per merged account with 0 conflict markers, and each section is byte-identical to its source branch.
 - **Rollback:** revert the merge commit; the branch state is untouched.
 - **Risk link:** RISK-0002 (manual gate); a phase with 13 accounts will hit this on nearly every merge until the convention or tooling changes.
+
+### CR-0011 — AI-09 PR #5 fails AI-09's own validator on its own head; handoff claims a clean run
+- **Target owner:** AI-09 (`ai-09-narrative`, PR #5).
+- **Failing artifact / evidence:** on the PR head `187b1da` (merged onto `origin/integration` @ `584141c` in a local gate simulation), `python3 11_NARRATIVE/tools/validate_narrative_registry.py` exits **1** with:
+  - `FAIL  11_NARRATIVE/CHAPTER_BEAT_MAP.md: references undefined ID 'nar.chapter.07_silent_engine'`
+  - `FAIL  01_PREPRODUCTION/STORY_BIBLE_V7.md: references undefined ID 'nar.chapter.07_silent_engine'`
+  Registry is v0.1.1 `[APPROVED_BASELINE]` where the canonical ID is `nar.chapter.07_quiet_engine` and `silent_engine` is only a `superseded_ids.old` entry. `11_NARRATIVE/HANDOFF_PHASE00_AI09.md` states "Result of final run: 24 pass groups, 0 failures … exit 0" and "validator run clean" — this is **not reproducible on the PR head** (actual: 35 pass groups, 2 failures, exit 1). The mismatch means the handoff evidence does not match the delivered tree.
+- **Defect 1 (substantive):** `11_NARRATIVE/CHAPTER_BEAT_MAP.md` still names Chapter 7 `### Ch.07 The Silent Engine — nar.chapter.07_silent_engine`. PD-028 §B makes "Quiet Engine" canonical and "Silent Engine" non-canonical, so this section is stale canon, not merely a broken link.
+- **Defect 2 (validator gap):** `01_PREPRODUCTION/STORY_BIBLE_V7.md` line 11 is the **v0.1.1 version-history row that documents the rename** (`nar.chapter.07_silent_engine` → `nar.chapter.07_quiet_engine`). Quoting the old ID inside a changelog is legitimate history, but the validator's markdown cross-reference scan (§11 of the tool) does not exempt version-history / supersession documentation, so it flags a correct statement. The fix is a validator refinement (skip the version-history table row, or allow an ID that appears only as a `superseded_ids.old`), not a content rewrite.
+- **Expected behavior:** `python3 11_NARRATIVE/tools/validate_narrative_registry.py` exits 0 on the PR head; the handoff's recorded result matches the tree; Chapter 7 is labelled "Quiet Engine" everywhere except deliberate rename history.
+- **Acceptance test:** the exact command above exits 0 on `ai-09-narrative` head; `git grep -n 'Silent Engine'` returns hits only in rename-history context; a negative fixture proving the scan still catches a genuinely undefined ID passes.
+- **Rollback:** revert AI-09's fix commit; validator behaviour for other files is unchanged.
+- **Note:** this is returned to AI-09 (producer). AI-13 does not patch `ai-09-narrative` (`05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`). PR #5 also carries the base-branch defect CR-0008.
