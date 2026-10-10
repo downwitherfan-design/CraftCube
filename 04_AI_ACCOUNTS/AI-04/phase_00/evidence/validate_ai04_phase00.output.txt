@@ -1,0 +1,42 @@
+command: python3 04_AI_ACCOUNTS/AI-04/phase_00/scripts/validate_ai04_phase00.py
+cwd: repo root (/home/user/CraftCube)
+python: Python 3.13.14
+git HEAD before evidence commit: 33ad282
+date_utc: 2026-09-13T12:26:09Z
+---
+AI-04 Phase 00 self-audit
+root: /home/user/CraftCube/04_AI_ACCOUNTS/AI-04/phase_00
+PASS  47 registry IDs match idPattern
+PASS  no duplicate registry IDs
+PASS  all IDs inside AI-04-owned namespaces
+PASS  no reserved-namespace shadowing
+PASS  1 reserved-not-proposed ID(s) kept out of the proposed catalog
+PASS  every markdown ID exists in registry
+PASS  every registry ID is referenced in markdown (intent variants documented as <value>)
+PASS  13 tunables identical in markdown and registry
+PASS  fixture schema parses
+PASS  schema required tunables == registry tunables
+PASS  schema intent enum == registry intents
+PASS  sample fixture structurally valid: fx.arbiter.second_finger_cancels_twist.json
+PASS  01_INTERACTION_VISION_AND_PRINCIPLES.md: no forbidden terms
+PASS  02_PLATFORM_AND_INPUT_ASSUMPTIONS.md: no forbidden terms
+PASS  03_INTERACTION_TERMINOLOGY.md: no forbidden terms
+PASS  04_GESTURE_ARBITRATION_MODEL.md: no forbidden terms
+PASS  05_INTERRUPTION_AND_RECOVERY.md: no forbidden terms
+PASS  06_EQUIPMENT_AND_WORLD_RUNTIME_INTERACTION.md: no forbidden terms
+PASS  07_SUCCESS_CRITERIA_AND_MEASURABLE_BOUNDARIES.md: no forbidden terms
+PASS  08_OPEN_DECISIONS_AND_INTEGRATION_REQUESTS.md: no forbidden terms
+PASS  09_CONTRACT_PROPOSAL_INTERACTION_COMMAND_v0.1.0.md: no forbidden terms
+PASS  10_HANDOFF_PHASE_00.md: no forbidden terms
+PASS  01_INTERACTION_VISION_AND_PRINCIPLES.md: Status declared
+PASS  02_PLATFORM_AND_INPUT_ASSUMPTIONS.md: Status declared
+PASS  03_INTERACTION_TERMINOLOGY.md: Status declared
+PASS  04_GESTURE_ARBITRATION_MODEL.md: Status declared
+PASS  05_INTERRUPTION_AND_RECOVERY.md: Status declared
+PASS  06_EQUIPMENT_AND_WORLD_RUNTIME_INTERACTION.md: Status declared
+PASS  07_SUCCESS_CRITERIA_AND_MEASURABLE_BOUNDARIES.md: Status declared
+PASS  08_OPEN_DECISIONS_AND_INTEGRATION_REQUESTS.md: Status declared
+PASS  09_CONTRACT_PROPOSAL_INTERACTION_COMMAND_v0.1.0.md: Status declared
+PASS  10_HANDOFF_PHASE_00.md: Status declared
+summary: 32 passed, 0 failed
+exit=0
