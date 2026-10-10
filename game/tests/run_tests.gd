@@ -42,6 +42,7 @@ func _initialize() -> void:
 	_test_completion_feedback()
 	_test_camera_framing()
 	_test_resume_selection()
+	_test_chapter_playthrough()
 	_test_scramble_fuzz()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -644,6 +645,50 @@ func _test_resume_selection() -> void:
 	if b.get_parent() != null:
 		b.get_parent().remove_child(b)
 	b.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## First-session loop, end to end through the real scene and the wired HUD: solve every
+## Chapter 01 level with the actual buttons, follow progression, and verify the story
+## feedback, rewards and equipment a player would see. Synchronous (no frames), matching
+## the other scene tests.
+func _test_chapter_playthrough() -> void:
+	print("[chapter playthrough]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var packed: PackedScene = load("res://scenes/Main.tscn")
+	if packed == null:
+		_check("Main.tscn loads for playthrough", false)
+		return
+	var main = packed.instantiate()
+	main._ready()
+	var hud = main.get_node_or_null("HUD")
+	_check("playthrough: HUD bound", hud != null)
+	_check("playthrough: starts at level 1", main.current_index == 0)
+	var expect_hooks := ["mechanism_awakens", "seed_grows", "stone_marks_awaken"]
+	for i in range(3):
+		main.load_level(i)
+		for k in range(main.engine._scramble_moves.size() - 1, -1, -1):
+			main.engine.apply_move(MoveTable.inverse(main.engine._scramble_moves[k]))
+		main.cube_view.refresh(main.engine.state)
+		_check("playthrough: level %d solved" % (i + 1), main.engine.is_solved())
+		_check("playthrough: level %d confirms" % (i + 1), main.confirm_solve())
+		var lid: String = str(main.levels[i]["level_id"])
+		_check("playthrough: level %d recorded" % (i + 1), main.game_state.is_solved(lid))
+		_check("playthrough: level %d story reaction shown" % (i + 1),
+				hud._story.text.contains(StoryContent.reaction_for(expect_hooks[i])))
+	_check("playthrough: chapter complete", main.game_state.first_unsolved_index(main.levels) == -1)
+	_check("playthrough: equipment persists", main.game_state.owns("equipment.rootweave_gauntlet"))
+	_check("playthrough: all three world markers lit", main.world_view.lit_count() == 3)
+	if main.get_parent() != null:
+		main.get_parent().remove_child(main)
+	main.free()
 	if had:
 		var w := FileAccess.open(saved, FileAccess.WRITE)
 		w.store_string(backup)

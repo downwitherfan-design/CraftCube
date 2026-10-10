@@ -155,6 +155,10 @@ func _refresh_legal() -> void:
 
 func _refresh_status() -> void:
 	_status.text = "Moves: %d" % controller.engine.move_count()
+	# Live cue so the player knows when the required faces are aligned; the win is still
+	# confirmed by the domain predicate via "I solved it".
+	if controller.engine.is_solved():
+		_status.text = "All required faces aligned — press \"I solved it\"."
 
 func _on_flip() -> void:
 	_ccw_mode = not _ccw_mode
@@ -162,16 +166,21 @@ func _on_flip() -> void:
 		_flip_btn.text = "Direction: CCW" if _ccw_mode else "Direction: CW"
 
 func _on_face_pressed(face: String) -> void:
-	controller.try_move(face, not _ccw_mode)
+	var applied: bool = controller.try_move(face, not _ccw_mode)
+	if applied:
+		_haptic(18)
 	_refresh_status()
-	# Live cue so the player knows when the required faces are aligned; the win is still
-	# confirmed by the domain predicate via "I solved it".
-	if controller.engine.is_solved():
-		_status.text = "All required faces aligned — press \"I solved it\"."
 
 func _on_solve() -> void:
 	if not controller.confirm_solve():
 		_status.text = "Not yet — the required faces are not aligned."
+	else:
+		_haptic(60)
+
+## Short vibration on supported handhelds; a harmless no-op elsewhere.
+func _haptic(ms: int) -> void:
+	if OS.has_feature("mobile"):
+		Input.vibrate_handheld(ms)
 
 ## Completion feedback accumulates in `_story` so the world reaction, the reward
 ## narrative and the discovery are all readable together. Writing them to one shared
