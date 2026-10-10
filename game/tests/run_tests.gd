@@ -39,6 +39,7 @@ func _initialize() -> void:
 	_test_hud_layout_and_wiring()
 	_test_save_corruption_variants()
 	_test_scene_integration()
+	_test_completion_feedback()
 	_test_scramble_fuzz()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -497,6 +498,53 @@ func _test_scene_integration() -> void:
 	_check("confirm_solve succeeds in the real scene", main.confirm_solve())
 	# main was never added to the tree (we call _ready() directly), so it has no parent;
 	# only detach when one exists to avoid an engine ERROR from remove_child.
+	if main.get_parent() != null:
+		main.get_parent().remove_child(main)
+	main.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## Completion feedback must reach the player intact. Regression for a real defect where the
+## world reaction, reward narrative and discovery all wrote to one shared label, so later
+## signals overwrote earlier ones and the authored narrative was never shown.
+func _test_completion_feedback() -> void:
+	print("[completion feedback]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var packed: PackedScene = load("res://scenes/Main.tscn")
+	if packed == null:
+		_check("Main.tscn loads for feedback test", false)
+		return
+	var main = packed.instantiate()
+	main._ready()
+	main.load_level(2)  # level 3: world hook + narrative reward + discovery
+	var hud = main.get_node_or_null("HUD")
+	_check("HUD bound for feedback test", hud != null and hud._story != null)
+	if hud != null:
+		for i in range(main.engine._scramble_moves.size() - 1, -1, -1):
+			main.engine.apply_move(MoveTable.inverse(main.engine._scramble_moves[i]))
+		_check("feedback: level solved", main.engine.is_solved())
+		_check("feedback: confirm_solve true", main.confirm_solve())
+		var story: String = hud._story.text
+		# Every authored element must be present, not overwritten by a later signal.
+		_check("feedback shows world reaction",
+				story.contains(StoryContent.reaction_for("stone_marks_awaken")))
+		_check("feedback shows reward narrative",
+				story.contains(str(StoryContent.reward_for("reward.01.nox_meets")["narrative"])))
+		_check("feedback shows discovery",
+				story.contains("Discovery — The Stone Mark"))
+		_check("feedback shows equipment purpose",
+				hud._hint.text.contains("Rootweave Gauntlet"))
+		# A replay must not duplicate the feedback.
+		var before: String = hud._story.text
+		main.confirm_solve()
+		_check("feedback idempotent on re-confirm", hud._story.text == before)
 	if main.get_parent() != null:
 		main.get_parent().remove_child(main)
 	main.free()
