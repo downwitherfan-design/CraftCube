@@ -302,3 +302,16 @@ integration token** — `POST /repos/.../git/refs` returned HTTP `403`
   and re-sign the APK on the fixed commit and refresh game/docs/evidence/.
 - Then run PR #11 through the Phase 00 gate; do NOT merge until the gate and human decisions permit.
 
+### Android build reproduced locally (Workstream F closed)
+- Provisioned JDK 21, Android SDK (platform-tools + platforms;android-35 + build-tools;35.0.0) and the
+  Godot 4.7.2-stable export templates; set export/android paths in editor_settings-4.7.tres; created the
+  standard debug keystore.
+- `bash game/ci/build_android.sh` -> **CI: PASS** on commit 8793822: import 0, **198 tests, 0 failed**,
+  main-scene boot 0, debug APK exported and **signed** (`apksigner`, build-tools 35.0.0).
+- APK: 28,338,657 bytes; package `com.downwitherfandesign.craftcube` v0.1.0; arm64-v8a; targetSdk 36.
+  Full log: `game/docs/evidence/android_export_run_8793822.log`.
+- Limitation: no physical Android device / emulator in this session (adb daemon unavailable) -> NOT a
+  device playtest; the pipeline itself is VERIFIED. APK hashes differ between runs (non-reproducible zip);
+  the log's hash is the authoritative artifact for that run.
+
+

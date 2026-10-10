@@ -143,3 +143,13 @@ This file is deliberately short. Each AI must update only its own section in the
 - Tests: `python3 08_QA_RELEASE/phase_00/QA_PHASE00_VALIDATOR.py` → exit 0, fail=0 (6 check groups A–F, 14 negative self-test cases). Evidence: `08_QA_RELEASE/phase_00/evidence/validator_run_ai-10-qa_only.log` (5 SOURCE_NOT_PRESENT skips) and `validator_run_with_ai-01-product_overlay.log` (all 8 sources cross-checked, 0 skips). No build/device/playtest executed — none exists.
 - Known issues: 12 findings in `08_QA_RELEASE/phase_00/QA_PHASE00_FINDINGS_REGISTER.md` (7 MAJOR, all Phase 01 contract inputs; 0 BLOCKER). 25/36 QAT items blocked on contracts/sources by design. Protocol exit-question wording is `1.0.0-draft` pending AI-01 (QAF-007).
 - Next integration action: PR `ai-10-qa` → `integration` after AI-01's PRODUCT docs merge (register cross-check E depends on them); AI-13 to register `QAT/QAR/QAF/PT` ID families (QAF-001).
+### AI-13 — Session 8 (Godot gameplay-quality sprint)
+- Branch: `godot-migration` (PR #11 → `integration`); commits `69de79d`..`309c4cf` (local in this runtime; push blocked by a read-only token).
+- Task: Phase 00 closure continuation — find and fix real, player-visible defects by RUNNING the Godot slice, then reproduce the Android build on the fixed commit.
+- Defects fixed (verified at runtime): (1) completion feedback clobbered — reward/discovery wrote over the world reaction, hiding authored narrative (`69de79d`); (2) cube camera off-centre and clipped left on every viewport (`298ec98`); (3) relaunch replayed the just-solved level instead of resuming (`4f4190f`); plus aligned-cue refresh after undo/restart and guarded mobile haptics (`8793822`).
+- Tests: `godot --headless --path game --script res://tests/run_tests.gd` → **198 passed / 0 failed** (was 166). New regressions: `_test_completion_feedback`, `_test_camera_framing`, `_test_resume_selection`, `_test_chapter_playthrough`.
+- Build: `bash game/ci/build_android.sh` → **CI: PASS** (import 0, tests 198/0, boot 0, signed debug APK, package `com.downwitherfandesign.craftcube` v0.1.0, arm64-v8a). Log: `game/docs/evidence/android_export_run_8793822.log`.
+- Status: READY_FOR_REVIEW. Phase 00 gate remains **NOT PASSED**; no PR merged. Human decisions OD-0001 (branch protection) and OD-0005 (IP/title clearance) still open.
+- Known limitations: no physical Android device (no device playtest); 4 verified commits unpushed (read-only credential); QA validator `fail=20` on this branch is pre-existing and fixed by PR #12.
+- Checkpoint: `11_INTEGRATION/OPENHANDS_RESUME_STATE.md` (Session 8).
+
