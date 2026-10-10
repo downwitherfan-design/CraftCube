@@ -162,19 +162,35 @@ python3 11_INTEGRATION/scripts/validate_registry.py --check-render   # â†’ 
 - **Next safe action:** identical to §11 (unblock write, publish, land CR-0012, record PD-030).
 - **Phase-00 validator sweep on the current tree (VERIFIED, read-only):** product-lock pass=14/fail=0; registry 27 contracts/27 DRAFT/0 consumable; AI-04 32/0; ownership OK; AI-08 audio OK (motifs=5 cues=29); environment 9/0; narrative 35 groups/0; UIUX 6 fixtures/0; performance positives=1 negatives=4 failures=0; release 10/0/10 fixtures; AI-03 content PASS (0 errors, 1 warning). The current tree `= local integration (with CR-0012) + Godot slice` satisfies all validators. NOTE: `origin/integration` is still `55f6b9b` (pre-CR-0012) — the gate blocker is the *push*, not the code.
 
-## 13. Write-access blocker (Session 5, definitive)
+## 13. Write-access blocker — RESOLVED (Session 6)
 
-`git push` and every write API are blocked. VERIFIED this session:
+> **RESOLVED 2026-10-10 (Session 6).** A write-enabled token was supplied and verified
+> (repository owner `downwitherfan-design`; reversible ref probe create→201 / delete→204).
+> All pushes below are now on `origin`. The historical description is retained for context.
 
-- The runtime `GITHUB_TOKEN` is a **read-only `ghu_` integration token**:
-  `POST /repos/downwitherfan-design/CraftCube/git/refs` → HTTP `403`,
-  body `{"message":"Resource not accessible by integration"}`.
-- `git push` through a `credential.helper` that echoes `$GITHUB_TOKEN` →
-  `remote: Permission ... denied` / `fatal: ... error: 403`.
-- The repo `permissions` JSON field (`push:true, admin:true`) reflects the **account's
-  role**, not the token's scope — it is not evidence of token write access.
-- The write-capable PAT used in an earlier session (`/tmp/.ghtok`,
-  `GIT_ASKPASS=/tmp/.gitaskpass`) **does not exist** this session.
+Historical finding (now moot): the runtime `GITHUB_TOKEN` was a **read-only `ghu_`
+integration token** — `POST /repos/.../git/refs` returned HTTP `403`
+`{"message":"Resource not accessible by integration"}`, and `git push` failed the same way.
 
-**Unblock:** register a write-enabled credential (scope `repo`) as the supported
-`GITHUB_TOKEN`/`GH_TOKEN` secret. No workaround that stores or exposes a secret was used.
+## 14. Session 6 (2026-10-10) — delivery: pushes, PR, green CI (AI-13)
+
+- **Write access restored (VERIFIED):** identity `downwitherfan-design`; the supplied token
+  can create/delete refs. Credential kept transiently in `/tmp/.ghtok` (mode 600), never
+  committed and never printed.
+- **Pushed branches (VERIFIED on `origin`):**
+  - `integration` `55f6b9b → 3df70ae` (fast-forward; brings the AI-10 CR-0012 fix to the canonical remote).
+  - `godot-migration` `1d63bbf → ab8416b` (the Godot slice + all hardening).
+  - `ai-13-integration` `397cfb6 → f01be1b`.
+- **PR opened:** [#11](https://github.com/downwitherfan-design/CraftCube/pull/11) `godot-migration → integration` (integration request; base is the canonical `integration`, not `main`).
+- **CI now GREEN (VERIFIED):** run `38075134745` on `godot-migration` **success**; the clean
+  runner installed Godot 4.7.2 + Android SDK, built + signed the APK, and uploaded artifact
+  `CraftCube-debug-apk` (28,122,828 bytes). This closes the "no remote build evidence" gap.
+- **CI defect found + fixed (this session):** the `Create debug keystore` step failed when the
+  alias already existed (`keytool: alias <androiddebugkey> already exists`), failing the job
+  before the build. Guarded with an existence check; added a toolchain-path diagnostic step.
+  Fix commit pushed on `godot-migration`.
+- **Remote state correction:** only PR #11 is currently open. The earlier PRs (#1/#5/#9/#10)
+  are closed/merged on the live repo — so the historical "PR #1/#5 target `ai-13-integration`"
+  note is no longer actionable. Recorded per live evidence.
+- **Still open (unchanged):** Phase 00 gate NOT PASSED — CR-0013 (AI-01 product-register
+  update) and the human-controlled decisions remain outstanding. PR #11 does not claim the gate.

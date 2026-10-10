@@ -60,22 +60,24 @@ Compact, factual status for external reviewers. Companion to
 
 ## Current failures / blockers
 
-- **Remote write BLOCKED.** Required fix: register a write-enabled credential as the
-  supported `GITHUB_TOKEN`/`GH_TOKEN` secret (scope `repo`). A `ghu_` integration token
-  cannot push to this repo.
-- **CR-0012 not on `integration`.** The fix `8bd03f0` (branch `ai-10-qa`) is verified to
-  make the QA validator exit 0, but `origin/integration` is still `55f6b9b`.
+- **Delivery path: RESOLVED.** Write access restored; branches pushed to `origin` and
+  PR [#11](https://github.com/downwitherfan-design/CraftCube/pull/11) opened
+  (`godot-migration -> integration`). Remote CI is **green** (clean-runner build + APK artifact).
+- **Phase 00 gate: NOT PASSED (open).** CR-0013 (AI-01 product-register/validator engine
+  update) and the human-controlled decisions remain outstanding. PR #11 does not claim the gate.
+- **CR-0012 is now on `origin/integration`** (`55f6b9b -> 3df70ae`); the QA validator exits 0 there.
 - **CR-0013 open** (engine decision needs an AI-01-recorded `PD-030`).
 - **No physical Android device** in this environment — no on-device run is claimed.
 
 ## Next concrete action
 
-1. Restore write access, push `godot-migration`, open a PR to `integration`
-   (base corrected from `ai-13-integration` if it still points there).
-2. Publish the CR-0012 fix branch (`ai-10-qa`) and land it on `integration`.
-3. Have AI-01 record `PD-030` + restate `PD-029` items 4/5 engine-neutrally (CR-0013).
+1. Obtained — write access restored; `godot-migration` pushed and PR #11 opened to `integration`.
+2. Done — CR-0012 fix is now on `origin/integration` (`3df70ae`).
+3. AI-01 records `PD-030` + restates `PD-029` items 4/5 engine-neutrally (CR-0013); then
+   re-evaluate the Phase-00 gate rows against the integrated tree.
 
 ## Last successful push / PR
 
-- Last successful remote write: prior session (`ai-13-integration`, `ai-09-narrative`).
-- **This session: none** — no push and no PR were performed; no remote state was changed.
+- **This session:** pushed `integration` (`55f6b9b->3df70ae`), `godot-migration`
+  (`1d63bbf->ab8416b`), `ai-13-integration` (`397cfb6->f01be1b`); opened PR #11;
+  remote CI green (run `38075134745`).
