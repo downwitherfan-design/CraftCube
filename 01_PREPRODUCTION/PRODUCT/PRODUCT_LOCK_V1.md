@@ -5,7 +5,7 @@
 | Owner | AI-01 — Product / Game Direction |
 | Document ID | `CC.PRODUCT.LOCK` |
 | Version | 1.1.0 |
-| Status | READY_FOR_REVIEW — Human Product Authority decisions for engine, title/namespace, monetization and canon are RECORDED (PD-025..PD-028). Remaining human items are listed in §11 / PD-029. Integration gate verdict is AI-13's. |
+| Status | READY_FOR_REVIEW — Human Product Authority decisions for engine, title/namespace, monetization and canon are RECORDED (PD-025..PD-028; engine re-confirmed to Godot by PD-030). Remaining human items are listed in §11 / PD-029. Integration gate verdict is AI-13's. |
 | Phase | 00 — Product/IP Lock |
 | Supersedes | nothing (first product lock) |
 | Canonical intent source | `00_CONTROL/CRAFTCUBE_GAME_MASTER_BIBLE.md` |
@@ -63,7 +63,7 @@ Design consequences:
 | Assumption | Value | Owner to verify | Status |
 |---|---|---|---|
 | Primary platform | Android phones, portrait-first | AI-04 / AI-11 | ASSUMED |
-| Engine | Unity 6 + URP + Android (per `02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md`); Domain/Simulation pure C#, engine-independent | Human Project Owner (licence, CI/build environment before Phase 02) / AI-02 / AI-12 | **HUMAN_DECIDED (PD-025).** Exact Unity/URP/SDK/NDK/JDK versions deliberately NOT pinned until the technical freeze step. |
+| Engine | Godot 4.x stable + GDScript, Android-first (per `PD-030`, superseding `PD-025`); Domain/Simulation pure and engine-independent (no Node/SceneTree dependencies) | Human Project Owner (build/toolchain environment before Phase 02) / AI-02 / AI-12 | **HUMAN_DECIDED (PD-030).** Exact Godot/Android SDK/NDK/JDK versions deliberately NOT pinned until the technical freeze step. |
 | Device tiers | low / mid / high defined by AI-11 device matrix | AI-11 | MISSING (no matrix in repo yet) |
 | Frame targets | 60 FPS mid-tier target, 30 FPS safe mode (Blueprint hypothesis) | AI-11 | HYPOTHESIS |
 | Offline | Entire critical path playable with no network (DD-015) | AI-02 / AI-12 | PRODUCT REQUIREMENT |
@@ -182,7 +182,7 @@ These are product boundaries, not engineering budgets. Engineering budgets are o
 
 | Item | Status (v1.1.0) | Decision owner |
 |---|---|---|
-| Engine / technology lock | **DECIDED** — Unity 6 + URP + Android (`PD-025`); versions pinned later | Human Project Owner provides licence/CI before Phase 02 |
+| Engine / technology lock | **DECIDED** — Godot 4.x stable + GDScript, Android-first (`PD-030`, supersedes `PD-025`); versions pinned later | Human Project Owner provides build/toolchain environment before Phase 02 |
 | Public title | **DECIDED for current phase** — "CraftCube" working title (`PD-026`); **trademark/legal clearance still REQUIRED before final brand lock** | Human / legal |
 | "Asterra" public use | **DECIDED** — internal-only until legal clearance (`PD-026`, `PD-028` §D) | Human / legal |
 | Monetization model | **DECIDED** — premium one-time purchase (`PD-027`); **exact price NOT frozen** | Human (price: commercial/store decision) |
