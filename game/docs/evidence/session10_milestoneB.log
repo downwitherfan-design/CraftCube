@@ -9,13 +9,14 @@ Unit tests (godot --headless --path game --script res://tests/run_tests.gd):
   Milestone E:          350 passed, 0 failed
   Milestone F:          359 passed, 0 failed
   Milestone G:          364 passed, 0 failed
+  Milestone H:          375 passed, 0 failed
 
 Full Android CI (GODOT_BIN=<godot 4.7.2> bash game/ci/build_android.sh): exit 0, CI: PASS
   - import: OK
-  - domain unit tests: 364 passed, 0 failed
+  - domain unit tests: 375 passed, 0 failed
   - main scene smoke boot (--quit-after 30): OK
   - android export (debug): APK produced 28,359,497 bytes
-      dist/CraftCube.apk sha256 bb702e3cff53fd44de841f392a67b7edbfb3cf2eb487dcc5d38cd7d68001cc91
+      dist/CraftCube.apk sha256 018458babf53d53c3777adaad547acce04d571ff39114913c126c5cab1ce3e23
   - NDK/ADB warnings ("cannot connect to daemon at tcp:5037") are expected: no device attached.
 
 Rendered frames (xvfb-run, 720x1280, opengl3/Mesa llvmpipe) via res://tests/capture_frames.gd:
@@ -44,6 +45,9 @@ Scope
   * Milestone G: progress is flushed to disk on the OS close/back request
     (NOTIFICATION_WM_CLOSE_REQUEST / WM_GO_BACK_REQUEST), so a session ended by the Android
     back gesture never loses progress. save_progress() is idempotent and test-isolatable.
+  * Milestone H: reduced-motion accessibility choice, persisted with the large-text option; a
+    turn under reduced motion still runs the real animated lifecycle (logic advances once on
+    settle) and simply sweeps instantly.
 
 Limitations: rendering on a virtual X server only. There is no physical Android device in
 this environment, so this is NOT a device playtest; the APK is an artifact, not a store build.

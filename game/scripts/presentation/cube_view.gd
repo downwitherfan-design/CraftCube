@@ -35,6 +35,10 @@ var _half := 1.0
 var _glyphs: Array = []
 
 var _animating := false
+
+## Accessibility: when true, face turns settle instantly (no sweep). The logical lifecycle is
+## unchanged, so gameplay is identical, only the visual duration changes.
+var reduced_motion := false
 var _active: Array = []
 var _tween: Tween
 var _pivot: Node3D
@@ -159,7 +163,9 @@ func animate_move(move: Dictionary, state: CubeState, on_done: Callable = Callab
 	_pending_state = state
 	_tween = create_tween()
 	_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(_pivot, "rotation", target, TURN_DURATION)
+	# Reduced motion: keep the identical lifecycle (so the logic still advances on settle) but
+	# make the sweep instantaneous. The turn still goes through the same _finish_move path.
+	_tween.tween_property(_pivot, "rotation", target, TURN_DURATION if not reduced_motion else 0.0)
 	_tween.tween_callback(_finish_move.bind(state, on_done))
 	return true
 

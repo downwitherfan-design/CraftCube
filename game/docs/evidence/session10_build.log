@@ -15,9 +15,10 @@ Could not find version of build tools that matches Target SDK, using 35.0.0
 [  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
 [92m[ DONE ][39m [1mfirst_scan_filesystem[22m
 [0m
-[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (2 steps)[39m[0m
-[   0% ] [90m[1mupdate_scripts_classes[22m | GameController[39m[0m
-[  33% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (3 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  25% ] [90m[1mupdate_scripts_classes[22m | CubeView[39m[0m
+[  50% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
 [92m[ DONE ][39m [1mupdate_scripts_classes[22m
 [0m
 [   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
@@ -42,7 +43,7 @@ WARNING: SaveManager: save version 9999 is newer than supported 1
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:57)
-         [1] _test_save_load (res://tests/run_tests.gd:181)
+         [1] _test_save_load (res://tests/run_tests.gd:182)
          [2] _initialize (res://tests/run_tests.gd:30)
 [level catalog]
 [end-to-end solve]
@@ -52,13 +53,13 @@ ERROR: Parse JSON failed. Error at line 0: Expected key
    at: parse_string (core/io/json.cpp:629)
    GDScript backtrace (most recent call first):
        [0] load_from_path (res://scripts/game/save_manager.gd:46)
-       [1] _test_save_hardening (res://tests/run_tests.gd:273)
+       [1] _test_save_hardening (res://tests/run_tests.gd:274)
        [2] _initialize (res://tests/run_tests.gd:34)
 WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:48)
-         [1] _test_save_hardening (res://tests/run_tests.gd:273)
+         [1] _test_save_hardening (res://tests/run_tests.gd:274)
          [2] _initialize (res://tests/run_tests.gd:34)
 [completion idempotency]
 [level advancement]
@@ -69,7 +70,7 @@ WARNING: generate_scramble: no non-solved scramble found; returning last attempt
      GDScript backtrace (most recent call first):
          [0] generate_scramble (res://scripts/domain/puzzle_engine.gd:152)
          [1] setup (res://scripts/domain/puzzle_engine.gd:21)
-         [2] _test_level_rule_semantics (res://tests/run_tests.gd:369)
+         [2] _test_level_rule_semantics (res://tests/run_tests.gd:370)
          [3] _initialize (res://tests/run_tests.gd:38)
 [hud layout and wiring]
 [save corruption variants]
@@ -77,31 +78,31 @@ ERROR: Parse JSON failed. Error at line 0: Unknown error getting token
    at: parse_string (core/io/json.cpp:629)
    GDScript backtrace (most recent call first):
        [0] load_from_path (res://scripts/game/save_manager.gd:46)
-       [1] _test_save_corruption_variants (res://tests/run_tests.gd:456)
+       [1] _test_save_corruption_variants (res://tests/run_tests.gd:457)
        [2] _initialize (res://tests/run_tests.gd:40)
 WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:48)
-         [1] _test_save_corruption_variants (res://tests/run_tests.gd:456)
+         [1] _test_save_corruption_variants (res://tests/run_tests.gd:457)
          [2] _initialize (res://tests/run_tests.gd:40)
 ERROR: Parse JSON failed. Error at line 0: Expected ']'
    at: parse_string (core/io/json.cpp:629)
    GDScript backtrace (most recent call first):
        [0] load_from_path (res://scripts/game/save_manager.gd:46)
-       [1] _test_save_corruption_variants (res://tests/run_tests.gd:464)
+       [1] _test_save_corruption_variants (res://tests/run_tests.gd:465)
        [2] _initialize (res://tests/run_tests.gd:40)
 WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:48)
-         [1] _test_save_corruption_variants (res://tests/run_tests.gd:464)
+         [1] _test_save_corruption_variants (res://tests/run_tests.gd:465)
          [2] _initialize (res://tests/run_tests.gd:40)
 WARNING: SaveManager: save file has no usable version; quarantined, starting fresh
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:53)
-         [1] _test_save_corruption_variants (res://tests/run_tests.gd:471)
+         [1] _test_save_corruption_variants (res://tests/run_tests.gd:472)
          [2] _initialize (res://tests/run_tests.gd:40)
 [scene integration]
 [completion feedback]
@@ -124,22 +125,23 @@ ERROR: Parse JSON failed. Error at line 0: Expected key
    at: parse_string (core/io/json.cpp:629)
    GDScript backtrace (most recent call first):
        [0] load_settings (res://scripts/game/save_manager.gd:98)
-       [1] _test_settings_persistence (res://tests/run_tests.gd:1143)
+       [1] _test_settings_persistence (res://tests/run_tests.gd:1144)
        [2] _initialize (res://tests/run_tests.gd:57)
 WARNING: SaveManager: settings file is not valid JSON; using defaults
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_settings (res://scripts/game/save_manager.gd:100)
-         [1] _test_settings_persistence (res://tests/run_tests.gd:1143)
+         [1] _test_settings_persistence (res://tests/run_tests.gd:1144)
          [2] _initialize (res://tests/run_tests.gd:57)
 [hud big-text persistence]
 [progress flush on exit]
+[reduced motion persistence]
 [animated chapter end-to-end]
 [guided solver domain]
 [guided solver controller]
 [hud status text]
 [scramble fuzz]
-== Summary: 364 passed, 0 failed ==
+== Summary: 375 passed, 0 failed ==
 
 === main scene smoke boot ===
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
@@ -279,7 +281,7 @@ Signed
 [0m
 cannot connect to daemon at tcp:5037: Cannot assign requested address
 APK produced:
--rw------- 1 openhands openhands 28359497 Oct 10 21:23 /workspace/project/CraftCube/dist/CraftCube.apk
-bb702e3cff53fd44de841f392a67b7edbfb3cf2eb487dcc5d38cd7d68001cc91  /workspace/project/CraftCube/dist/CraftCube.apk
+-rw------- 1 openhands openhands 28363593 Oct 10 21:25 /workspace/project/CraftCube/dist/CraftCube.apk
+018458babf53d53c3777adaad547acce04d571ff39114913c126c5cab1ce3e23  /workspace/project/CraftCube/dist/CraftCube.apk
 
 CI: PASS

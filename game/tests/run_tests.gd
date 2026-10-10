@@ -57,6 +57,7 @@ func _initialize() -> void:
 	_test_settings_persistence()
 	_test_hud_big_text_persistence()
 	_test_progress_flush_on_exit()
+	_test_reduced_motion_persistence()
 	_test_animated_chapter_end_to_end()
 	_test_guided_solver_domain()
 	_test_guided_solver_controller()
@@ -1208,6 +1209,47 @@ func _test_progress_flush_on_exit() -> void:
 		m.get_parent().remove_child(m)
 	m.free()
 	SaveManager.delete_at_path(p)
+
+## Milestone H: reduced motion is a persisted accessibility choice that reaches the cube view.
+func _test_reduced_motion_persistence() -> void:
+	print("[reduced motion persistence]")
+	var p := "user://t_rm_settings.json"
+	SaveManager.delete_settings(p)
+	SaveManager.delete_settings()
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	var hud = m.get_node("HUD")
+	hud.settings_path = p
+	hud._apply_saved_settings()
+	_check("reduced motion is off by default", not hud._reduced_motion)
+	_check("cube view starts with motion enabled", not m.cube_view.reduced_motion)
+	hud._on_reduced_motion()
+	_check("toggling reduced motion turns it on", hud._reduced_motion)
+	_check("reduced motion reaches the cube view", m.cube_view.reduced_motion)
+	_check("reduced motion was persisted", bool(SaveManager.load_settings(p).get("reduced_motion", false)))
+	# A turn under reduced motion must still go through the real animated lifecycle and advance
+	# the logic exactly once when it settles.
+	m.load_level(0)
+	var before: int = m.engine.move_count()
+	_check("reduced-motion animated turn starts", m.try_move("U", true, true))
+	_check("reduced-motion turn is in flight", m.is_animating())
+	m.cube_view.skip_animation()
+	_check("reduced-motion turn advanced the logic once", m.engine.move_count() == before + 1)
+	_check("reduced-motion turn is no longer in flight", not m.is_animating())
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+	var m2 = load("res://scenes/Main.tscn").instantiate()
+	m2._ready()
+	var hud2 = m2.get_node("HUD")
+	hud2.settings_path = p
+	hud2._apply_saved_settings()
+	_check("a fresh HUD restores reduced motion", hud2._reduced_motion)
+	_check("restored reduced motion reaches the fresh cube view", m2.cube_view.reduced_motion)
+	if m2.get_parent() != null:
+		m2.get_parent().remove_child(m2)
+	m2.free()
+	SaveManager.delete_settings(p)
 
 ## Play the whole chapter through the real scene using ANIMATED turns (each turn started via
 ## the controller and settled through the tween path), asserting the rendered cube matches

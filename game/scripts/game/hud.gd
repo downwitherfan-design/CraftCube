@@ -25,6 +25,9 @@ var _step_btn: Button
 var _readiness: Label
 var _resonance: Label
 
+## Accessibility state: large text and reduced motion, both persisted in the settings file.
+var _reduced_motion := false
+
 ## Settings file used for accessibility persistence; tests override this to isolate.
 var settings_path := SaveManager.SETTINGS_PATH
 
@@ -51,8 +54,12 @@ func bind(ctrl: Node3D) -> void:
 ## default (normal text); loading must never fail or crash on a bad file.
 func _apply_saved_settings() -> void:
 	_big_text = false
-	if bool(SaveManager.load_settings(settings_path).get("big_text", false)):
+	_reduced_motion = false
+	var s := SaveManager.load_settings(settings_path)
+	if bool(s.get("big_text", false)):
 		_apply_big_text(true)
+	if bool(s.get("reduced_motion", false)):
+		_apply_reduced_motion(true)
 
 func _label(text: String, size: int) -> Label:
 	var l := Label.new()
@@ -163,6 +170,9 @@ func _build() -> void:
 	var big := _button("Large text")
 	big.pressed.connect(_on_big_text)
 	a11y_row.add_child(big)
+	var rm := _button("Reduced motion")
+	rm.pressed.connect(_on_reduced_motion)
+	a11y_row.add_child(rm)
 
 	# Guided solving: request a reliable route (not optimal) and step through it using the
 	# same engine/animation path as a manual turn.
@@ -366,7 +376,19 @@ func _on_solved(_level: Dictionary, _reward: Dictionary) -> void:
 
 func _on_big_text() -> void:
 	_apply_big_text(not _big_text)
-	SaveManager.save_settings({"big_text": _big_text}, settings_path)
+	SaveManager.save_settings({"big_text": _big_text, "reduced_motion": _reduced_motion}, settings_path)
+
+## Reduced-motion toggle: face turns settle instantly for players who prefer less movement.
+## Persisted together with the other accessibility choices.
+func _on_reduced_motion() -> void:
+	_apply_reduced_motion(not _reduced_motion)
+	SaveManager.save_settings({"big_text": _big_text, "reduced_motion": _reduced_motion}, settings_path)
+
+## Apply reduced motion to the cube view. Shared by the toggle and the settings restore path.
+func _apply_reduced_motion(on: bool) -> void:
+	_reduced_motion = on
+	if controller and controller.cube_view:
+		controller.cube_view.reduced_motion = on
 
 ## Apply the accessibility text scale. Shared by the toggle and by settings restore, so the
 ## restore path and the interactive path can never diverge.
