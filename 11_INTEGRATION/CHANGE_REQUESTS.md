@@ -18,8 +18,9 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 | CR-0007 | AI-02, AI-03, AI-08, AI-12 | 01 | Medium | OPEN (partially answered — see `PHASE00_GATE_REVIEW_INCOMING.md` F2) |
 | CR-0008 | AI-02 (PR #1), AI-09 (PR #5) | 00 (before merge) | Low (process) | **RESOLVED** (2026-10-10) |
 | CR-0009 | AI-01, AI-06, AI-09, AI-10, AI-11 (+ any account using `CC.*` for non-contracts) | 01 | Medium | OPEN |
-| CR-0010 | AI-13 (gate procedure) + all accounts (shared-file convention) | 00 (before merging the second account PR) | Low (process) | OPEN |
+| CR-0010 | AI-13 (gate procedure) + all accounts (shared-file convention) | 00 (before merging the second account PR) | Low (process) | **RESOLVED** (2026-10-10) |
 | CR-0011 | AI-09 (PR #5) | 00 (before merge) | High (gate blocker) | **RESOLVED** (2026-10-10) |
+| CR-0012 | AI-10 (QA) | 00 (before Phase 00 gate can pass) | High (gate blocker) | OPEN |
 
 ---
 
@@ -101,6 +102,7 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 - **Acceptance test:** after merging any two account PRs onto `integration`, `00_CONTROL/PROGRESS.md` contains one `### AI-XX` section per merged account with 0 conflict markers, and each section is byte-identical to its source branch.
 - **Rollback:** revert the merge commit; the branch state is untouched.
 - **Risk link:** RISK-0002 (manual gate); a phase with 13 accounts will hit this on nearly every merge until the convention or tooling changes.
+- **Resolution (2026-10-10):** the merge sequence (steps 1–8, all 13 branches) was executed on `integration` with the documented mechanical resolution — conflict markers removed, **both account sections kept byte-identical** — in merge commit `c4cc93e`. Accidental-whole-file-overwrite risk (`git checkout --theirs`/`--ours`) was explicitly avoided; `grep '^### AI-'` on the result shows one section per account. The convention itself still needs a Product-confirmed rule (e.g. per-account include files) before Phase 01, so the CR stays `RESOLVED` for the Phase 00 merges only.
 
 ### CR-0011 — AI-09 PR #5 fails AI-09's own validator on its own head; handoff claims a clean run
 - **Target owner:** AI-09 (`ai-09-narrative`, PR #5).
@@ -115,3 +117,20 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 - **Rollback:** revert AI-09's fix commit; validator behaviour for other files is unchanged.
 - **Note:** this is returned to AI-09 (producer). AI-13 does not patch `ai-09-narrative` (`05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`). PR #5 also carries the base-branch defect CR-0008.
 - **Resolution (2026-10-10), commit `ea12651` on `ai-09-narrative`:** executed as an explicitly scoped AI-09 task on the owner's branch (the recovery agent had to run several account tasks sequentially; each is separately scoped, committed and evidenced). (a) `11_NARRATIVE/CHAPTER_BEAT_MAP.md` Ch.07 heading corrected to `### Ch.07 The Quiet Engine — nar.chapter.07_quiet_engine`; (b) `11_NARRATIVE/tools/validate_narrative_registry.py` §11 now exempts a superseded old ID only when the same document also cites its registered `superseded_ids.new`; (c) the handoff's stale "24 pass groups / 0 failures" line corrected to the real result. **No check was weakened:** an orphaned superseded ID (`nar.chapter.07_silent_engine` without `nar.chapter.07_quiet_engine` in the same file) and a genuinely undefined ID (`nar.chapter.99_ghost`) both still FAIL (verified by injected fixtures). Validator on the new PR head: `35 pass groups, 0 failures`, exit 0.
+
+### CR-0012 - AI-10 QA Phase-00 validator FAILS on the integrated Phase 00 tree (passed only in isolation)
+- **Target owner:** AI-10 (`ai-10-qa`, PR #7).
+- **Failing artifact / evidence:** on the fully integrated tree (all 13 branches merged into `integration` at `c4cc93e`), `python3 08_QA_RELEASE/phase_00/QA_PHASE00_VALIDATOR.py` exits **1**, `SUMMARY fail=20 info=692 skip=0`. The same validator exits 0 on the `ai-10-qa` branch alone (`evidence/validator_run_ai-10-qa_only.log`), so the defect is only observable once the other accounts' artifacts land - exactly the integration-time condition the gate exists to catch. Two independent causes:
+  1. **C2 terminology false positives (16 FAILs).** The `IDENTIFIER` scope (severity `FAIL`, `QA_IP_TERMINOLOGY_RULES.json`) matches affirmative forbidden terms inside other accounts' **negative/declaration data**:
+     - `04_AI_ACCOUNTS/AI-04/phase_00/fixtures/interaction_terminology_registry.v0.1.0.json:94` - the `"forbiddenTerms"` list contains `minecraft`, `creeper`, `redstone`, `steve` (QAR-001).
+     - `01_PREPRODUCTION/CHARACTERS_VFX/AI06_CHARACTERS_VFX_REGISTER_PHASE00.json:178` - `ipForbiddenTerms.terms` contains `minecraft`, `creeper`, `enderman`, `redstone`, `steve`, `rubik`, `speedcube` (QAR-001/002).
+     - Same file lines 132-133 - `domainCutList` entries literally describing rejected categories ("damage", "attack") (QAR-005).
+     - `09_ART_AUDIO/AUDIO/fixtures/audio_cue_registry_draft.v0.1.0.json:103,142` - the word "attack" inside a **prose description** field ("Loom attack + ..."), not an identifier (QAR-005).
+     The validator already excludes its own `08_QA_RELEASE/phase_00/` path for the same reason ("QA's own rule/register files quote the terms by design"); the same reasoning applies to other accounts' forbidden-term lists and to prose descriptions. This is a **false positive class**, not real IP contamination (AI-10's own `QA_PHASE00_FINDINGS_REGISTER.md` acknowledges the DESIGN_DOC-scope hits are negations).
+  2. **E3 stale source baselines (4 FAILs).** The QA plan records `sourceBaseline` versions of Product documents as 1.0.0, but AI-01 advanced them (PD-work on PR #10): SRC-PRODUCT-LOCK 1.1.0, SRC-PD 1.2.0, SRC-IGM 1.0.2, SRC-CUT 1.1.0. QA's baseline must track the **integrated** Product versions or the check can never pass after any Product revision.
+- **Expected behavior:** `QA_PHASE00_VALIDATOR.py` exits 0 on the integrated tree. (a) C2 `IDENTIFIER` scanning must not FAIL on a file whose matched term is part of a declared forbidden-terms/cut-list entry (structured data), and should treat free-text `description` fields as `DESIGN_DOC`/INFO, not `IDENTIFIER`; the exclusion must be by *structure/semantics*, not by loosening the term list. (b) E3 `sourceBaseline` versions must be updated to the merged Product document versions.
+- **Acceptance test:** `python3 08_QA_RELEASE/phase_00/QA_PHASE00_VALIDATOR.py` exits 0 on `integration@c4cc93e`; its F self-test (negative fixtures) still produces failures; a negative case (a real forbidden term used affirmatively in an ID) still FAILS.
+- **Rollback:** revert AI-10's fix commit; no other track is affected.
+- **Note:** returned to AI-10 (producer). AI-13 does not patch `ai-10-qa` (`05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`). PR #7 is already represented in `integration`; this CR must be resolved by a **follow-up commit on `ai-10-qa`**.
+- **Gate impact:** HIGH. AI-10 owns the G-case (measurability) of the gate; while its own validator fails on the integrated tree, L6/L12 measurability cannot be certified. Phase 00 verdict therefore remains **NOT PASSED**.
+
