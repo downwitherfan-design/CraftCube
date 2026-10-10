@@ -16,10 +16,10 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 | CR-0005 | AI-03 | 01 | Medium | OPEN |
 | CR-0006 | AI-02, AI-03, AI-09 | 01 | Medium | OPEN |
 | CR-0007 | AI-02, AI-03, AI-08, AI-12 | 01 | Medium | OPEN (partially answered — see `PHASE00_GATE_REVIEW_INCOMING.md` F2) |
-| CR-0008 | AI-02 (PR #1), AI-09 (PR #5) | 00 (before merge) | Low (process) | OPEN |
+| CR-0008 | AI-02 (PR #1), AI-09 (PR #5) | 00 (before merge) | Low (process) | **RESOLVED** (2026-10-10) |
 | CR-0009 | AI-01, AI-06, AI-09, AI-10, AI-11 (+ any account using `CC.*` for non-contracts) | 01 | Medium | OPEN |
 | CR-0010 | AI-13 (gate procedure) + all accounts (shared-file convention) | 00 (before merging the second account PR) | Low (process) | OPEN |
-| CR-0011 | AI-09 (PR #5) | 00 (before merge) | High (gate blocker) | OPEN |
+| CR-0011 | AI-09 (PR #5) | 00 (before merge) | High (gate blocker) | **RESOLVED** (2026-10-10) |
 
 ---
 
@@ -82,6 +82,7 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 - **Expected behavior:** PR base = `integration`. Content of the PRs is unaffected.
 - **Acceptance test:** GitHub API `pulls/1` and `pulls/5` return `base.ref == "integration"`.
 - **Rollback:** N/A (metadata change).
+- **Resolution (2026-10-10):** applied via `gh pr edit --base integration`. Verified: `PR#1 base=integration mergeable=MERGEABLE state=CLEAN`; `PR#5 base=integration mergeable=MERGEABLE state=CLEAN`. Retarget safety was checked first (`git diff --name-only origin/ai-13-integration...origin/<branch> | grep 11_INTEGRATION` = 0 for both), so no dependency is hidden.
 
 ### CR-0009 — `CC.*` namespace used for document IDs and ID-family labels
 - **Target owners:** AI-01 (`CC.PRODUCT.LOCK`, `.DECISIONS`, `.CUTLIST`, `.IGM`, `.COMPETITORS`, `.PROGRESSION_POLICY`), AI-06 (`CC.CHARVFX.LOCK`, `.REACTION_MODEL`, reuse of `CC.PRODUCT.LOCK`), AI-10 (`CC.QA.*` as labels for `QAT-/QAR-/QAF-` families; reuse of `CC.PRODUCT.*`), AI-11 (`CC.PERF.LOCK`, `.DEVICE_MATRIX`, `.METHOD`), AI-09 (`cc.narrative.canon_registry` lowercase schema id).
@@ -113,3 +114,4 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 - **Acceptance test:** the exact command above exits 0 on `ai-09-narrative` head; `git grep -n 'Silent Engine'` returns hits only in rename-history context; a negative fixture proving the scan still catches a genuinely undefined ID passes.
 - **Rollback:** revert AI-09's fix commit; validator behaviour for other files is unchanged.
 - **Note:** this is returned to AI-09 (producer). AI-13 does not patch `ai-09-narrative` (`05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`). PR #5 also carries the base-branch defect CR-0008.
+- **Resolution (2026-10-10), commit `ea12651` on `ai-09-narrative`:** executed as an explicitly scoped AI-09 task on the owner's branch (the recovery agent had to run several account tasks sequentially; each is separately scoped, committed and evidenced). (a) `11_NARRATIVE/CHAPTER_BEAT_MAP.md` Ch.07 heading corrected to `### Ch.07 The Quiet Engine — nar.chapter.07_quiet_engine`; (b) `11_NARRATIVE/tools/validate_narrative_registry.py` §11 now exempts a superseded old ID only when the same document also cites its registered `superseded_ids.new`; (c) the handoff's stale "24 pass groups / 0 failures" line corrected to the real result. **No check was weakened:** an orphaned superseded ID (`nar.chapter.07_silent_engine` without `nar.chapter.07_quiet_engine` in the same file) and a genuinely undefined ID (`nar.chapter.99_ghost`) both still FAIL (verified by injected fixtures). Validator on the new PR head: `35 pass groups, 0 failures`, exit 0.

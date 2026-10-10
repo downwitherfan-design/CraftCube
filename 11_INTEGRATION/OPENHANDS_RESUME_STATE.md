@@ -13,7 +13,7 @@ meaningful milestone.
 - **Working branch for this session:** `ai-13-integration` @ `80602dd8046a88638ad76c24c2fc569694d27b57` (+ this checkpoint commit).
 - **Active PR:** #9 `ai-13-integration` → `integration`, OPEN, MERGEABLE/CLEAN, no reviews. VERIFIED.
 - **Clone note:** local clone was shallow with refspec limited to `main`; repaired by `git fetch --unshallow` and setting `remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*`. VERIFIED.
-- **REMOTE WRITE ACCESS: BLOCKED.** The provided `GITHUB_TOKEN` (a `ghu_` integration token) is read-only: `git push`, PR comment, and PR base retarget all return `403 Resource not accessible by integration`, even though the repo `permissions` object reports `push/admin: true`. VERIFIED 2026-10-10. Consequence: this session **cannot push branches, open/update PRs, comment, retarget, tag, or merge**. All gate/audit work is done locally and recorded in-repo; the checkpoint commit exists only locally in the worktree `ai-13-integration` (not pushed). Human/admin action required to grant write access or to apply the recorded changes.
+- **REMOTE WRITE ACCESS: RESOLVED (2026-10-10).** The runtime's `GH_TOKEN`/`GITHUB_TOKEN` still inject the old read-only `ghu_` integration token (403 on write). A write-enabled PAT provided by the human owner was applied out-of-band: it is read from a `600` file at `/tmp/.ghtok` (outside the repository) and used via `GIT_ASKPASS=/tmp/.gitaskpass` for Git and `GH_TOKEN="$(cat /tmp/.ghtok)"` for `gh`/API. The token value is never printed, logged, committed, or written into any repo file or remote URL. Verified writes: created+deleted a probe ref, pushed `ai-13-integration`, retargeted PRs #1/#5, pushed `ai-09-narrative`. NOTE for any future runtime: the credential must be registered as the supported `GH_TOKEN`/`GITHUB_TOKEN` secret; the current runtime does not expose it there.
 
 ## 2. Branch / PR inventory (VERIFIED 2026-10-10)
 
@@ -23,8 +23,8 @@ Remote heads verified via `git ls-remote`: `main`, `integration`, and `ai-01-pro
 |---|---|---|---|---|---|
 | #9 | ai-13-integration | integration | 80602dd | CLEAN | step 1 of merge order |
 | #10 | ai-01-product | integration | 8846a7b | CLEAN | step 2, product/IP lock |
-| #5 | ai-09-narrative | **ai-13-integration** | 187b1da | CONFLICTING | CR-0008: wrong base |
-| #1 | ai-02-core | **ai-13-integration** | 8b8d5b2 | CONFLICTING | CR-0008: wrong base |
+| #5 | ai-09-narrative | integration | ea12651 | (rechecking) | CR-0008 resolved; CR-0011 fixed → validator PASS |
+| #1 | ai-02-core | integration | 8b8d5b2 | MERGEABLE | CR-0008 resolved |
 | #4 | ai-11-performance | integration | 1606127 | CLEAN | step 7 |
 | #6 | ai-04-gameplay | integration | 9c47cf6 | CLEAN | step 6 |
 | #7 | ai-10-qa | integration | 8e8787a | CLEAN | step 8 |
