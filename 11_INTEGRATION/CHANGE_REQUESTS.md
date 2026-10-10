@@ -144,4 +144,5 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 - **Acceptance test:** `python3 01_PREPRODUCTION/PRODUCT/validate_product_lock.py` exits 0 with §8 reading the Godot engine string; `PD-030` exists with `Supersedes: PD-025`; `PD-025` shows a matching `Superseded by: PD-030`.
 - **Rollback:** revert AI-01's commit; the technical migration files remain valid and independent.
 - **Gate impact:** MEDIUM. The engine decision is a product-authority matter; the technical slice is already runnable, but the product record and the validator remain inconsistent with the directive until AI-01 records it. Tracked alongside RISK-0001 (engine/toolchain).
+- **Update (Session 5, 2026-10-10):** status **OPEN**, unchanged owner. Re-verified the blocker `validate_product_lock.py` §8 still hard-codes `"Unity 6 + URP + Android"`; AI-13 did not touch it. The Godot slice was deepened and the Android build pipeline corrected + re-verified (`game/ci/build_android.sh` → CI: PASS; suite 132/0). Evidence: `game/docs/OPENHANDS_STATUS.md`.
 
