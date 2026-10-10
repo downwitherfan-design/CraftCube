@@ -358,6 +358,20 @@ with ANIMATED turns; asserts render==truth after every turn + progression/reward
 - Run PR #11 through the Phase 00 gate; do NOT merge until the gate and human decisions permit.
 - Phase 00 gate remains **NOT PASSED**. Human decisions still open: OD-0001 (branch protection), OD-0005 (IP/title clearance).
 
+### Integration-review conclusion for PR #11 (AI-13, this session)
+- Live state (VERIFIED via API): `integration` = `3df70ae` (Phase 00 docs tree; no `game/`), `main` = `584141c`,
+  PR #11 OPEN, base `integration`, head `godot-migration`, mergeable_state `unstable` (CI was re-running).
+- PR #11 carries the Godot game slice only; `integration` has no game subtree → the merge adds new files and cannot
+  be a stale-baseline overwrite. Rebased cleanly on the docs tree (merge-base `55f6b9b`).
+- **Ordering dependency (BLOCKED until resolved):** the product decision that authorises the Godot engine (**PD-030**)
+  lives in **PR #12** (`ai-01-product-godot`, OPEN, AI-01-owned). If #11 merged first, `integration` would carry the
+  Godot game without the product register entry that authorises the engine. #12 must merge before #11. Recorded in
+  `11_INTEGRATION/ENGINE_MIGRATION_UNITY_TO_GODOT.md` and restated in the PR body.
+- Gate rows L1…L13 are NOT satisfied by an integrated tree yet (`integration` holds no product lock, story bibles,
+  QA evidence as merged artifacts). AI-13's own L13 contribution (registry/gate/merge-sequence) is validated:
+  `python3 11_INTEGRATION/scripts/validate_registry.py` → PASS on this branch.
+- Verdict: PR #11 is READY_FOR_REVIEW but **must not merge** before PR #12 and before the gate/human decisions.
+
 ### Known limitations
 - No physical Android device / emulator in this runtime (adb daemon unavailable) → the pipeline is VERIFIED, but this is
   **not** a device playtest.
