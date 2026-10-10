@@ -7,7 +7,7 @@ Compact, factual status for external reviewers. Companion to
 |---|---|
 | Last verified (UTC) | 2026-10-10T17:23:09Z |
 | Working branch | `godot-migration` |
-| Last commit (pushed) | `1f1d099` (remote: **not pushed** — write access blocked, see below) |
+| Last commit (pushed) | tip of `godot-migration` (remote: **not pushed** — write access blocked, see below) |
 | Engine | Godot 4.7.2-stable + GDScript, Android-first |
 | Milestone | M1 — delivery path + deep audit + hardening + verified Android build |
 | Phase 00 gate | **NOT PASSED** (CR-0012 fix not yet on `integration`; CR-0013 + human ODs open) |
@@ -52,6 +52,11 @@ Compact, factual status for external reviewers. Companion to
 
 6. **Tests.** Domain suite **132 passed / 0 failed**; main scene headless boot clean.
    Evidence logs in `game/docs/evidence/`.
+7. **Phase-00 validator sweep (read-only) — all pass on this tree:** product-lock 14/0;
+   registry 27 contracts; AI-04 32/0; ownership OK; AI-08 audio OK; environment 9/0;
+   narrative 35 groups/0; UIUX 6/0; performance 1 positive/4 negatives/0 failures;
+   release 10/0; AI-03 content PASS. The current tree (local `integration` with the
+   CR-0012 fix + the Godot slice) satisfies every validator.
 
 ## Current failures / blockers
 

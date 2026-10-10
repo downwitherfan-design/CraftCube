@@ -160,6 +160,7 @@ python3 11_INTEGRATION/scripts/validate_registry.py --check-render   # â†’ 
 - **Governance/docs:** added `game/docs/OPENHANDS_STATUS.md`; refreshed `game/docs/ENGINE_AND_BUILD.md` evidence + APK digest; CI workflow now triggers on `ai-*`/`godot-*` branches.
 - **Gate status unchanged:** Phase 00 remains **NOT PASSED** (CR-0012 not in `origin/integration`; CR-0013 + human ODs open).
 - **Next safe action:** identical to §11 (unblock write, publish, land CR-0012, record PD-030).
+- **Phase-00 validator sweep on the current tree (VERIFIED, read-only):** product-lock pass=14/fail=0; registry 27 contracts/27 DRAFT/0 consumable; AI-04 32/0; ownership OK; AI-08 audio OK (motifs=5 cues=29); environment 9/0; narrative 35 groups/0; UIUX 6 fixtures/0; performance positives=1 negatives=4 failures=0; release 10/0/10 fixtures; AI-03 content PASS (0 errors, 1 warning). The current tree `= local integration (with CR-0012) + Godot slice` satisfies all validators. NOTE: `origin/integration` is still `55f6b9b` (pre-CR-0012) — the gate blocker is the *push*, not the code.
 
 ## 13. Write-access blocker (Session 5, definitive)
 
