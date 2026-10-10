@@ -7,7 +7,11 @@ meaningful milestone.
 
 ## 1. Last verified repository state
 
-- **Inspection time:** 2026-10-10 (recovery session).
+- **Inspection time:** 2026-10-10 (Epic 0.3 session 10; last milestone H, head `5af28e1`). Earlier recovery inspection also recorded below.
+- **Epic 0.3 session 10 (VERIFIED):** working branch `godot-migration`; branch head `5af28e1` after Milestones E/F/G/H, all pushed
+  (`bab56ee..5af28e1`). `integration` = `3df70ae7518a9d6055b46d7dd690bbb13c8eeb51` (does NOT yet contain `game/` — PR #11 unmerged).
+  Remote write worked this session via the injected `GITHUB_TOKEN` (pushes succeeded); the earlier "remote write BLOCKED" note in
+  this section was a prior-runtime condition and does not hold here. GitHub Actions `CraftCube Android build` green on the head.
 - **Repo:** `downwitherfan-design/CraftCube`.
 - **Default branch:** `main` = `584141ce53ce87cc934b08d6a026f7de6b95bc24` ("Initial CraftCube v7 WORLDCLASS baseline"); `integration` is now `c4cc93e` (13-branch Phase 00 merge). VERIFIED.
 - **Working branch for this session:** `ai-13-integration` @ `4580959` (pushed). `integration` advanced from `584141c` to `c4cc93e` (all 13 branches merged, steps 1â€“8). VERIFIED.

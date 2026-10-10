@@ -165,3 +165,14 @@ This file is deliberately short. Each AI must update only its own section in the
 - Known limitation: no physical Android device (no device playtest) — the pipeline is VERIFIED, not a device run.
 - Checkpoint: `11_INTEGRATION/OPENHANDS_RESUME_STATE.md` (Session 9).
 
+### AI-13 — Session 10 (Epic 0.3 — Extended Gameplay Development, Milestones A–H)
+- Branch: `godot-migration` (PR #11 → `integration`); commits `314d836` (A), `efda6de` (B), `a899179` (C), `bab56ee` (D), `5c075de` (E), `56be0bb` (F), `c21d897` (G), `5af28e1` (H) — all pushed; remote synced.
+- Task: Phase 00 closure continuation — extend the playable slice with real, player-facing features, each with acceptance criteria, tests and evidence.
+- Features (verified by running the Godot slice): (A) deterministic guided-solving — a cached self-consistent route whose HUD step applies the real move; (B) interactive orbit/zoom/reset camera with HUD input pass-through; (C) world remembers progression — one ward stone per level, warming ground, Nox on completion, one authoritative revealed count restored on resume; (D) per-face readiness readout (`PuzzleEngine.face_readiness()`; HUD "solid"/"N shades", objective faces marked); (E) equipment delivers its declared capability — the granted Rootweave Gauntlet's `perceive.resonance` surfaces faces one turn from settling, keyed off the effect slot and only while equipped (PD-002); (F) persisted large-text accessibility in a separate settings file; (G) progress flushed on the OS close/back request; (H) persisted reduced-motion toggle that still runs the real animated lifecycle.
+- Tests: `godot --headless --path game --script res://tests/run_tests.gd` → **375 passed / 0 failed** (was 239). New: `_test_guided_solver_domain`/`_controller`, `_test_orbit_camera`, `_test_world_progression_landmarks`, `_test_face_readiness`, `_test_hud_readiness_line`, `_test_equipment_capability`, `_test_hud_resonance_line`, `_test_settings_persistence`, `_test_hud_big_text_persistence`, `_test_progress_flush_on_exit`, `_test_reduced_motion_persistence`.
+- Build: `bash game/ci/build_android.sh` → **CI: PASS** on `5af28e1` (import 0, tests 375/0, boot 0, signed debug APK sha256 `018458ba…`). Log: `game/docs/evidence/session10_build.log`. GitHub Actions green on every pushed head.
+- Rendering evidence: real 720x1280 frames from the running scene (`game/docs/evidence/screenshots/`); `capture_frames.gd` now preserves/restores the player save it used to overwrite.
+- Status: READY_FOR_REVIEW. Phase 00 gate remains **NOT PASSED**; no PR merged. Human decisions OD-0001 (branch protection) and OD-0005 (IP/title clearance) still open. PR #12 (AI-01 `PD-030`) must merge before PR #11.
+- Known limitation: no physical Android device (no device playtest) — the pipeline is VERIFIED, not a device run.
+- Checkpoint: `11_INTEGRATION/OPENHANDS_RESUME_STATE.md` (Session 10).
+
