@@ -100,7 +100,7 @@ bash game/ci/build_android.sh
 
 | Check | Command | Result |
 |---|---|---|
-| Unit tests | `godot --headless --path game --script res://tests/run_tests.gd` | **134 passed, 0 failed** |
+| Unit tests | `godot --headless --path game --script res://tests/run_tests.gd` | **166 passed, 0 failed** |
 | Scene smoke boot | `godot --headless --path game --quit-after 30` | clean, no errors |
 | Android export | `godot --headless --path game --export-debug Android dist/CraftCube.apk` | **signed APK produced (~27 MB)** |
 | Full CI | `bash game/ci/build_android.sh` | **PASS** |

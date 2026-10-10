@@ -4,7 +4,7 @@
 |---|---|
 | Owner | AI-13 — Integration / Technical Production |
 | Document ID | `CC.INTEGRATION.ENGINE_MIGRATION` |
-| Status | **ACTIVE RECORD** — directive executed as a technical track; product-register update routed to AI-01 (see CR-0013) |
+| Status | **ACTIVE RECORD** — directive executed; product-register update **RESOLVED** by `PD-030` (AI-01, PR #12; CR-0013) |
 | Supersedes (technical) | The Unity-specific *technical* execution of `PD-025`; the `PD-025` record itself is AI-01-owned and is **not** rewritten here |
 | Evidence | `game/docs/ENGINE_AND_BUILD.md`, `game/docs/evidence/*.log` |
 
@@ -39,7 +39,7 @@ views separated from it.
   progression, versioned save/load, world reaction, a reward + equipment grant,
   and one optional discovery.
 - Mobile-first HUD (touch-sized controls, large-text accessibility toggle).
-- Headless test suite: **52 passed / 0 failed** (`game/docs/evidence/unit_tests_run.log`).
+- Headless test suite: **166 passed / 0 failed** (`game/docs/evidence/unit_tests_run.log`), including a real-scene integration test, a deterministic scramble fuzz, and Chapter 01 rule-semantics regression tests.
 - Clean main-scene headless boot (`main_scene_boot.log`).
 - **Signed Android debug APK** built by the export pipeline:
   `com.downwitherfandesign.craftcube`, v0.1.0, minSdk 24, arm64-v8a
@@ -53,10 +53,11 @@ views separated from it.
   still open (see `PD-029`; the signing-custody item is now Godot-scoped, not Unity).
 - **No physical Android device** was available; no on-device run is claimed. Evidence
   is headless tests + a successful export.
-- `PD-025`'s numeric-version ban and `PD-029` items 4–5 referenced **Unity**; they now
-  need a Godot-scoped restatement — routed to AI-01 as **CR-0013**. Until AI-01 records
-  the superseding product decision, the product register still states Unity, so this
-  file is marked **ACTIVE RECORD / CONFLICT-PENDING** against `PD-025`.
+- `PD-025`'s numeric-version ban and `PD-029` items 4–5 referenced **Unity**. This is now
+  **RESOLVED**: AI-01 recorded **`PD-030`** (Godot 4.x + GDScript + Android-first), which
+  supersedes `PD-025` and restates `PD-029` items 4–5 engine-neutrally (PR #12, branch
+  `ai-01-product-godot`). `validate_product_lock.py` now checks the Godot decision; no
+  numeric toolchain version is pinned in product documents.
 
 ## 5. Obligations created downstream
 

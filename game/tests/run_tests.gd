@@ -35,6 +35,9 @@ func _initialize() -> void:
 	_test_completion_idempotency()
 	_test_level_advancement()
 	_test_content_id_consistency()
+	_test_level_rule_semantics()
+	_test_hud_layout_and_wiring()
+	_test_save_corruption_variants()
 	_test_scene_integration()
 	_test_scramble_fuzz()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
@@ -328,6 +331,146 @@ func _test_content_id_consistency() -> void:
 			StoryContent.equipment_id_for("reward.01.nox_meets") != ""
 			and not StoryContent.equipment_for("reward.01.nox_meets").is_empty())
 
+func _test_level_rule_semantics() -> void:
+	print("[level rule semantics]")
+	# rule.axis_lock {axes:[X,Z]} + objective.align{U} is DEGENERATE on a 2x2 cube:
+	# locking X and Z leaves only Y-axis turns (U/D), which never move the U face, so the
+	# objective is already satisfied at the scramble. Regression guard for the resolved
+	# AI-03 content conflict (see level_catalog.gd header).
+	var degenerate := {
+		"topology_id": "topology.cube.2",
+		"scramble": {"seed": 101, "depth_hint": 3},
+		"objective": {"family": "objective.align", "params": {"faces": ["U"]}},
+		"level_rules": [{"rule_id": "rule.axis_lock", "params": {"axes": ["X", "Z"]}}],
+	}
+	var ed := PuzzleEngine.new()
+	ed.setup(degenerate)
+	_eq("axis_lock{X,Z} leaves only U/D legal (Y axis)", ed._legal_faces, ["U", "D"])
+	_check("degenerate rule leaves objective solved on scramble", ed.is_solved())
+	# The corrected level.01.awaken (no lock) is genuinely unsolved and solvable.
+	var awake := LevelCatalog.by_id("level.01.awaken")
+	var ea := PuzzleEngine.new()
+	ea.setup(awake)
+	_check("level.01.awaken starts unsolved", not ea.is_solved())
+	_check("level.01.awaken scramble solvable", ea.verify_scramble_solvable())
+	_eq("level.01.awaken exposes all six faces", ea._legal_faces.size(), 6)
+	# Every shipped level must start unsolved and be solvable under its own rules.
+	for l in LevelCatalog.chapter_one():
+		var e := PuzzleEngine.new()
+		e.setup(l)
+		_check("%s starts unsolved" % l["level_id"], not e.is_solved())
+		_check("%s solvable by inverse replay" % l["level_id"], e.verify_scramble_solvable())
+	# The chapter's single constraint: level 3 Y-lock must forbid U/D and be necessary.
+	var hollow := LevelCatalog.by_id("level.01.hollow_stone")
+	var eh := PuzzleEngine.new()
+	eh.setup(hollow)
+	_check("level.01.hollow_stone forbids Y-axis faces (U/D)",
+		not eh._legal_faces.has("U") and not eh._legal_faces.has("D"))
+	_check("level.01.hollow_stone starts unsolved", not eh.is_solved())
+	_check("Y-lock is a real constraint (objective not auto-satisfied)", not eh.is_solved())
+
+
+func _test_hud_layout_and_wiring() -> void:
+	print("[hud layout and wiring]")
+	var packed: PackedScene = load("res://scenes/Main.tscn")
+	if packed == null:
+		_check("Main.tscn loads for HUD test", false)
+		return
+	var main = packed.instantiate()
+	main._ready()
+	var hud = main.get_node_or_null("HUD")
+	_check("HUD exists in the real scene", hud != null)
+	if hud == null:
+		main.free()
+		return
+	# All six face controls must exist (broken scene wiring would drop one).
+	_eq("HUD built six face controls", hud._face_buttons.size(), 6)
+	# The controls must sit inside a ScrollContainer so small screens / large text
+	# never push the action buttons off-screen (mobile-first requirement).
+	var parent = hud._root.get_parent()
+	_check("controls live in a scroll container",
+		parent != null and parent.get_parent() is ScrollContainer)
+	# Each face button must fit a 3-column grid within a 360px-wide portrait phone:
+	# 3*width + 2*separation + margins <= 360.
+	var widest := 0
+	for entry in hud._face_buttons:
+		widest = maxi(widest, int(entry["button"].custom_minimum_size.x))
+	_check("face button grid fits ~360px portrait (widest=%d)" % widest, 3 * widest + 16 + 32 <= 360)
+	# Level 1 exposes all six faces: every face button enabled.
+	main.load_level(0)
+	hud._refresh_legal()
+	var enabled := 0
+	for entry in hud._face_buttons:
+		if not entry["button"].disabled:
+			enabled += 1
+	_eq("level 1 enables all six face buttons", enabled, 6)
+	# Level 3 (Y-lock) must disable the U and D buttons via the wired controller.
+	main.load_level(2)
+	hud._refresh_legal()
+	var u_disabled := false
+	var d_disabled := false
+	var l_enabled := false
+	for entry in hud._face_buttons:
+		match str(entry["face"]):
+			"U": u_disabled = entry["button"].disabled
+			"D": d_disabled = entry["button"].disabled
+			"L": l_enabled = not entry["button"].disabled
+	_check("Y-lock level disables U", u_disabled)
+	_check("Y-lock level disables D", d_disabled)
+	_check("Y-lock level keeps side faces enabled", l_enabled)
+	if main.get_parent() != null:
+		main.get_parent().remove_child(main)
+	main.free()
+
+
+func _test_save_corruption_variants() -> void:
+	print("[save corruption variants]")
+	var path := "user://craftcube_save_corrupt_test.json"
+	SaveManager.delete_at_path(path)
+	# (a) empty file -> not valid JSON -> quarantined, fresh state.
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string("")
+	f.close()
+	var empty_load = SaveManager.load_from_path(path)
+	_check("empty save loads fresh state", empty_load.solved_levels.is_empty())
+	_check("empty save quarantined", FileAccess.file_exists(path + ".corrupt"))
+	# (b) truncated JSON -> fresh state.
+	SaveManager.delete_at_path(path)
+	f = FileAccess.open(path, FileAccess.WRITE)
+	f.store_string('{"save_version":1,"solved_levels":["a"')
+	f.close()
+	var trunc_load = SaveManager.load_from_path(path)
+	_check("truncated save loads fresh state", trunc_load.solved_levels.is_empty())
+	# (c) valid JSON but save_version 0 -> quarantined, fresh state.
+	SaveManager.delete_at_path(path)
+	f = FileAccess.open(path, FileAccess.WRITE)
+	f.store_string('{"save_version":0,"solved_levels":["x"]}')
+	f.close()
+	var zero_load = SaveManager.load_from_path(path)
+	_check("zero-version save loads fresh state", zero_load.solved_levels.is_empty())
+	# (d) structurally valid but hostile payloads are coerced, never trusted.
+	SaveManager.delete_at_path(path)
+	f = FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify({
+		"save_version": 1,
+		"solved_levels": [1, 2, {"k": "v"}, "ok.level"],
+		"discoveries": "not-an-array",
+		"owned_equipment": null,
+		"loadout": ["a", "b", "c", "d", "e", "f", "g"],
+		"world_flags": {"f1": true, 5: true, "f2": false},
+		"current_level_index": -7,
+	}))
+	f.close()
+	var coerced = SaveManager.load_from_path(path)
+	_eq("only string level IDs survive", coerced.solved_levels, ["ok.level"])
+	_check("discoveries wrong type -> empty", coerced.discoveries.is_empty())
+	_check("owned_equipment null -> empty", coerced.owned_equipment.is_empty())
+	_check("loadout capped to MAX_SLOTS", coerced.loadout.size() == GameState.MAX_SLOTS)
+	_check("negative index clamped", coerced.current_level_index == 0)
+	_check("non-string flag key dropped", not coerced.world_flags.has(5))
+	SaveManager.delete_at_path(path)
+
+
 func _test_scene_integration() -> void:
 	print("[scene integration]")
 	# Load the real Main scene and drive the wired controller -> view -> domain loop,
@@ -352,7 +495,10 @@ func _test_scene_integration() -> void:
 		main.engine.apply_move(MoveTable.inverse(main.engine._scramble_moves[i]))
 	_check("level 1 solved through the controller", main.engine.is_solved())
 	_check("confirm_solve succeeds in the real scene", main.confirm_solve())
-	get_root().remove_child(main)
+	# main was never added to the tree (we call _ready() directly), so it has no parent;
+	# only detach when one exists to avoid an engine ERROR from remove_child.
+	if main.get_parent() != null:
+		main.get_parent().remove_child(main)
 	main.free()
 	if had:
 		var w := FileAccess.open(saved, FileAccess.WRITE)

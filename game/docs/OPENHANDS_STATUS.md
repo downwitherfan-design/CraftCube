@@ -50,7 +50,7 @@ Compact, factual status for external reviewers. Companion to
 | ABI | arm64-v8a |
 | Signature | verified (`CN=Android Debug`) — throwaway debug key, not committed |
 
-6. **Tests.** Domain suite **134 passed / 0 failed**; main scene headless boot clean.
+6. **Tests.** Domain suite **166 passed / 0 failed**; main scene headless boot clean.
    Evidence logs in `game/docs/evidence/`.
 7. **Phase-00 validator sweep (read-only) — all pass on this tree:** product-lock 14/0;
    registry 27 contracts; AI-04 32/0; ownership OK; AI-08 audio OK; environment 9/0;

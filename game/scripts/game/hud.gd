@@ -16,7 +16,7 @@ var _ccw_mode := false
 var _big_text := false
 var _root: VBoxContainer
 
-const BTN_MIN := Vector2(96, 72)
+const BTN_MIN := Vector2(88, 64)
 
 func bind(ctrl: Node3D) -> void:
 	controller = ctrl
@@ -51,9 +51,15 @@ func _build() -> void:
 	margin.add_theme_constant_override("margin_bottom", 24)
 	add_child(margin)
 
+	var scroll := ScrollContainer.new()
+	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	margin.add_child(scroll)
+
 	var outer := VBoxContainer.new()
+	outer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	outer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	margin.add_child(outer)
+	scroll.add_child(outer)
 
 	_title = _label("", 34)
 	_status = _label("", 22)
@@ -73,12 +79,14 @@ func _build() -> void:
 	outer.add_child(_root)
 
 	# Face-turn row (legal faces). Tap = recommended direction; toggle flips it.
-	var face_row := HBoxContainer.new()
-	face_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	face_row.add_theme_constant_override("separation", 8)
+	var face_row := GridContainer.new()
+	face_row.columns = 3
+	face_row.add_theme_constant_override("h_separation", 8)
+	face_row.add_theme_constant_override("v_separation", 8)
 	_root.add_child(face_row)
 	for f in ["U", "D", "L", "R", "F", "B"]:
 		var b := _button(f)
+		b.custom_minimum_size = Vector2(72, 60)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.pressed.connect(_on_face_pressed.bind(f))
 		face_row.add_child(b)
