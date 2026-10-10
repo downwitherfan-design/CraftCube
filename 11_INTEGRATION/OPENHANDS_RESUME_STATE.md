@@ -194,3 +194,10 @@ integration token** — `POST /repos/.../git/refs` returned HTTP `403`
   note is no longer actionable. Recorded per live evidence.
 - **Still open (unchanged):** Phase 00 gate NOT PASSED — CR-0013 (AI-01 product-register
   update) and the human-controlled decisions remain outstanding. PR #11 does not claim the gate.
+- **PR #11 status:** `mergeable`, `mergeable_state: clean`; both `build-and-test` checks on the
+  head commit (`e6e0ff9`) are `success`. Marked **READY_FOR_REVIEW**.
+- **Merge decision (AI-13):** deliberately **not merged**. The Phase-00 gate is NOT PASSED and
+  the engine change is a product-authority matter pending CR-0013 (AI-01) and the AI-03
+  Chapter-01 binding confirmation. Merging now would bypass the documented order
+  (governance -> product/IP lock -> narrative/core -> remaining tracks). No `main` push and no
+  release was performed.
