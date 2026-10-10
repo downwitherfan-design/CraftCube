@@ -102,6 +102,17 @@
 - **Evidence:** `05_PROMPTS/PHASE_KICKOFF_PROCEDURE.md:5` "هشت branch مستقل" (eight independent branches) vs 13 tracks everywhere else (`07_GITHUB/GITHUB_MODEL.md`, `00_CONTROL/manifest.json` `"accounts": 13`).
 - **Request:** textual fix by the owner; no QA impact.
 
+## QAF-013 — CR-0012 resolved: validator false positives on the integrated tree
+
+- **Severity:** INFO · **Status:** RESOLVED · **Owner:** AI-10
+- **Trigger:** AI-13 CR-0012 (High). On the integrated Phase 00 tree the validator exited `1` with 20 FAIL findings even though it passed on `ai-10-qa` in isolation.
+- **Root cause (VERIFIED):**
+  1. C2 scanned JSON IDENTIFIER files as raw text. Rejected terms *declared* by other tracks (AI-06 `forbiddenTerms` list, AI-04 terminology fixture, AI-08 audio-cue prose) were reported as affirmative violations — 16 false positives.
+  2. E3 compared each product document's Version against the frozen `sourceBaseline` (`1.0.0`). AI-01 advanced Product Lock to 1.1.0, Decisions to 1.2.0, IGM to 1.0.2, Cut List to 1.1.0 after QA authored the baseline — 4 stale-baseline FAILs.
+- **Fix:** JSON IDENTIFIER files are now scanned **structurally**: a rejected term inside a declared forbidden-term list, a prose/description field, or a cut-list entry with `status: REJECT*` is INFO; a term used as a key, id, or ordinary value still FAILs. E3 now accepts a document that legitimately **advanced** past the baseline (baseline version still recorded AND current version is the highest in the document); a rollback or an invented baseline still FAILs.
+- **Evidence:** `evidence/validator_run_integrated_tree_after_cr0012_fix.log` — integrated tree exit `0`, `fail=0`; adversarial temporary fixtures confirmed real violations (id/value uses) still FAIL while declarations are INFO; self-test now 23 negative cases.
+- **No weakening:** no assertion removed, no scope severity lowered, no negative fixture relabelled. The exemption is structural and self-tested.
+
 ---
 
 ## Summary
@@ -111,6 +122,6 @@
 | BLOCKER | 0 | — |
 | MAJOR | 7 | QAF-001, 003, 004, 005, 006, 008, 009 |
 | MINOR | 4 | QAF-002, 007, 011, 012 |
-| INFO | 1 | QAF-010 |
+| INFO | 2 | QAF-010, QAF-013 (RESOLVED) |
 
 No finding blocks the Phase 00 QA deliverables themselves; the MAJOR items block **Phase 01 automation** of the named QAT items and are therefore Phase 01 contract-freeze inputs.
