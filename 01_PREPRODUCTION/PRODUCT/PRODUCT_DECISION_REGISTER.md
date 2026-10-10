@@ -4,7 +4,7 @@
 |---|---|
 | Owner | AI-01 — Product / Game Direction |
 | Document ID | `CC.PRODUCT.DECISIONS` |
-| Version | 1.2.0 |
+| Version | 1.3.0 |
 | ID family | `PD-###` (Product Decision). Immutable once released. Never reuse a number. |
 | Relationship to `DD-###` | `00_CONTROL/V7_DESIGN_DECISION_REGISTER.md` holds *starting design decisions*. `PD-###` records Product's **approve / reject / defer** verdicts on them and on the v7 bibles, with testable acceptance criteria. `PD` entries cite the `DD` they confirm; they never duplicate a `DD`. |
 

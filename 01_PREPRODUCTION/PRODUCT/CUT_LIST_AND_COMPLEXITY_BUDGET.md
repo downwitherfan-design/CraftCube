@@ -4,7 +4,7 @@
 |---|---|
 | Owner | AI-01 — Product / Game Direction |
 | Document ID | `CC.PRODUCT.CUTLIST` |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | ID family | `CUT-###`. Immutable once released. A cut item is never deleted from this file; if reinstated, its status changes and a new `PD-###` is cited. |
 | Source requirements | Phase 00 prompt ("Maintain a hard CUT LIST"), `INVESTMENT_GATE.md` Gate D, `V7_1_WORLDCLASS_UPGRADE.md` §16 complexity budget, `13_AI_EXECUTION_MANUAL.md` human gates |
 
@@ -122,4 +122,4 @@ Any change to §1–§4 is appended here with date, `PD` reference and direction
 | Phase 00 closure | CUT-030 Verdant Archive: LATER **confirmed by Human**; v1 biomes 6→5, chapter ceiling 10→9 | shrink | PD-028 §C |
 | Phase 00 closure | Monetization model fixed: premium one-time purchase; CUT-002/003/012/016/017/020 reinstatement now requires a Human decision **superseding PD-027**, not merely "Human (monetization gate)" | no growth (hardened) | PD-027 |
 | Phase 00 closure | Engine confirmed Unity 6 + URP + Android; no scope change | — | PD-025 |
-| Phase 00 closure (v1.3.0) | Engine **re-confirmed to Godot 4.x stable + GDScript + Android-first**, superseding PD-025 per the owner directive (CR-0013); no scope change | — | PD-030 |
+| Phase 00 closure | Engine **re-confirmed to Godot 4.x stable + GDScript + Android-first**, superseding PD-025 per the owner directive (CR-0013); no scope change | — | PD-030 |
