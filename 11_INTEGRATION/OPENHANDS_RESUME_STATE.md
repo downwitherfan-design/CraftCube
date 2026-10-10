@@ -13,6 +13,7 @@ meaningful milestone.
 - **Working branch for this session:** `ai-13-integration` @ `80602dd8046a88638ad76c24c2fc569694d27b57` (+ this checkpoint commit).
 - **Active PR:** #9 `ai-13-integration` → `integration`, OPEN, MERGEABLE/CLEAN, no reviews. VERIFIED.
 - **Clone note:** local clone was shallow with refspec limited to `main`; repaired by `git fetch --unshallow` and setting `remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*`. VERIFIED.
+- **REMOTE WRITE ACCESS: BLOCKED.** The provided `GITHUB_TOKEN` (a `ghu_` integration token) is read-only: `git push`, PR comment, and PR base retarget all return `403 Resource not accessible by integration`, even though the repo `permissions` object reports `push/admin: true`. VERIFIED 2026-10-10. Consequence: this session **cannot push branches, open/update PRs, comment, retarget, tag, or merge**. All gate/audit work is done locally and recorded in-repo; the checkpoint commit exists only locally in the worktree `ai-13-integration` (not pushed). Human/admin action required to grant write access or to apply the recorded changes.
 
 ## 2. Branch / PR inventory (VERIFIED 2026-10-10)
 
@@ -44,6 +45,8 @@ Branches with **no PR yet**: `ai-03-puzzle`, `ai-06-creatures`, `ai-08-audio`. V
 - Reconstructed live branch/PR state (all 13 account branches + 10 open PRs). VERIFIED.
 - Read mandatory governance docs (control, prompts, account matrix/track, integration pack). VERIFIED.
 - **PR #9 gate check performed locally:** diff `integration...ai-13-integration` = 18 files, all under `11_INTEGRATION/**` + additive AI-13 section in `00_CONTROL/PROGRESS.md`; no out-of-scope paths; simulated `--no-ff` merge onto `integration` merged clean; `validate_registry.py --check-render` → `PASS: 27 contracts, 27 DRAFT, 0 consumable; governance IDs consistent.`, exit 0. VERIFIED.
+- **PR #10 (AI-01) content gate review performed locally:** diff `integration...ai-01-product` = 12 files, all under `01_PREPRODUCTION/PRODUCT/**` + additive AI-01 section in `00_CONTROL/PROGRESS.md`; no out-of-scope paths. `validate_product_lock.py` → `SUMMARY pass=14 fail=0`, exit 0. Content coherent with Product Lock (L1 product truth, L2 scope+cut list); PD-025..029 recorded by Human Product Authority. VERIFIED.
+- **Combined-tree gate check (PR #9 + PR #10 simulated on `integration`):** the two merge cleanly except `00_CONTROL/PROGRESS.md` (both append an `### AI-XX` section → `UU`). Resolved by keeping both sections; both validators then PASS on the combined tree (registry PASS; product pass=14 fail=0). Filed **CR-0010** for this shared-append conflict. VERIFIED.
 - Created this checkpoint.
 
 ## 5. Open decisions / blockers

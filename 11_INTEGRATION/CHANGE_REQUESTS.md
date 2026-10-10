@@ -18,6 +18,7 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 | CR-0007 | AI-02, AI-03, AI-08, AI-12 | 01 | Medium | OPEN (partially answered — see `PHASE00_GATE_REVIEW_INCOMING.md` F2) |
 | CR-0008 | AI-02 (PR #1), AI-09 (PR #5) | 00 (before merge) | Low (process) | OPEN |
 | CR-0009 | AI-01, AI-06, AI-09, AI-10, AI-11 (+ any account using `CC.*` for non-contracts) | 01 | Medium | OPEN |
+| CR-0010 | AI-13 (gate procedure) + all accounts (shared-file convention) | 00 (before merging the second account PR) | Low (process) | OPEN |
 
 ---
 
@@ -89,3 +90,12 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 - **Acceptance test:** after each owner's next edit, `git grep -ohE '\\bCC\\.[A-Z]+(\\.[A-Z_]+)+\\b' <branch> -- . ':!06_CONTRACTS' ':!05_PROMPTS'` returns only IDs present in `registry/contract_registry.json` (or pending-registration proposals listed in a handoff).
 - **Rollback:** N/A — no rename is required before Phase 01; existing Phase 00 documents are accepted as-is with this CR recorded.
 - **Owner confirmation needed:** AI-01 to confirm the namespace ruling as a product-level naming decision (it affects all tracks).
+
+### CR-0010 — `00_CONTROL/PROGRESS.md` shared-append conflict between account PRs
+- **Target owner:** AI-13 (gate procedure / merge order) with the account edit convention confirmed by Product (AI-01).
+- **Failing artifact:** merging `ai-13-integration` (PR #9) and `ai-01-product` (PR #10) onto `integration` produces a textual conflict in `00_CONTROL/PROGRESS.md`, because both accounts independently append their own `### AI-XX` section at end-of-file.
+- **Evidence:** local gate simulation — `git merge --no-ff origin/ai-13-integration` then `origin/ai-01-product` on `origin/integration` (584141c) → `UU 00_CONTROL/PROGRESS.md`, conflict markers around the AI-13 and AI-01 sections. Reproduced 2026-10-10 in the recovery session; see `OPENHANDS_RESUME_STATE.md` §4.
+- **Expected behavior:** merging each account PR must not require a content decision. AI-13 resolves the conflict by **keeping both sections unchanged** (the file's own rule: "Each AI must update only its own section"); no account text is dropped or rewritten. This is a mechanical resolution, not an edit to any owner's content, so it stays within AI-13 gate scope.
+- **Acceptance test:** after merging any two account PRs onto `integration`, `00_CONTROL/PROGRESS.md` contains one `### AI-XX` section per merged account with 0 conflict markers, and each section is byte-identical to its source branch.
+- **Rollback:** revert the merge commit; the branch state is untouched.
+- **Risk link:** RISK-0002 (manual gate); a phase with 13 accounts will hit this on nearly every merge until the convention or tooling changes.
