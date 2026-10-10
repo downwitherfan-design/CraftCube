@@ -1,0 +1,270 @@
+{
+  "fixture": true,
+  "production": false,
+  "fixtureId": "ai06.fixture.companion_reaction.phase00",
+  "fixtureVersion": "0.1.0-draft",
+  "schemaVersion": "0.1.0-draft",
+  "owner": "AI-06",
+  "phase": "00",
+  "label": "TEMPORARY NON-PRODUCTION FIXTURE — draft CompanionReaction shapes for AI-04/AI-08/AI-09/AI-10 mocks. No ID in this file is released. Replace when the CompanionReaction contract is FROZEN in Phase 01.",
+  "modelDoc": "01_PREPRODUCTION/CHARACTERS_VFX/AI06_COMPANION_REACTION_MODEL_DRAFT.md",
+  "registerDoc": "01_PREPRODUCTION/CHARACTERS_VFX/AI06_CHARACTERS_VFX_REGISTER_PHASE00.json",
+  "placeholderIdPolicy": "Companion, asset, hook and flag IDs below are DRAFT placeholders prefixed 'draft.' so they cannot collide with released IDs.",
+  "triggerExamples": [
+    {
+      "schemaVersion": "0.1.0-draft",
+      "companionId": "draft.companion.nox",
+      "triggerClass": "biome_health",
+      "triggerRef": "draft.biome.hearthwild:tier:0->1",
+      "bondStage": "meet",
+      "memoryFlags": [],
+      "inputActive": false,
+      "seed": 12345,
+      "expectedDefinitionId": "draft.reaction.nox.biome_health.tier_up.clear"
+    },
+    {
+      "schemaVersion": "0.1.0-draft",
+      "companionId": "draft.companion.nox",
+      "triggerClass": "puzzle_state",
+      "triggerRef": "draft.puzzle_state.alignment_reached",
+      "bondStage": "trust",
+      "memoryFlags": [],
+      "inputActive": true,
+      "seed": 12345,
+      "expectedDefinitionId": "draft.reaction.nox.puzzle_state.alignment.subtle",
+      "note": "inputActive=true clamps puzzle_state reactions to subtle (arbitration rule 3)"
+    },
+    {
+      "schemaVersion": "0.1.0-draft",
+      "companionId": "draft.companion.nox",
+      "triggerClass": "gift_received",
+      "triggerRef": "draft.invalid",
+      "bondStage": "meet",
+      "memoryFlags": [],
+      "inputActive": false,
+      "seed": 1,
+      "expectedResult": "REJECTED_BY_VALIDATOR",
+      "note": "Negative example: trigger class outside the PD-005 whitelist (CUT-011 gift-grinding). Validators must reject it. Marked negative so the whitelist check skips it as a definition but the model doc test uses it as an expected failure."
+    }
+  ],
+  "definitions": [
+    {
+      "schemaVersion": "0.1.0-draft",
+      "definitionId": "draft.reaction.nox.puzzle_state.alignment.subtle",
+      "companionId": "draft.companion.nox",
+      "triggerClass": "puzzle_state",
+      "match": {"stateKind": "alignment_reached", "minBondStage": "meet"},
+      "purpose": "confirm",
+      "intensity": "subtle",
+      "durationMsMax": 600,
+      "cooldownMs": 1500,
+      "onBusy": "drop",
+      "channels": {
+        "pose": "draft.anim.nox.perk_a_v01",
+        "locomotion": "hold",
+        "facet": {"pattern": "draft.facet.align_ring", "pulseHz": 1.0, "luminanceBand": "mid"},
+        "vfx": null,
+        "audioHook": "draft.hook.audio.nox.confirm_soft",
+        "dialogueHook": null,
+        "feedbackCue": {"shake": "none", "haptic": "light"}
+      },
+      "meaningChannels": ["pose", "facet", "audioHook"],
+      "reducedMotion": {
+        "pose": "draft.anim.nox.perk_static_v01",
+        "locomotion": "none",
+        "facet": {"pattern": "draft.facet.align_ring", "pulseHz": 0.5, "luminanceBand": "mid"}
+      },
+      "occludesPuzzleDuringInput": false,
+      "flashRateMaxHz": 1,
+      "localizationKeys": [],
+      "placeholder": true
+    },
+    {
+      "schemaVersion": "0.1.0-draft",
+      "definitionId": "draft.reaction.nox.biome_health.tier_up.clear",
+      "companionId": "draft.companion.nox",
+      "triggerClass": "biome_health",
+      "match": {"tierDelta": 1, "minBondStage": "meet"},
+      "purpose": "celebrate",
+      "intensity": "clear",
+      "durationMsMax": 1500,
+      "cooldownMs": 4000,
+      "onBusy": "queue",
+      "channels": {
+        "pose": "draft.anim.nox.bounce_arc_v01",
+        "locomotion": "orbit",
+        "facet": {"pattern": "draft.facet.bloom_spiral", "pulseHz": 2.0, "luminanceBand": "high"},
+        "vfx": "draft.vfx.companion.nox_trace_a_v01",
+        "audioHook": "draft.hook.audio.nox.celebrate",
+        "dialogueHook": "draft.hook.dialogue.nox.first_restoration",
+        "feedbackCue": {"shake": "low", "haptic": "medium"}
+      },
+      "meaningChannels": ["pose", "locomotion", "audioHook"],
+      "reducedMotion": {
+        "pose": "draft.anim.nox.settle_glow_v01",
+        "locomotion": "none",
+        "facet": {"pattern": "draft.facet.bloom_spiral", "pulseHz": 1.0, "luminanceBand": "high"}
+      },
+      "occludesPuzzleDuringInput": false,
+      "flashRateMaxHz": 2,
+      "localizationKeys": [],
+      "placeholder": true
+    },
+    {
+      "schemaVersion": "0.1.0-draft",
+      "definitionId": "draft.reaction.nox.biome_health.instability.warn",
+      "companionId": "draft.companion.nox",
+      "triggerClass": "biome_health",
+      "match": {"tierDelta": -1, "minBondStage": "meet"},
+      "purpose": "warn",
+      "intensity": "clear",
+      "durationMsMax": 1200,
+      "cooldownMs": 3000,
+      "onBusy": "queue",
+      "channels": {
+        "pose": "draft.anim.nox.recoil_low_v01",
+        "locomotion": "retreat",
+        "facet": {"pattern": "draft.facet.fracture_lines", "pulseHz": 3.0, "luminanceBand": "low"},
+        "vfx": null,
+        "audioHook": "draft.hook.audio.nox.warn",
+        "dialogueHook": null,
+        "feedbackCue": {"shake": "none", "haptic": "light"}
+      },
+      "meaningChannels": ["pose", "locomotion", "facet", "audioHook"],
+      "reducedMotion": {
+        "pose": "draft.anim.nox.crouch_static_v01",
+        "locomotion": "none",
+        "facet": {"pattern": "draft.facet.fracture_lines", "pulseHz": 1.0, "luminanceBand": "low"}
+      },
+      "occludesPuzzleDuringInput": false,
+      "flashRateMaxHz": 3,
+      "localizationKeys": [],
+      "placeholder": true
+    },
+    {
+      "schemaVersion": "0.1.0-draft",
+      "definitionId": "draft.reaction.nox.relic.discovered.point",
+      "companionId": "draft.companion.nox",
+      "triggerClass": "relic",
+      "match": {"eventKind": "discovered", "minBondStage": "trust"},
+      "purpose": "point",
+      "intensity": "clear",
+      "durationMsMax": 1500,
+      "cooldownMs": 6000,
+      "onBusy": "queue",
+      "channels": {
+        "pose": "draft.anim.nox.lean_toward_v01",
+        "locomotion": "approach",
+        "facet": {"pattern": "draft.facet.seek_arrowless", "pulseHz": 1.5, "luminanceBand": "mid"},
+        "vfx": null,
+        "audioHook": "draft.hook.audio.nox.notice",
+        "dialogueHook": null,
+        "feedbackCue": {"shake": "none", "haptic": "none"}
+      },
+      "meaningChannels": ["pose", "locomotion", "audioHook"],
+      "reducedMotion": {
+        "pose": "draft.anim.nox.gaze_static_v01",
+        "locomotion": "none",
+        "facet": {"pattern": "draft.facet.seek_arrowless", "pulseHz": 0.75, "luminanceBand": "mid"}
+      },
+      "occludesPuzzleDuringInput": false,
+      "flashRateMaxHz": 2,
+      "localizationKeys": [],
+      "placeholder": true,
+      "note": "'point' means attention toward a discovered relic; it never indicates a puzzle move (Sense job, lock §6)."
+    },
+    {
+      "schemaVersion": "0.1.0-draft",
+      "definitionId": "draft.reaction.nox.story_revelation.question.peak",
+      "companionId": "draft.companion.nox",
+      "triggerClass": "story_revelation",
+      "match": {"narrativeEventRef": "draft.narrative_event.first_artifact_record", "minBondStage": "shared_discovery"},
+      "purpose": "question",
+      "intensity": "peak",
+      "durationMsMax": 3000,
+      "cooldownMs": 60000,
+      "onBusy": "queue",
+      "channels": {
+        "pose": "draft.anim.nox.rise_tilt_v01",
+        "locomotion": "hold",
+        "facet": {"pattern": "draft.facet.unresolved_loop", "pulseHz": 1.0, "luminanceBand": "mid"},
+        "vfx": "draft.vfx.companion.nox_resonance_a_v01",
+        "audioHook": "draft.hook.audio.nox.question",
+        "dialogueHook": "draft.hook.dialogue.nox.first_artifact",
+        "feedbackCue": {"shake": "none", "haptic": "light"}
+      },
+      "meaningChannels": ["pose", "facet", "audioHook", "dialogueHook"],
+      "reducedMotion": {
+        "pose": "draft.anim.nox.tilt_static_v01",
+        "locomotion": "none",
+        "facet": {"pattern": "draft.facet.unresolved_loop", "pulseHz": 0.5, "luminanceBand": "mid"}
+      },
+      "occludesPuzzleDuringInput": false,
+      "flashRateMaxHz": 1,
+      "localizationKeys": [],
+      "placeholder": true
+    },
+    {
+      "schemaVersion": "0.1.0-draft",
+      "definitionId": "draft.reaction.nox.mastery_moment.solve.peak",
+      "companionId": "draft.companion.nox",
+      "triggerClass": "mastery_moment",
+      "match": {"challengeType": "standard_solve", "outcome": "success", "minBondStage": "meet"},
+      "purpose": "celebrate",
+      "intensity": "peak",
+      "durationMsMax": 3000,
+      "cooldownMs": 20000,
+      "onBusy": "queue",
+      "channels": {
+        "pose": "draft.anim.nox.spiral_leap_v01",
+        "locomotion": "orbit",
+        "facet": {"pattern": "draft.facet.bloom_spiral", "pulseHz": 2.0, "luminanceBand": "high"},
+        "vfx": "draft.vfx.companion.nox_trace_a_v01",
+        "audioHook": "draft.hook.audio.nox.mastery",
+        "dialogueHook": null,
+        "feedbackCue": {"shake": "mid", "haptic": "medium"}
+      },
+      "meaningChannels": ["pose", "locomotion", "vfx", "audioHook"],
+      "reducedMotion": {
+        "pose": "draft.anim.nox.settle_glow_v01",
+        "locomotion": "none",
+        "facet": {"pattern": "draft.facet.bloom_spiral", "pulseHz": 1.0, "luminanceBand": "high"}
+      },
+      "occludesPuzzleDuringInput": false,
+      "flashRateMaxHz": 2,
+      "localizationKeys": [],
+      "placeholder": true
+    },
+    {
+      "schemaVersion": "0.1.0-draft",
+      "definitionId": "draft.reaction.nox.player_choice.committed.comfort",
+      "companionId": "draft.companion.nox",
+      "triggerClass": "player_choice",
+      "match": {"choiceRef": "draft.choice.restoration_priority", "minBondStage": "trust"},
+      "purpose": "comfort",
+      "intensity": "subtle",
+      "durationMsMax": 600,
+      "cooldownMs": 10000,
+      "onBusy": "drop",
+      "channels": {
+        "pose": "draft.anim.nox.nestle_v01",
+        "locomotion": "approach",
+        "facet": {"pattern": "draft.facet.steady_ring", "pulseHz": 0.5, "luminanceBand": "low"},
+        "vfx": null,
+        "audioHook": "draft.hook.audio.nox.comfort",
+        "dialogueHook": null,
+        "feedbackCue": {"shake": "none", "haptic": "none"}
+      },
+      "meaningChannels": ["pose", "locomotion", "audioHook"],
+      "reducedMotion": {
+        "pose": "draft.anim.nox.nestle_static_v01",
+        "locomotion": "none",
+        "facet": {"pattern": "draft.facet.steady_ring", "pulseHz": 0.5, "luminanceBand": "low"}
+      },
+      "occludesPuzzleDuringInput": false,
+      "flashRateMaxHz": 1,
+      "localizationKeys": [],
+      "placeholder": true
+    }
+  ]
+}

@@ -88,3 +88,12 @@ This file is deliberately short. Each AI must update only its own section in the
 - Tests: `python3 09_ART_AUDIO/environment/tools/validate_environment_fixtures.py` → exit 0, 9 passed / 0 failed; 7 negative mutations each exit 1
 - Known issues: DEP-03 "Quiet Engine" vs "Silent Engine" naming (AI-09); DEP-04 screen orientation UNKNOWN; DEP-05 legacy AI-05→UI ownership mappings in `07_GITHUB/*` and `08_QA_RELEASE/DEVICE_MATRIX_TEMPLATE.csv`; presentation IDs DRAFT until Phase-1 freeze
 - Next integration action: review/merge PR #2 `ai-05-world` → `integration`; AI-13 ratify `09_ART_AUDIO/environment/` as AI-05 path; AI-01 ratify boundaries/cut list. Handoff: `09_ART_AUDIO/environment/handoffs/AI-05_PHASE00_HANDOFF.md`
+### AI-06
+- Branch: `ai-06-creatures`
+- Task: Phase 00 — Characters / Creatures / Animation / VFX direction lock, companion reaction model (DRAFT `CompanionReaction` outline), draft register, labeled fixture, validator, handoff. Artifacts under `01_PREPRODUCTION/CHARACTERS_VFX/`.
+- Status: READY_FOR_REVIEW
+- Contract versions consumed: none released (all `TBD 1.0.0`); worked from verified design docs and unmerged AI-01/AI-02 Phase 00 outputs (dependencies listed in lock §2)
+- Contract versions changed: none (`CompanionReaction` proposed as `0.1.0-draft`, not consumable)
+- Tests: `python3 01_PREPRODUCTION/CHARACTERS_VFX/tools/ai06_validate_phase00.py` → 187 passed, 0 failed
+- Known issues: lock becomes LOCKED only after AI-01 product lock approval + AI-13 decisions D6-03/D6-04; no `integration` branch on remote (U6-02); D6-01 human-character fidelity and D6-02 ambient creatures need Product decisions; conflicts C6-01..C6-03 routed to owners
+- Next integration action: PR `ai-06-creatures` → integration branch named by AI-13; see `01_PREPRODUCTION/CHARACTERS_VFX/AI06_PHASE00_HANDOFF.md`

@@ -1,0 +1,180 @@
+{
+  "registerId": "ai06.characters_vfx_register",
+  "registerVersion": "0.1.0-draft",
+  "status": "DRAFT",
+  "owner": "AI-06",
+  "phase": "00",
+  "purpose": "Machine-readable companion to AI06_CHARACTER_CREATURE_VFX_LOCK_V1.md and AI06_COMPANION_REACTION_MODEL_DRAFT.md. Closed sets, boundaries, metadata spec and forbidden terms for cross-track discussion and validator input. Not a released contract. No runtime IDs, event IDs or asset IDs are released here.",
+  "idPolicy": "Document IDs use AI-06 families CVX-M## (measurable boundaries), CVX-CUT-### (domain cut list), VFX-R# (hard rules), U6-## / C6-## / D6-## / B6-## (unknown / conflict / decision / boundary proposal). Draft runtime keys use dotted lowercase and may change until Phase 01 freeze; they are never used as released identifiers.",
+  "sources": {
+    "verified": [
+      "00_CONTROL/CRAFTCUBE_GAME_MASTER_BIBLE.md",
+      "01_PREPRODUCTION/COMPANION_BOND_BIBLE_V7.md",
+      "01_PREPRODUCTION/COMPANION_AND_CHARACTER_SYSTEM.md",
+      "01_PREPRODUCTION/STORY_BIBLE_V7.md",
+      "01_PREPRODUCTION/WORLD_BIOME_BIBLE_V7.md",
+      "00_CONTROL/V7_DESIGN_DECISION_REGISTER.md",
+      "00_CONTROL/V7_1_WORLDCLASS_UPGRADE.md",
+      "09_ART_AUDIO/ASSET_PIPELINE.md",
+      "02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md",
+      "06_CONTRACTS/V7_MASTER_CONTRACT_REGISTER.md",
+      "06_CONTRACTS/WORLDCLASS_CONTRACTS_V7_1.md",
+      "06_CONTRACTS/INTERACTION_CONTRACTS.md",
+      "08_QA_RELEASE/QUALITY_AND_RELEASE.md",
+      "10_SOURCE_REFERENCE/SOURCE_GDD_NOTES.md"
+    ],
+    "verifiedOnUnmergedBranches": [
+      {"branch": "origin/ai-01-product", "path": "01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md", "status": "READY_FOR_REVIEW"},
+      {"branch": "origin/ai-01-product", "path": "01_PREPRODUCTION/PRODUCT/PRODUCT_DECISION_REGISTER.md", "status": "READY_FOR_REVIEW"},
+      {"branch": "origin/ai-01-product", "path": "01_PREPRODUCTION/PRODUCT/CUT_LIST_AND_COMPLEXITY_BUDGET.md", "status": "READY_FOR_REVIEW"},
+      {"branch": "origin/ai-02-core", "path": "02_ARCHITECTURE/AI02_CORE_DOMAIN_BOUNDARY_AUDIT_PHASE00.md", "status": "DRAFT"},
+      {"branch": "origin/ai-02-core", "path": "02_ARCHITECTURE/AI02_DOMAIN_CONCEPT_REGISTER_PHASE00.json", "status": "DRAFT"}
+    ]
+  },
+  "contractFamilies": {
+    "produced": [
+      {"family": "CompanionReaction", "role": "presentation definitions + deterministic selection (proposal B6-01)", "version": "TBD 1.0.0", "status": "DRAFT_OUTLINE", "consumers": ["AI-04", "AI-08", "AI-09", "AI-10"]}
+    ],
+    "consumed": [
+      {"family": "PuzzleState", "owner": "AI-02", "version": "TBD 1.0.0"},
+      {"family": "WorldState", "owner": "AI-02", "version": "TBD 1.0.0"},
+      {"family": "WorldStateEvent", "owner": "AI-13 governance + AI-02 domain", "version": "TBD 1.0.0"},
+      {"family": "EquipmentEffect", "owner": "AI-02", "version": "TBD 1.0.0"},
+      {"family": "NarrativeEvent", "owner": "AI-09", "version": "TBD 1.0.0"},
+      {"family": "CharacterMemory", "owner": "AI-09", "version": "TBD 1.0.0"},
+      {"family": "NarrativeMemoryFlag", "owner": "AI-09", "version": "TBD 1.0.0"},
+      {"family": "LocalizationKey", "owner": "AI-09", "version": "TBD 1.0.0"},
+      {"family": "DiscoveryDefinition", "owner": "AI-03", "version": "TBD 1.0.0"},
+      {"family": "AccessibilityPreference", "owner": "AI-07", "version": "TBD 1.0.0"},
+      {"family": "PerformanceBudget", "owner": "AI-11", "version": "TBD 1.0.0"}
+    ]
+  },
+  "closedSets": {
+    "triggerClass": {
+      "source": "PD-005 acceptance validator; COMPANION_BOND_BIBLE_V7.md 'Companion reactions' list",
+      "values": ["puzzle_state", "biome_health", "relic", "story_revelation", "mastery_moment", "player_choice"],
+      "growthPolicy": "MINOR bump + Product decision (changes PD-005)"
+    },
+    "purpose": {
+      "values": ["confirm", "warn", "point", "celebrate", "comfort", "question"],
+      "interruptPriorityHighToLow": ["warn", "point", "question", "celebrate", "confirm", "comfort"]
+    },
+    "intensity": {
+      "values": ["subtle", "clear", "peak"],
+      "peakAllowedTriggerClasses": ["mastery_moment", "story_revelation"],
+      "durationMsMaxHypothesis": {"subtle": 600, "clear": 1500, "peak": 3000}
+    },
+    "bondStage": {
+      "source": "COMPANION_BOND_BIBLE_V7.md 'Meet -> Trust -> Shared discovery -> Capability -> Memory -> Choice'",
+      "values": ["meet", "trust", "shared_discovery", "capability", "memory", "choice"],
+      "stateOwner": "AI-02",
+      "meaningOwner": "AI-09"
+    },
+    "biomeTier": {
+      "source": "WORLD_BIOME_BIBLE_V7.md 'Biome transformation tiers'",
+      "values": [0, 1, 2, 3, 4],
+      "labels": ["dormant", "awakened", "recovering", "flourishing", "mastered_rare"]
+    },
+    "channels": ["pose", "locomotion", "facet", "vfx", "audioHook", "dialogueHook", "feedbackCue"],
+    "locomotion": ["approach", "orbit", "retreat", "hold", "none"],
+    "feedbackShake": ["none", "low", "mid"],
+    "feedbackHaptic": ["none", "light", "medium"],
+    "vfxRole": ["puzzle_feedback_cue", "restoration_vfx", "instability_vfx", "companion_expression_vfx", "discovery_cue", "resonance_cue"]
+  },
+  "roster": [
+    {"key": "concept.charvfx.companion.nox", "entity": "Nox", "kind": "companion", "v1Status": "MUST_NEVER_CUT", "presentationOwner": "AI-06", "canonOwner": "AI-09", "stateOwner": "AI-02", "combat": false, "evidence": "VERIFIED"},
+    {"key": "concept.charvfx.character.mira", "entity": "Mira", "kind": "human_character", "v1Status": "MUST_PRESENCE_FIDELITY_TBD", "presentationOwner": "AI-06", "canonOwner": "AI-09", "openItems": ["D6-01"], "evidence": "VERIFIED"},
+    {"key": "concept.charvfx.character.orin", "entity": "Orin", "kind": "human_character", "v1Status": "MUST_PRESENCE_FIDELITY_TBD", "presentationOwner": "AI-06", "canonOwner": "AI-09", "openItems": ["D6-01"], "evidence": "VERIFIED"},
+    {"key": "concept.charvfx.character.weaver", "entity": "The Weaver (player)", "kind": "player", "v1Status": "NO_FULL_BODY_PROPOSAL", "openItems": ["U6-05"], "evidence": "VERIFIED (lightly defined; CUT-014 no avatar creator)"},
+    {"key": "concept.charvfx.character.quiet_architect", "entity": "The Quiet Architect", "kind": "historical_presence", "v1Status": "NO_ASSET", "evidence": "VERIFIED (revealed via relics/architecture)"},
+    {"key": "concept.charvfx.creature.ambient", "entity": "Ambient creatures", "kind": "ambient_creature", "v1Status": "BLOCKED_ON_DECISION", "openItems": ["D6-02"], "proposalCapPerBiome": 2, "evidence": "INFERRED from 'safe creature habitats' and 'creature behavior' environmental storytelling"},
+    {"key": "concept.charvfx.companion.second", "entity": "Second companion", "kind": "companion", "v1Status": "REJECT", "evidence": "VERIFIED (CUT-004 on ai-01-product)"}
+  ],
+  "hardRules": [
+    {"id": "VFX-R1", "rule": "No VFX occludes an interactive puzzle tile during input-accepting state", "metadataField": "occludesPuzzleDuringInput", "expected": false},
+    {"id": "VFX-R2", "rule": "Meaning carried by >= 2 channels; color alone forbidden", "metadataField": "meaningChannels", "expected": "length >= 2"},
+    {"id": "VFX-R3", "rule": "<= 3 flashes per second; no full-screen luminance flash (guidance: WCAG 2.1 SC 2.3.1)", "metadataField": "flashRateMaxHz", "expected": "<= 3"},
+    {"id": "VFX-R4", "rule": "Reduced-motion variant declared for every definition; never empty", "metadataField": "reducedMotion", "expected": "non-empty"},
+    {"id": "VFX-R5", "rule": "Shake/haptics requested as feedbackCue with intensity class; AI-06 never drives camera or haptics directly", "metadataField": "channels.feedbackCue", "expected": "class values only"},
+    {"id": "VFX-R6", "rule": "No asset without complete metadata; placeholders mechanically detectable", "metadataField": "placeholder", "expected": "false in release"},
+    {"id": "VFX-R7", "rule": "World transformations are witnessed before->transition->after in one continuous view", "metadataField": null, "expected": "review"},
+    {"id": "VFX-R8", "rule": "<= 3 simultaneous transient VFX systems during interactive puzzle state (HYPOTHESIS until AI-11 budgets)", "metadataField": null, "expected": "runtime assertion"}
+  ],
+  "measurableBoundaries": [
+    {"id": "CVX-M01", "criterion": "Companion recall >= 50% unprompted (IGM-005c)", "phase": "06", "status": "VERIFIED_TARGET_AI01"},
+    {"id": "CVX-M02", "criterion": "Reaction purpose legibility >= 70% without text", "phase": "06", "status": "HYPOTHESIS"},
+    {"id": "CVX-M03", "criterion": "Reaction onset <= 250 ms; completes within <= 2 s world-reaction window", "phase": "04-06", "status": "HYPOTHESIS"},
+    {"id": "CVX-M04", "criterion": "0 interactive tiles occluded during input", "phase": "04", "status": "REQUIREMENT"},
+    {"id": "CVX-M05", "criterion": "100% trigger whitelist compliance", "phase": "00+", "status": "REQUIREMENT", "validator": "tools/ai06_validate_phase00.py"},
+    {"id": "CVX-M06", "criterion": "100% reduced-motion coverage", "phase": "00+", "status": "REQUIREMENT", "validator": "tools/ai06_validate_phase00.py"},
+    {"id": "CVX-M07", "criterion": "100% >= 2 meaning channels", "phase": "00+", "status": "REQUIREMENT", "validator": "tools/ai06_validate_phase00.py"},
+    {"id": "CVX-M08", "criterion": "0 assets > 3 flashes/s", "phase": "04+", "status": "REQUIREMENT"},
+    {"id": "CVX-M09", "criterion": "100% asset metadata complete; 0 placeholders in release", "phase": "02+", "status": "REQUIREMENT"},
+    {"id": "CVX-M10", "criterion": "<= 1 active reaction; <= 1 peak per chapter beat", "phase": "05+", "status": "HYPOTHESIS"},
+    {"id": "CVX-M11", "criterion": "Within AI-11 PerformanceBudget on low/mid/high", "phase": "12", "status": "DEPENDS_ON_MISSING_BUDGET"},
+    {"id": "CVX-M12", "criterion": "0 forbidden franchise terms; 0 resemblance review flags", "phase": "00+", "status": "REQUIREMENT", "validator": "tools/ai06_validate_phase00.py"}
+  ],
+  "assetMetadataSpec": {
+    "namingPattern": "<type>_<system>_<semantic>_<variant>_<lod/version>",
+    "namingSource": "09_ART_AUDIO/ASSET_PIPELINE.md",
+    "baseFields": ["assetId", "type", "owner", "source", "license", "version", "targetPlatform", "memoryEstimate", "dependencies"],
+    "ai06Fields": ["placeholder", "reducedMotionVariant", "occludesPuzzleDuringInput", "meaningChannels", "flashRateMaxHz", "applicability"],
+    "fieldStatus": "DRAFT until Phase 01 freeze"
+  },
+  "runtimeFeasibilityHypotheses": [
+    {"topic": "Nox rig", "hypothesis": "single skinned mesh, <= 32 bones, no blendshapes at v1, facets via shader params + bones", "verifier": "AI-11"},
+    {"topic": "Nox LOD", "hypothesis": "2 LODs", "verifier": "AI-11"},
+    {"topic": "Particle approach", "hypothesis": "built-in particle system vs VFX Graph decided in Phase 02 against AI-11 device matrix; VFX Graph needs compute-shader support not assumable on low tier", "verifier": "AI-11 / AI-12", "openItems": ["U6-01"]},
+    {"topic": "Particle budget", "hypothesis": null, "note": "no number invented; requires AI-11 measurement", "verifier": "AI-11"},
+    {"topic": "Frame budget share", "hypothesis": null, "note": "no ms share claimed; PerformanceBudget contract missing", "verifier": "AI-11"}
+  ],
+  "domainCutList": [
+    {"id": "CVX-CUT-001", "item": "Combat/damage/hit/death animation sets", "status": "REJECT", "ref": "CUT-005, DD-007"},
+    {"id": "CVX-CUT-002", "item": "Damage/health/attack VFX categories", "status": "REJECT", "ref": "PD-002"},
+    {"id": "CVX-CUT-003", "item": "Second companion presentation", "status": "REJECT", "ref": "CUT-004"},
+    {"id": "CVX-CUT-004", "item": "Companion cosmetics/accents (earned)", "status": "LATER", "ref": "CUT-031"},
+    {"id": "CVX-CUT-005", "item": "Facial blendshape rig for Nox", "status": "LATER", "ref": "rig hypothesis"},
+    {"id": "CVX-CUT-006", "item": "Physics ragdoll/cloth on creatures", "status": "REJECT_V1", "ref": "mobile cost"},
+    {"id": "CVX-CUT-007", "item": "Procedural creature generation/variation", "status": "REJECT", "ref": "CUT-019 spirit"},
+    {"id": "CVX-CUT-008", "item": "Emote wheel/gesture menu", "status": "REJECT", "ref": "menu bloat"},
+    {"id": "CVX-CUT-009", "item": "Weather/atmosphere VFX systems", "status": "OUT_OF_SCOPE_AI05", "ref": "B6-03"},
+    {"id": "CVX-CUT-010", "item": "Heavy post-processing as VFX carrier on low tier", "status": "LATER_AI11_DECISION", "ref": "budget"},
+    {"id": "CVX-CUT-011", "item": "Voice performance for reactions", "status": "LATER", "ref": "AI-08/AI-09; hook slots only"},
+    {"id": "CVX-CUT-012", "item": "Ambient creatures beyond approved count", "status": "BLOCKED_ON_D6-02", "ref": "D6-02"}
+  ],
+  "boundaryProposals": [
+    {"id": "B6-01", "proposal": "CompanionReaction split: AI-02 deterministic trigger evaluation + payload; AI-06 definitions, deterministic selection, presentation", "aligns": "AI-02 audit §9 / D-04", "decisionOwner": "AI-13"},
+    {"id": "B6-02", "proposal": "Cube Pulse / Golden Trail: AI-06 VFX assets + readability; AI-04 placement/timing; AI-03 hint semantics", "aligns": "AI-02 register concept.puzzle_rules.hint_presentation (no VFX owner named)", "decisionOwner": "AI-13"},
+    {"id": "B6-03", "proposal": "AI-05 persistent environment state visuals; AI-06 transient restoration/instability VFX layered during transitions", "decisionOwner": "AI-13"},
+    {"id": "B6-04", "proposal": "AI-06 emits feedbackCue intensity class; AI-04 applies shake/haptics under AI-07 AccessibilityPreference", "decisionOwner": "AI-13"}
+  ],
+  "openItems": {
+    "unknown": [
+      {"id": "U6-01", "item": "AI-11 device matrix and PerformanceBudget missing"},
+      {"id": "U6-02", "item": "No 'integration' branch on remote (only ai-13-integration)"},
+      {"id": "U6-03", "item": "Cube Pulse / Golden Trail semantics and VFX ownership"},
+      {"id": "U6-04", "item": "Source GDD ZIP not in repository"},
+      {"id": "U6-05", "item": "Whether Weaver hands/body are rendered"},
+      {"id": "U6-06", "item": "memoryFlags / localizationKeys formats"},
+      {"id": "U6-07", "item": "puzzle_state descriptor fields and seed source"},
+      {"id": "U6-08", "item": "mastery_moment signal shape"},
+      {"id": "U6-09", "item": "locomotion anchor/target model"}
+    ],
+    "conflict": [
+      {"id": "C6-01", "item": "'The Quiet Engine' (biome) vs 'The Silent Engine' (chapter)", "owner": "AI-09"},
+      {"id": "C6-02", "item": "CODEOWNERS/validator example maps Assets/VFX to AI-04 and Assets/Audio to AI-06 vs 13-account model", "owner": "AI-12 / AI-13"},
+      {"id": "C6-03", "item": "ID style creature.pollinator.bee vs game.bloom.started", "owner": "AI-13"}
+    ],
+    "decision": [
+      {"id": "D6-01", "item": "Human character presentation fidelity tier"},
+      {"id": "D6-02", "item": "Ambient creatures in v1 and per-biome cap"},
+      {"id": "D6-03", "item": "Confirm boundary proposals B6-01..B6-04"},
+      {"id": "D6-04", "item": "Register AI-06 document-ID families"},
+      {"id": "D6-05", "item": "Location of reaction selection function (pure domain vs presentation with pure core)"}
+    ]
+  },
+  "ipForbiddenTerms": {
+    "note": "Terms that must not appear in AI-06 design vocabulary, IDs or asset names. Presence fails CVX-M12. Scan is case-insensitive on whole words. Source: SOURCE_GDD_NOTES.md IP warning; Product Lock §6.1/§6.3 avoid-list.",
+    "terms": ["minecraft", "creeper", "enderman", "steve", "villager", "mob", "mobs", "redstone", "nether", "pokemon", "pikachu", "rubik", "rubiks", "speedcube"]
+  }
+}
