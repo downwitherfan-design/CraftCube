@@ -1,0 +1,40 @@
+[gd_scene load_steps=7 format=3 uid="uid://ccube1mainsce0"]
+
+[ext_resource type="Script" path="res://scripts/game/game_controller.gd" id="1_ctrl"]
+[ext_resource type="Script" path="res://scripts/presentation/cube_view.gd" id="2_cube"]
+[ext_resource type="Script" path="res://scripts/presentation/world_view.gd" id="3_world"]
+[ext_resource type="Script" path="res://scripts/game/hud.gd" id="4_hud"]
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 1
+background_color = Color(0.07, 0.08, 0.1, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.7, 0.72, 0.75, 1)
+ambient_light_energy = 0.6
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_ctrl")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.83, -0.28, 0.48, 0, 0.86, 0.51, -0.56, -0.42, 0.71, 3.6, 3.2, 4.6)
+fov = 55.0
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.7, -0.5, 0.5, 0, 0.7, 0.7, -0.7, -0.5, 0.5, 0, 5, 0)
+light_energy = 0.9
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="WorldView" type="Node3D" parent="."]
+script = ExtResource("3_world")
+
+[node name="CubeView" type="Node3D" parent="."]
+script = ExtResource("2_cube")
+position = Vector3(0, 0, 0)
+
+[node name="HUD" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+script = ExtResource("4_hud")

@@ -14,6 +14,7 @@ meaningful milestone.
 - **PRs:** #9 MERGED (mergeCommit `c607272`), #10 MERGED (`6b5818f`). #1,#2,#3,#4,#5,#6,#7,#8 still show OPEN though each head is an ancestor of `integration` (their content is integrated; GitHub records them open because the direct `integration` push â€” see Â§4). VERIFIED.
 - **Clone note:** local clone was shallow with refspec limited to `main`; repaired by `git fetch --unshallow` and setting `remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*`. VERIFIED.
 - **REMOTE WRITE ACCESS: RESOLVED (2026-10-10).** The runtime's `GH_TOKEN`/`GITHUB_TOKEN` still inject the old read-only `ghu_` integration token (403 on write). A write-enabled PAT provided by the human owner was applied out-of-band: it is read from a `600` file at `/tmp/.ghtok` (outside the repository) and used via `GIT_ASKPASS=/tmp/.gitaskpass` for Git and `GH_TOKEN="$(cat /tmp/.ghtok)"` for `gh`/API. The token value is never printed, logged, committed, or written into any repo file or remote URL. Verified writes: created+deleted a probe ref, pushed `ai-13-integration`, retargeted PRs #1/#5, pushed `ai-09-narrative`. NOTE for any future runtime: the credential must be registered as the supported `GH_TOKEN`/`GITHUB_TOKEN` secret; the current runtime does not expose it there.
+  - **REGRESSION (Session 4, 2026-10-10):** the out-of-band PAT is **absent** in the current runtime (`/tmp/.ghtok` and `/tmp/.gitaskpass` do not exist). The injected `GITHUB_TOKEN` has **empty OAuth scopes** (`x-oauth-scopes:` blank; read works, `x-accepted-github-permissions: metadata=read`). `git ls-remote` reads fine; `git push` has no credential helper and prompts for a username. **Remote write is BLOCKED again** in this environment. Branch `godot-migration` is committed locally only. See §11.
 
 ## 2. Branch / PR inventory (VERIFIED 2026-10-10)
 
@@ -121,3 +122,24 @@ python3 11_INTEGRATION/scripts/validate_registry.py --check-render   # â†’ same 
 - AI-13 sandbox: Python 3.13 + `gh` 2.102 available; **no Unity, no Android SDK**. VERIFIED.
 - No build, device, or APK claims may be made. Phase 00 is documentation/JSON only, so none are needed.
 - No CI runs the validator (RISK-0002); the gate step is manual.
+
+## 11. Session 4 (2026-10-10) — Godot engine migration + playable Android slice (AI-13)
+
+- **Directive:** Human Project Owner — official engine change to **Godot 4.x stable + GDScript**, Android-first, to remove the Unity dependency and produce a runnable build.
+- **Branch:** `godot-migration`, created from `integration` @ `55f6b9b` (current `origin/integration`). VERIFIED.
+- **Toolchain provisioned and VERIFIED in this sandbox:**
+  - Godot `4.7.2.stable.official.ed1daf0bf` at `/opt/godot`, symlinked to `/usr/local/bin/godot`.
+  - Export templates 4.7.2-stable installed to `~/.local/share/godot/export_templates/4.7.2.stable/`.
+  - OpenJDK 21 (`openjdk-21-jdk-headless`) + Android SDK at `/opt/android-sdk` (`platform-tools`, `platforms;android-34`, `build-tools;34.0.0`); Godot editor settings point at both; debug keystore created.
+- **Built (VERIFIED):** a real Godot project under `game/` — 11 GDScript classes, `project.godot`, `scenes/Main.tscn`, `export_presets.cfg`, `icon.svg`, a headless test runner, a CI script, and a GitHub Actions workflow.
+  - Domain: deterministic NxN puzzle (`cube_state.gd` geometry-derived permutations, `move_table.gd`, `puzzle_engine.gd` seeded scramble + reverse-replay solvability proof, `level_catalog.gd`).
+  - Game: `game_state.gd`, `save_manager.gd` (versioned JSON), `story_content.gd`, `game_controller.gd`, `hud.gd`.
+  - Presentation: `cube_view.gd`, `world_view.gd` (procedural, no external assets).
+  - Playable Chapter 01 slice: 3 levels (AI-03 IDs), progression, save, world reaction, a reward + equipment grant, one optional discovery, mobile HUD with a large-text toggle.
+- **Tests / evidence (VERIFIED):** unit tests **52 passed / 0 failed**; headless main-scene boot clean; **signed Android debug APK** built — `com.downwitherfandesign.craftcube`, v0.1.0, minSdk 24, arm64-v8a. Logs in `game/docs/evidence/`.
+- **Fixed during the session (real defects found by tests, not worked around):** rotation was about the corner not the cube centre; `apply_move` never resolved the `layer=-1` ("outer") sentinel; scramble generation recursed infinitely on a rejected seed. All three fixed and re-tested.
+- **Design finding (routed to AI-03):** the draft fixture's `rule.axis_lock {axes:[X,Z]}` + `objective.align{U}` is degenerate (level starts solved). The binding uses no axis lock for levels 1–2 and a **Y-axis lock** for level 3. Documented in `game/docs/ENGINE_AND_BUILD.md` and `11_INTEGRATION/ENGINE_MIGRATION_UNITY_TO_GODOT.md`.
+- **Governance:** added `11_INTEGRATION/ENGINE_MIGRATION_UNITY_TO_GODOT.md` (AI-13 record) and **CR-0013** (route engine change to AI-01; `PD-025` + `validate_product_lock.py` §8 remain Unity-scoped and are AI-01-owned). AI-13 did **not** rewrite the AI-01 product register/validator.
+- **Gate status unchanged:** Phase 00 remains **NOT PASSED**. The CR-0012 fix (`8bd03f0`) is committed on `ai-10-qa` and referenced by `f01be1b` on `ai-13-integration`, but **neither is in `origin/integration`** (validator still fails `fail=20`, F self-test 14 cases). This is the open validator blocker.
+- **BLOCKED (write):** `git push` needs the PAT that is absent this session (see §1 regression). The session's commits are local on `godot-migration` only.
+- **Next safe action:** (1) restore write access and push `godot-migration` + open a PR to `integration`; (2) land the CR-0012 fix onto `integration` (fast-forward/re-merge `ai-10-qa@8bd03f0` or equivalent) so the QA validator exits 0; (3) AI-01 records `PD-030` (CR-0013) and restates `PD-029` items 4/5 engine-neutrally; (4) AI-03 confirms the Chapter 01 rule binding.
