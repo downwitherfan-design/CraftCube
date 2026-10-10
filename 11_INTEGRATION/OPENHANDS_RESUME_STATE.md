@@ -263,3 +263,42 @@ integration token** — `POST /repos/.../git/refs` returned HTTP `403`
    and human decisions permit.
 3. AI-03 confirms/rescinds the Chapter-01 binding (`AI03-DRAFT-RULE-001`); human owner decides OD-0001/OD-0005.
 
+
+## Session 8 — Gameplay-quality sprint (AI-13, godot-migration)
+### Environment
+- Re-provisioned Godot 4.7.2-stable locally (same release as CI); the fresh runtime had no engine.
+- GITHUB_TOKEN in this runtime is a read-only App installation token (git push and API writes both
+  return 403 "Resource not accessible by integration"). The commits below are LOCAL and unpushed;
+  no remote write, no merge, no `main` push was possible.
+
+### Real defects found by RUNNING the game (not by reading it)
+1. Completion feedback clobbered — world reaction, reward narrative and discovery all wrote to one
+   shared label; the last signal won. Level 2 lost the reaction text; level 3's Nox reward narrative
+   was never shown at all. Fix: dedicated accumulating `_story` panel; clears per level; no duplicate
+   on re-confirm. Commit `69de79d`.
+2. Cube camera mis-framed — projecting the cube through the scene camera showed x -15..548 on the
+   720px canvas: off-centre and clipped at the left on every viewport. Recomputed the Transform3D
+   (now x 126..583, 63% width, centred); also corrected the row/column order of the stored Basis.
+   Commit `298ec98`.
+3. Resume replayed the solved level — relaunch always reopened the level just completed. Now resumes
+   at the first unsolved level; keeps the saved position when the chapter is complete. Commit `4f4190f`.
+4. UX: aligned-cue now also refreshes after Undo/Restart; guarded mobile haptics + fullscreen. Commit `8793822`.
+
+### Verified results (this branch, this runtime)
+- Godot domain suite: 198 passed / 0 failed (was 166). Command: godot --headless --path game --script res://tests/run_tests.gd
+- Main scene boots clean headless (--quit-after 180, exit 0, no engine errors).
+- HUD layout measured at the real 720x1280 canvas: 12 buttons, 0 offscreen, normal + large-text.
+- Validators on THIS branch: registry 27/27 PASS, product_lock 14/0 PASS. QA validator still fail=20 —
+  all pre-existing and in files this branch does not contain/touch (AI-04/AI-06/audio fixtures + E3
+  product-doc version drift). E3 is fixed by PR #12. None of the 20 are in the game code changed here.
+
+### Branch / commits
+- godot-migration @ 8793822 (4 commits ahead of origin/godot-migration). PR #11 target `integration`.
+- New regressions: _test_completion_feedback, _test_camera_framing, _test_resume_selection,
+  _test_chapter_playthrough (all in game/tests/run_tests.gd).
+
+### Next safe action
+- Push godot-migration (69de79d..8793822) once a write-capable credential is available, so CI can rebuild
+  and re-sign the APK on the fixed commit and refresh game/docs/evidence/.
+- Then run PR #11 through the Phase 00 gate; do NOT merge until the gate and human decisions permit.
+
