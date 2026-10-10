@@ -49,6 +49,7 @@ func _initialize() -> void:
 	_test_world_state_and_resume()
 	_test_objective_progress()
 	_test_animated_chapter_end_to_end()
+	_test_hud_status_text()
 	_test_scramble_fuzz()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -925,6 +926,26 @@ func _test_animated_chapter_end_to_end() -> void:
 		w.close()
 	else:
 		SaveManager.delete_at_path(saved)
+
+## The HUD status line must name the objective in player terms (top/bottom, not U/D), show
+## progress toward it, and show the level par so "good" play is legible without a manual.
+func _test_hud_status_text() -> void:
+	print("[hud status text]")
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	var hud = m.get_node_or_null("HUD")
+	m.load_level(0)  # Awaken: align top, par 3
+	hud._refresh_status()
+	_check("status names the top face for a U objective", hud._status.text.contains("top"))
+	_check("status shows progress fraction", hud._status.text.contains("/1 aligned"))
+	_check("status shows par", hud._status.text.contains("par 3"))
+	m.load_level(2)  # Hollow Stone: align top+front
+	hud._refresh_status()
+	_check("status names both required faces", hud._status.text.contains("top") and hud._status.text.contains("front"))
+	_check("status shows /2 for a two-face objective", hud._status.text.contains("/2 aligned"))
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
 
 func _colour_histogram(c: CubeState) -> Dictionary:
 	var h := {}

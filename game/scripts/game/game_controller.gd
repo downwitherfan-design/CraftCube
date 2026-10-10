@@ -105,6 +105,12 @@ func undo() -> bool:
 func objective_progress() -> Dictionary:
 	return engine.objective_progress()
 
+## The level currently loaded, for presentation-layer readouts (title, objective faces, par).
+func current_level() -> Dictionary:
+	if current_index >= 0 and current_index < levels.size():
+		return levels[current_index]
+	return {}
+
 func legal_faces() -> Array:
 	var faces := []
 	for m in engine.legal_moves():

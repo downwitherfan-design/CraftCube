@@ -163,14 +163,24 @@ func _refresh_status() -> void:
 	var prog: Dictionary = controller.objective_progress()
 	var total := int(prog.get("total", 0))
 	var aligned := int(prog.get("aligned", 0))
+	var par := int(controller.current_level().get("par_moves", 0))
 	if total > 0:
-		_status.text = "Aligned %d/%d required faces · Moves: %d" % [aligned, total, controller.engine.move_count()]
+		_status.text = "%s · %d/%d aligned · Moves: %d (par %d)" % [_objective_faces_text(), aligned, total, controller.engine.move_count(), par]
 	else:
-		_status.text = "Moves: %d" % controller.engine.move_count()
+		_status.text = "Moves: %d (par %d)" % [controller.engine.move_count(), par]
 	# Live cue so the player knows when the required faces are aligned; the win is still
 	# confirmed by the domain predicate via "I solved it".
 	if controller.engine.is_solved():
 		_status.text = "All required faces aligned — press \"I solved it\"."
+
+## Names the objective's required faces in player terms, so "Align U" reads as "top".
+func _objective_faces_text() -> String:
+	var names := {"U": "top", "D": "bottom", "F": "front", "B": "back", "L": "left", "R": "right"}
+	var faces: Array = controller.current_level().get("objective", {}).get("params", {}).get("faces", [])
+	var out := PackedStringArray()
+	for f in faces:
+		out.append(names.get(str(f), str(f)))
+	return "Align " + ", ".join(out)
 
 func _on_flip() -> void:
 	_ccw_mode = not _ccw_mode
