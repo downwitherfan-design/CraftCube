@@ -43,6 +43,9 @@ func _initialize() -> void:
 	_test_camera_framing()
 	_test_resume_selection()
 	_test_chapter_playthrough()
+	_test_face_orientation()
+	_test_layer_selection()
+	_test_animation_locks_and_syncs()
 	_test_scramble_fuzz()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -489,10 +492,10 @@ func _test_scene_integration() -> void:
 		return
 	var main = packed.instantiate()
 	main._ready()  # run the real wiring: HUD bind, world + cube build, level load
-	_check("cube view builds facelets for 2x2", main.cube_view != null and main.cube_view.get_child_count() == 6 * 2 * 2)
+	_check("cube view builds facelets for 2x2", main.cube_view != null and main.cube_view._facelets.size() == 6 * 2 * 2)
 	_check("HUD is bound to the controller", main.get_node_or_null("HUD").controller == main)
 	_check("world view built its markers", main.world_view != null and main.world_view.lit_count() == 0)
-	main.try_move("U", true)  # exercise the input -> domain -> view path
+	main.try_move("U", true, false)  # exercise the input -> domain -> view path (headless: no tween)
 	main.undo()               # restore the exact scrambled state before replay
 	# Solve level 1 by reverse-replaying its scramble, then complete it once.
 	for i in range(main.engine._scramble_moves.size() - 1, -1, -1):
@@ -727,6 +730,92 @@ func _test_scramble_fuzz() -> void:
 				bad_perturb += 1
 	_check("fuzz: every scramble solvable by inverse (120 trials)", bad_solvable == 0)
 	_check("fuzz: every non-empty scramble perturbs the cube", bad_perturb == 0)
+
+## The six face controls must map to the six VISIBLE faces of the rendered cube. Regression
+## for a real defect where the domain labelled the bottom face "U", so a level asking the
+## player to align the top face actually required an invisible bottom face.
+func _test_face_orientation() -> void:
+	print("[face orientation]")
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	var n: int = m.engine.state.n
+	# Domain: the U face's normals point +Y and its facelets sit at world-top.
+	var up_top := true
+	for i in range(n * n):
+		if m.engine.state._normals[i].y != 1:
+			up_top = false
+		if m.engine.state._positions[i].y < n - 1:
+			up_top = false
+	_check("domain U face normals point +Y (up)", up_top)
+	# Rendered: a U facelet must sit in the upper half of the cube (positive y).
+	var socks := 0
+	for f in range(6):
+		var mi = m.cube_view._facelets[f * n * n]
+		var is_up: bool = mi.position.y > 0.0
+		if f == 0 and not is_up:
+			socks += 1
+		if f == 1 and is_up:
+			socks += 1
+	_check("U renders on top and D on the bottom", socks == 0)
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+
+## The interactive chain must keep the rendered cube equal to the authoritative state after
+## every move, including when two inputs are fired back-to-back during an animation.
+func _test_animation_locks_and_syncs() -> void:
+	print("[animation lock and sync]")
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	# An animated turn starts, and a second input while busy is rejected (no overlap).
+	var first: bool = m.try_move("U", true)
+	_check("animated turn is accepted when idle", first)
+	var busy: bool = m.is_animating()
+	_check("cube reports animating mid-turn", busy)
+	var second: bool = m.try_move("F", true)
+	_check("second input during animation is rejected", not second)
+	# Undo/restart are also locked while animating.
+	_check("undo is locked during animation", not m.undo())
+	# Complete the in-flight turn through the same settle path the tween callback uses
+	# (headless frames run too fast for the 0.22s tween to advance deterministically).
+	m.cube_view.skip_animation()
+	_check("animation settles and releases the lock", not m.is_animating())
+	# Rendered colours must equal the truth layer's colours (position-based, so geometry too).
+	var n: int = m.engine.state.n
+	var mismatches := 0
+	for face in range(6):
+		for r in range(n):
+			for c in range(n):
+				var idx := face * n * n + r * n + c
+				var want: int = (m.engine.state.colours[idx] / (n * n)) % 6
+				var mi = m.cube_view._facelets[idx]
+				if mi.material_override.albedo_color != m.cube_view._materials[want].albedo_color:
+					mismatches += 1
+	_check("rendered facelets match the truth layer after settle", mismatches == 0)
+	# The layer that moved must be the U layer (domain +Y), i.e. the upper half of the cube.
+	var all_top := true
+	for i in range(n * n):
+		if m.cube_view._facelets[i].position.y <= 0.0:
+			all_top = false
+	_check("U layer after the turn still occupies the top row", all_top)
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+
+## Selecting a move must choose exactly the layer's facelets and no others; a wrong layer
+## selection is the classic twisting-puzzle defect where a button turns the wrong band.
+func _test_layer_selection() -> void:
+	print("[layer selection]")
+	var st := CubeState.new(3)
+	for layer in [0, 1, 2]:
+		var expected := 0
+		for i in range(st.colours.size()):
+			if st._positions[i].y == layer:
+				expected += 1
+		var got := st.layer_indices(1, layer).size()
+		_eq("Y layer %d has the expected facelet count" % layer, got, expected)
+	_check("every facelet is in exactly one Y layer",
+			st.layer_indices(1, 0).size() + st.layer_indices(1, 1).size() + st.layer_indices(1, 2).size() == st.colours.size())
 
 func _colour_histogram(c: CubeState) -> Dictionary:
 	var h := {}

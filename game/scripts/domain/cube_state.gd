@@ -35,8 +35,8 @@ func _build_geometry() -> void:
 	_normals.resize(FACE_COUNT * n * n)
 	_lookup.clear()
 	var faces := [
-		{"f": Face.U, "fn": func(r, c): return Vector3i(c, 0, r), "n": Vector3i(0, -1, 0)},
-		{"f": Face.D, "fn": func(r, c): return Vector3i(c, n - 1, n - 1 - r), "n": Vector3i(0, 1, 0)},
+		{"f": Face.U, "fn": func(r, c): return Vector3i(c, n - 1, n - 1 - r), "n": Vector3i(0, 1, 0)},
+		{"f": Face.D, "fn": func(r, c): return Vector3i(c, 0, r), "n": Vector3i(0, -1, 0)},
 		{"f": Face.F, "fn": func(r, c): return Vector3i(c, r, n - 1), "n": Vector3i(0, 0, 1)},
 		{"f": Face.B, "fn": func(r, c): return Vector3i(n - 1 - c, r, 0), "n": Vector3i(0, 0, -1)},
 		{"f": Face.L, "fn": func(r, c): return Vector3i(0, r, c), "n": Vector3i(-1, 0, 0)},
@@ -76,6 +76,18 @@ func _rotate_vec(v: Vector3i, ax: int, cw: bool) -> Vector3i:
 			return Vector3i(s * v.z, v.y, -s * v.x)
 		_:  # Z axis: (x, y, z) -> (-s*y, s*x, z)
 			return Vector3i(-s * v.y, s * v.x, v.z)
+
+## Facelet indices occupying `layer_value` along `axis` (0=X,1=Y,2=Z). Shared by the
+## permutation builder, the presentation (layer selection), and tests, so a layer is
+## defined in exactly one place.
+func layer_indices(axis: int, layer_value: int) -> Array:
+	var out := []
+	for i in range(_positions.size()):
+		var p: Vector3i = _positions[i]
+		var coord := p.x if axis == 0 else (p.y if axis == 1 else p.z)
+		if coord == layer_value:
+			out.append(i)
+	return out
 
 ## Build the permutation (new_index[old_index]) for one layer turn.
 ## axis: 0=X,1=Y,2=Z. layer_value: coordinate along that axis in 0..n-1. cw: direction.

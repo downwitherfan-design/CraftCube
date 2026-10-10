@@ -15,7 +15,10 @@ var _face_buttons: Array = []
 var _flip_btn: Button
 var _ccw_mode := false
 var _big_text := false
+var _busy := false
 var _root: VBoxContainer
+var _undo_btn: Button
+var _restart_btn: Button
 
 const BTN_MIN := Vector2(88, 64)
 
@@ -33,6 +36,7 @@ func bind(ctrl: Node3D) -> void:
 	controller.reward_granted.connect(_on_reward)
 	controller.discovery_found.connect(_on_discovery)
 	controller.solved.connect(_on_solved)
+	controller.move_applied.connect(_on_move_applied)
 
 func _label(text: String, size: int) -> Label:
 	var l := Label.new()
@@ -110,11 +114,13 @@ func _build() -> void:
 	action_row.add_child(flip)
 	_flip_btn = flip
 	var undo := _button("Undo")
-	undo.pressed.connect(func(): controller.undo(); _refresh_status())
+	undo.pressed.connect(func(): if not controller.is_animating(): controller.undo(); _refresh_status())
 	action_row.add_child(undo)
+	_undo_btn = undo
 	var restart := _button("Restart")
-	restart.pressed.connect(func(): controller.restart_level(); _refresh_status())
+	restart.pressed.connect(func(): if not controller.is_animating(): controller.restart_level(); _refresh_status())
 	action_row.add_child(restart)
+	_restart_btn = restart
 
 	var solve_row := HBoxContainer.new()
 	solve_row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -166,9 +172,27 @@ func _on_flip() -> void:
 		_flip_btn.text = "Direction: CCW" if _ccw_mode else "Direction: CW"
 
 func _on_face_pressed(face: String) -> void:
+	if controller.is_animating():
+		return
 	var applied: bool = controller.try_move(face, not _ccw_mode)
 	if applied:
 		_haptic(18)
+		set_busy(true)
+	_refresh_status()
+
+## Lock the interactive controls while a turn animation is in flight so a second input can
+## never start a competing turn (which would desync the rendered layer from the truth).
+func set_busy(busy: bool) -> void:
+	_busy = busy
+	for entry in _face_buttons:
+		entry["button"].disabled = busy or not controller.legal_faces().has(entry["face"])
+	if _undo_btn:
+		_undo_btn.disabled = busy
+	if _restart_btn:
+		_restart_btn.disabled = busy
+
+func _on_move_applied() -> void:
+	set_busy(false)
 	_refresh_status()
 
 func _on_solve() -> void:

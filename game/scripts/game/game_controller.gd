@@ -11,6 +11,7 @@ signal level_advanced(index: int)
 signal discovery_found(discovery: Dictionary)
 signal reward_granted(reward_id: String, equipment: Dictionary)
 signal world_reacted(hook: String, text: String)
+signal move_applied()
 
 var engine := PuzzleEngine.new()
 var game_state := GameState.new()
@@ -19,6 +20,9 @@ var current_index := 0
 
 var cube_view: CubeView
 var world_view: WorldView
+
+# When an animated turn ends the truth layer is advanced; this holds the in-flight move.
+var _pending_move: Dictionary = {}
 
 func _ready() -> void:
 	levels = LevelCatalog.chapter_one()
@@ -50,18 +54,47 @@ func load_level(index: int) -> void:
 	level_loaded.emit(lvl)
 
 func restart_level() -> void:
+	if is_animating():
+		return
 	engine.reset()
+	_pending_move = {}
 	if cube_view:
 		cube_view.refresh(engine.state)
 
-func try_move(face: String, cw: bool) -> bool:
+## Apply a face turn. Idle -> the move is validated, the layer animates, and the truth
+## layer advances exactly when the animation settles. Busy -> the input is ignored, so two
+## turns can never overlap and corrupt the logical state. `animated=false` (tests/headless)
+## applies immediately with no tween.
+func try_move(face: String, cw: bool, animated: bool = true) -> bool:
 	var move := MoveTable.face_move(face, cw)
+	if cube_view and animated and cube_view.has_method("animate_move"):
+		if cube_view.is_animating():
+			return false
+		if not engine.is_legal(move):
+			return false
+		if not cube_view.animate_move(move, engine.state, _on_move_animated.bind(move)):
+			return false
+		_pending_move = move
+		return true
 	var applied := engine.apply_move(move)
 	if applied and cube_view:
 		cube_view.refresh(engine.state)
+		move_applied.emit()
 	return applied
 
+func _on_move_animated(move: Dictionary) -> void:
+	engine.apply_move(move)
+	_pending_move = {}
+	if cube_view:
+		cube_view.refresh(engine.state)
+	move_applied.emit()
+
+func is_animating() -> bool:
+	return cube_view != null and cube_view.is_animating()
+
 func undo() -> bool:
+	if is_animating():
+		return false
 	var ok := engine.undo()
 	if ok and cube_view:
 		cube_view.refresh(engine.state)
@@ -90,6 +123,8 @@ func confirm_solve() -> bool:
 	game_state.set_world_flag(hook)
 	if world_view:
 		world_view.react()
+	if cube_view:
+		cube_view.flash_solved(engine.state)
 	world_reacted.emit(hook, StoryContent.reaction_for(hook))
 
 	var reward_id := str(lvl.get("reward_id", ""))
