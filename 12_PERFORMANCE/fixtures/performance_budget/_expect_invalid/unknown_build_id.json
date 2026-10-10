@@ -1,0 +1,56 @@
+{
+  "schema": "PerformanceBudget",
+  "schema_version": "0.1.0",
+  "budget_version": "0.1.0-hypothesis",
+  "method_version": "1.0.0",
+  "_label": "NEGATIVE FIXTURE (must be rejected): PERF-001 claims MEASURED but its only evidence item has build_id 'UNKNOWN'. All other evidence fields are dummy placeholders; this is NOT a real measurement.",
+  "tiers": [
+    "low",
+    "mid",
+    "high"
+  ],
+  "entries": [
+    {
+      "id": "PERF-001",
+      "category": "frame_time",
+      "metric": "frame_time_p95_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.puzzle_twist_loop"
+      ],
+      "gate": true,
+      "values": {
+        "low": 33.3,
+        "mid": 16.7,
+        "high": 16.7
+      },
+      "status": "MEASURED",
+      "rationale": "Blueprint 30/60 FPS hypotheses expressed as p95 ms so 120 Hz devices are covered (8.3 ms target on high/120 Hz).",
+      "product_links": [
+        "02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md#performance-budgets"
+      ],
+      "adopted_from": [],
+      "evidence": [
+        {
+          "scene_id": "perf.scene.puzzle_idle",
+          "device_id": "dev.placeholder-not-a-device",
+          "device_tier": "low",
+          "quality_tier": "low",
+          "build_id": "UNKNOWN",
+          "os_version": "placeholder",
+          "method_version": "1.0.0",
+          "tool": "placeholder",
+          "window_s": 60,
+          "value": 30.0,
+          "result": "PASS",
+          "artifact_path": "12_PERFORMANCE/evidence/placeholder/none",
+          "captured_by": "AI-11",
+          "date": "2000-01-01",
+          "notes": "synthetic negative fixture; not a measurement"
+        }
+      ]
+    }
+  ]
+}

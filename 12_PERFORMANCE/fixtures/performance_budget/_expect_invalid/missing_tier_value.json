@@ -1,0 +1,38 @@
+{
+  "schema": "PerformanceBudget",
+  "schema_version": "0.1.0",
+  "budget_version": "0.1.0-hypothesis",
+  "method_version": "1.0.0",
+  "_label": "NEGATIVE FIXTURE (must be rejected): PERF-010 lacks the 'high' tier value; budgets have no defaults.",
+  "tiers": [
+    "low",
+    "mid",
+    "high"
+  ],
+  "entries": [
+    {
+      "id": "PERF-010",
+      "category": "memory",
+      "metric": "resident_memory_mb",
+      "unit": "MB",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.puzzle_twist_loop",
+        "perf.scene.world_transition"
+      ],
+      "gate": true,
+      "values": {
+        "low": 350,
+        "mid": 600
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Placeholder ceilings so asset tracks can author now; replaced by per-device measured ceilings per Blueprint rule.",
+      "product_links": [
+        "02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md#performance-budgets"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    }
+  ]
+}

@@ -1,0 +1,870 @@
+{
+  "schema": "PerformanceBudget",
+  "schema_version": "0.1.0",
+  "budget_version": "0.1.0-hypothesis",
+  "method_version": "1.0.0",
+  "_label": "HYPOTHESIS FIXTURE - every value is an unmeasured design ceiling set in Phase 00. No device has been measured. Do not present any number here as a result.",
+  "tiers": [
+    "low",
+    "mid",
+    "high"
+  ],
+  "entries": [
+    {
+      "id": "PERF-001",
+      "category": "frame_time",
+      "metric": "frame_time_p95_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.puzzle_twist_loop"
+      ],
+      "gate": true,
+      "values": {
+        "low": 33.3,
+        "mid": 16.7,
+        "high": 16.7
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Blueprint 30/60 FPS hypotheses expressed as p95 ms so 120 Hz devices are covered (8.3 ms target on high/120 Hz).",
+      "product_links": [
+        "02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md#performance-budgets"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-002",
+      "category": "frame_time",
+      "metric": "frame_time_p99_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.puzzle_twist_loop"
+      ],
+      "gate": true,
+      "values": {
+        "low": 50,
+        "mid": 25,
+        "high": 20
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "p99 catches occasional stutter that p95 hides.",
+      "product_links": [
+        "08_QA_RELEASE/QUALITY_AND_RELEASE.md#gate-e"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-003",
+      "category": "frame_time",
+      "metric": "frame_time_p95_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.world_transition"
+      ],
+      "gate": true,
+      "values": {
+        "low": 40,
+        "mid": 20,
+        "high": 16.7
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "World-state transitions are the heaviest presentation moment; low may dip momentarily but must not hitch.",
+      "product_links": [
+        "AI-04:REACTION_FRAMING_MAX_MS",
+        "PP-2"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-004",
+      "category": "frame_time",
+      "metric": "max_frame_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.puzzle_twist_loop",
+        "perf.scene.world_transition",
+        "perf.scene.inventory"
+      ],
+      "gate": true,
+      "values": {
+        "low": 100,
+        "mid": 50,
+        "high": 33
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Single-frame hitch bound. Low equals AI-01 IGM-006b HARD line; mid/high tightened.",
+      "product_links": [
+        "AI-01:IGM-006b"
+      ],
+      "adopted_from": [
+        "AI-01:IGM-006b"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "PERF-005",
+      "category": "frame_time",
+      "metric": "hitch_count",
+      "unit": "count",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_twist_loop"
+      ],
+      "gate": true,
+      "values": {
+        "low": 3,
+        "mid": 1,
+        "high": 0
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Hitches per 10-minute steady-state capture.",
+      "product_links": [
+        "08_QA_RELEASE/DEVICE_MATRIX_TEMPLATE.csv#no-critical-spikes"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-006",
+      "category": "frame_time",
+      "metric": "consecutive_frames_over_p95_before_fallback",
+      "unit": "count",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_twist_loop",
+        "perf.scene.soak_30"
+      ],
+      "gate": false,
+      "values": {
+        "low": 120,
+        "mid": 120,
+        "high": 120
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Approx. 2-4 s of sustained miss before a runtime fallback is considered; avoids flapping on a single hitch.",
+      "product_links": [
+        "12_PERFORMANCE/phase_00/PERFORMANCE_PRODUCT_LOCK_AI11.md#6"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-007",
+      "category": "latency",
+      "metric": "touch_to_visual_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_twist_loop"
+      ],
+      "gate": true,
+      "values": {
+        "low": 100,
+        "mid": 70,
+        "high": 50
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Touch-down to first visual change (twist preview) p95. Low allows one extra 33 ms frame.",
+      "product_links": [
+        "02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md#performance-budgets",
+        "00_CONTROL/CRAFTCUBE_GAME_MASTER_BIBLE.md#13"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-008",
+      "category": "latency",
+      "metric": "touch_to_visual_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_twist_loop"
+      ],
+      "gate": true,
+      "values": {
+        "low": 66,
+        "mid": 33,
+        "high": 25
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Twist commit to puzzle state visually updated, p95. Two frames at tier rate.",
+      "product_links": [
+        "PP-1"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-009",
+      "category": "latency",
+      "metric": "load_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.world_transition"
+      ],
+      "gate": true,
+      "values": {
+        "low": 500,
+        "mid": 300,
+        "high": 300
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Solve confirmed to first visible world reaction start. AI-01 product bound is 2 s to visible reaction; AI-11 budgets the start so remaining time is authored animation, not stall.",
+      "product_links": [
+        "AI-01:PRODUCT_LOCK_V1.md#10",
+        "PP-2"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-010",
+      "category": "memory",
+      "metric": "resident_memory_mb",
+      "unit": "MB",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.puzzle_twist_loop",
+        "perf.scene.world_transition"
+      ],
+      "gate": true,
+      "values": {
+        "low": 350,
+        "mid": 600,
+        "high": 900
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Placeholder ceilings so asset tracks can author now; replaced by per-device measured ceilings per Blueprint rule.",
+      "product_links": [
+        "02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md#performance-budgets"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-011",
+      "category": "memory",
+      "metric": "texture_memory_mb",
+      "unit": "MB",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle"
+      ],
+      "gate": true,
+      "values": {
+        "low": 64,
+        "mid": 128,
+        "high": 192
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Resident environment texture memory per loaded biome. Low adopts AI-05 pending proposal verbatim.",
+      "product_links": [
+        "AI-05:ENVIRONMENT_ART_DIRECTION_LOCK_V1.md#materials"
+      ],
+      "adopted_from": [
+        "AI-05:texture-ceiling-64MB-low"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "PERF-012",
+      "category": "memory",
+      "metric": "managed_alloc_bytes_per_frame",
+      "unit": "B/frame",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.puzzle_twist_loop"
+      ],
+      "gate": true,
+      "values": {
+        "low": 8192,
+        "mid": 4096,
+        "high": 4096
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Keeps GC cadence low; no repeated GC spikes in common loop.",
+      "product_links": [
+        "08_QA_RELEASE/QUALITY_AND_RELEASE.md#gate-e"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-013",
+      "category": "memory",
+      "metric": "managed_alloc_bytes_per_frame",
+      "unit": "B/frame",
+      "direction": "exact",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.inventory"
+      ],
+      "gate": true,
+      "values": {
+        "low": 0,
+        "mid": 0,
+        "high": 0
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "UI layer allocates 0 bytes/frame in steady state. Adopts AI-07 UXM-11 verbatim.",
+      "product_links": [
+        "AI-07:UXM-11"
+      ],
+      "adopted_from": [
+        "AI-07:UXM-11"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "PERF-014",
+      "category": "memory",
+      "metric": "save_payload_kb",
+      "unit": "KB",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.save_reload"
+      ],
+      "gate": false,
+      "values": {
+        "low": 256,
+        "mid": 256,
+        "high": 256
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Full-profile serialized save incl. world/narrative memory. World Memory with restraint; keeps atomic writes fast. Hypothesis for AI-02 to confirm against SaveSchema.",
+      "product_links": [
+        "00_CONTROL/V7_1_WORLDCLASS_UPGRADE.md#2.4",
+        "DD-013"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-015",
+      "category": "rendering",
+      "metric": "draw_calls",
+      "unit": "count",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.puzzle_twist_loop"
+      ],
+      "gate": true,
+      "values": {
+        "low": 80,
+        "mid": 150,
+        "high": 250
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Draw calls after batching in gameplay view; tile-GPU friendly.",
+      "product_links": [
+        "08_QA_RELEASE/QUALITY_AND_RELEASE.md#gate-e"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-016",
+      "category": "rendering",
+      "metric": "realtime_shadow_lights",
+      "unit": "count",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.world_transition"
+      ],
+      "gate": true,
+      "values": {
+        "low": 1,
+        "mid": 1,
+        "high": 2
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Adopts AI-05 lighting rule: at most one real-time shadow-casting light on low/mid.",
+      "product_links": [
+        "AI-05:ENVIRONMENT_ART_DIRECTION_LOCK_V1.md#lighting"
+      ],
+      "adopted_from": [
+        "AI-05:one-shadow-light"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "PERF-017",
+      "category": "rendering",
+      "metric": "transient_vfx_systems",
+      "unit": "count",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_twist_loop"
+      ],
+      "gate": true,
+      "values": {
+        "low": 2,
+        "mid": 3,
+        "high": 4
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Simultaneous transient VFX during interactive puzzle. AI-06 VFX-R8 proposes 3; AI-11 tightens low to 2, allows 4 on high.",
+      "product_links": [
+        "AI-06:VFX-R8"
+      ],
+      "adopted_from": [
+        "AI-06:VFX-R8"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "PERF-018",
+      "category": "rendering",
+      "metric": "particle_systems_per_beacon",
+      "unit": "count",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.world_transition"
+      ],
+      "gate": true,
+      "values": {
+        "low": 1,
+        "mid": 2,
+        "high": 3
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Particle systems spawned per environment state beacon per transition. Low adopts AI-05 rule verbatim.",
+      "product_links": [
+        "AI-05:ENVIRONMENT_ART_DIRECTION_LOCK_V1.md#performance"
+      ],
+      "adopted_from": [
+        "AI-05:one-particle-per-beacon-low"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "PERF-019",
+      "category": "rendering",
+      "metric": "render_resolution_scale",
+      "unit": "ratio",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.puzzle_twist_loop",
+        "perf.scene.world_transition"
+      ],
+      "gate": false,
+      "values": {
+        "low": [
+          0.7,
+          0.85
+        ],
+        "mid": [
+          0.85,
+          1.0
+        ],
+        "high": [
+          1.0,
+          1.0
+        ]
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Render resolution scale relative to native (UI excluded). Largest single GPU win on low without touching content; exact value chosen per measured device.",
+      "product_links": [
+        "PP-5"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-020",
+      "category": "thermal",
+      "metric": "method_only",
+      "unit": "none",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.soak_30"
+      ],
+      "gate": true,
+      "values": {
+        "low": "method_only",
+        "mid": "method_only",
+        "high": "method_only"
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "30-minute thermal capture; record thermal status transitions and p95 per 5-min bucket. Pass criterion set after first measurement; runtime must observe thermal status.",
+      "product_links": [
+        "12_PERFORMANCE/phase_00/MEASUREMENT_METHOD_STANDARD.md#3",
+        "IR-AI11-003"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-021",
+      "category": "battery",
+      "metric": "method_only",
+      "unit": "none",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.soak_30"
+      ],
+      "gate": true,
+      "values": {
+        "low": "method_only",
+        "mid": "method_only",
+        "high": "method_only"
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "30-minute battery drain at fixed brightness vs system idle baseline. Pass criterion set after first measurement.",
+      "product_links": [
+        "12_PERFORMANCE/phase_00/MEASUREMENT_METHOD_STANDARD.md#3"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-022",
+      "category": "thermal",
+      "metric": "method_only",
+      "unit": "none",
+      "direction": "exact",
+      "scene_ids": [
+        "perf.scene.soak_30"
+      ],
+      "gate": true,
+      "values": {
+        "low": "method_only",
+        "mid": "method_only",
+        "high": "method_only"
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Thermal fallback must be reversible when status clears and visible in the development overlay. No silent fallbacks.",
+      "product_links": [
+        "05_PROMPTS/00_MASTER_CONTROL_PROMPT.md#no-silent-fallbacks"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-023",
+      "category": "load",
+      "metric": "cold_start_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.boot"
+      ],
+      "gate": true,
+      "values": {
+        "low": 5000,
+        "mid": 3000,
+        "high": 2000
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Cold start to first accepted touch. Low adopts AI-01 IGM-006e placeholder ceiling; mid/high tightened.",
+      "product_links": [
+        "AI-01:IGM-006e"
+      ],
+      "adopted_from": [
+        "AI-01:IGM-006e"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "PERF-024",
+      "category": "load",
+      "metric": "load_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.load_chapter"
+      ],
+      "gate": true,
+      "values": {
+        "low": 4000,
+        "mid": 2500,
+        "high": 2000
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Continue to first accepted puzzle touch; on-demand chapter packs assumed.",
+      "product_links": [
+        "02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md#performance-budgets"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-025",
+      "category": "load",
+      "metric": "install_size_mb",
+      "unit": "MB",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.boot"
+      ],
+      "gate": false,
+      "values": {
+        "low": 150,
+        "mid": 150,
+        "high": 150
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Initial install (download) size. Adopts AI-01 IGM-006e placeholder; artifact size measured by AI-12.",
+      "product_links": [
+        "AI-01:IGM-006e"
+      ],
+      "adopted_from": [
+        "AI-01:IGM-006e"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "PERF-026",
+      "category": "load",
+      "metric": "save_write_block_ms",
+      "unit": "ms",
+      "direction": "exact",
+      "scene_ids": [
+        "perf.scene.save_reload"
+      ],
+      "gate": true,
+      "values": {
+        "low": 0,
+        "mid": 0,
+        "high": 0
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Save write must not block the render thread; interruption safety must not cost a hitch.",
+      "product_links": [
+        "PP-4",
+        "AI-01:PRODUCT_LOCK_V1.md#4"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-027",
+      "category": "system",
+      "metric": "frame_time_delta_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.world_transition"
+      ],
+      "gate": false,
+      "values": {
+        "low": 4,
+        "mid": 2,
+        "high": 2
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Story presentation (dialogue line / narrative event) added frame cost; plus <= 1 KB allocation per line shown.",
+      "product_links": [
+        "AI-01:PRODUCT_LOCK_V1.md#10",
+        "DD-003"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-028",
+      "category": "system",
+      "metric": "eval_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.world_transition",
+        "perf.scene.save_reload"
+      ],
+      "gate": false,
+      "values": {
+        "low": 0.5,
+        "mid": 0.5,
+        "high": 0.5
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "World-memory / narrative-memory flag evaluation for a scene; runs on state change only, never per frame.",
+      "product_links": [
+        "DD-013",
+        "AI-01:PRODUCT_LOCK_V1.md#10"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-029",
+      "category": "system",
+      "metric": "load_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.inventory"
+      ],
+      "gate": false,
+      "values": {
+        "low": 50,
+        "mid": 50,
+        "high": 50
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Full profile inventory load; equipment-effect (Puzzle Affinity) lookup <= 0.2 ms per query.",
+      "product_links": [
+        "AI-01:PRODUCT_LOCK_V1.md#7.1",
+        "DD-002"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-030",
+      "category": "system",
+      "metric": "frame_time_delta_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_idle",
+        "perf.scene.puzzle_twist_loop",
+        "perf.scene.world_transition"
+      ],
+      "gate": true,
+      "values": {
+        "low": 1.5,
+        "mid": 1.5,
+        "high": 1.5
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Companion (Nox) total CPU+GPU cost. Single skinned mesh <= 32 bones, 2 LODs, <= 1 active reaction (adopts AI-06 hypotheses).",
+      "product_links": [
+        "DD-007",
+        "AI-06:AI06_CHARACTER_CREATURE_VFX_LOCK_V1.md#9"
+      ],
+      "adopted_from": [
+        "AI-06:nox-rig-32-bones",
+        "AI-06:one-reaction-at-a-time"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "PERF-031",
+      "category": "system",
+      "metric": "dispatch_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.puzzle_twist_loop",
+        "perf.scene.world_transition"
+      ],
+      "gate": false,
+      "values": {
+        "low": 0.1,
+        "mid": 0.1,
+        "high": 0.1
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Haptic / audio cue dispatch must never block the render thread.",
+      "product_links": [
+        "AI-04:IA-03",
+        "08_QA_RELEASE/QUALITY_AND_RELEASE.md#gate-d"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-032",
+      "category": "system",
+      "metric": "eval_ms",
+      "unit": "ms",
+      "direction": "max",
+      "scene_ids": [
+        "perf.scene.world_transition"
+      ],
+      "gate": false,
+      "values": {
+        "low": 0.5,
+        "mid": 0.5,
+        "high": 0.5
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Discovery / secret evaluation: deterministic, on state change only, never per frame.",
+      "product_links": [
+        "05_PROMPTS/00_MASTER_CONTROL_PROMPT.md#discovery"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-033",
+      "category": "complexity",
+      "metric": "count",
+      "unit": "count",
+      "direction": "exact",
+      "scene_ids": [],
+      "gate": false,
+      "values": {
+        "low": 3,
+        "mid": 3,
+        "high": 3
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Distinct quality tiers. Tablet is a layout class (AI-07), not a quality tier.",
+      "product_links": [
+        "00_CONTROL/V7_1_WORLDCLASS_UPGRADE.md#16"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-034",
+      "category": "complexity",
+      "metric": "count",
+      "unit": "count",
+      "direction": "max",
+      "scene_ids": [],
+      "gate": false,
+      "values": {
+        "low": 3,
+        "mid": 3,
+        "high": 3
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Distinct runtime fallback triggers (thermal status, sustained frame miss, battery-saver).",
+      "product_links": [
+        "00_CONTROL/V7_1_WORLDCLASS_UPGRADE.md#16"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    },
+    {
+      "id": "PERF-035",
+      "category": "complexity",
+      "metric": "count",
+      "unit": "count",
+      "direction": "max",
+      "scene_ids": [],
+      "gate": false,
+      "values": {
+        "low": 12,
+        "mid": 12,
+        "high": 12
+      },
+      "status": "HYPOTHESIS",
+      "rationale": "Distinct per-tier tunables exposed in PerformanceBudget at v1.",
+      "product_links": [
+        "00_CONTROL/V7_1_WORLDCLASS_UPGRADE.md#16"
+      ],
+      "adopted_from": [],
+      "evidence": []
+    }
+  ]
+}
