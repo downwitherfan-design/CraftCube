@@ -103,7 +103,7 @@ bash game/ci/build_android.sh
 | Unit tests | `godot --headless --path game --script res://tests/run_tests.gd` | **166 passed, 0 failed** |
 | Scene smoke boot | `godot --headless --path game --quit-after 30` | clean, no errors |
 | Android export | `godot --headless --path game --export-debug Android dist/CraftCube.apk` | **signed APK produced (~27 MB)** |
-| Full CI | `bash game/ci/build_android.sh` | **PASS** |
+| Full CI | `bash game/ci/build_android.sh` | **PASS** (clean-runner CI run 38078776142; see evidence/ci_run_38078776142_summary.log) |
 
 Logs: `game/docs/evidence/{unit_tests_run,main_scene_boot,android_export_run}.log`.
 
@@ -113,7 +113,7 @@ Logs: `game/docs/evidence/{unit_tests_run,main_scene_boot,android_export_run}.lo
 |---|---|
 | Path | `dist/CraftCube.apk` (gitignored build output) |
 | Size | 28,338,657 bytes (~27.0 MB) |
-| SHA-256 | `0ebcefbbca3cfbcd5a0b2a2ade25e03229037846a4ce34ed874126138b025ab9` |
+| SHA-256 | `99587cfbe210e9d3854746bfd1f3d689c4dc1b9dba0733d16efc57e09a4b319b` (CI run 38078776142) |
 | Package | `com.downwitherfandesign.craftcube` |
 | Version | name `0.1.0`, code `1` |
 | min / target SDK | 24 / 36 |
