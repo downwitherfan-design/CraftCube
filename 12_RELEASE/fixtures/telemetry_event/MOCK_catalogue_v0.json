@@ -1,0 +1,45 @@
+{
+  "schema": "TelemetryEventCatalogue",
+  "schema_version": "0.1.0",
+  "fixture_kind": "MOCK",
+  "_mock_notice": "MOCK fixture for AI-12 Phase 00. Event IDs are illustrative examples of the telemetry.<domain>.<verb> stem and are NOT approved catalogue entries (OI-TE-01). Must never be reachable from shipped content roots (RG-010).",
+  "catalogue_version": "0.1.0",
+  "events": [
+    {
+      "event_id": "telemetry.onboarding.step_completed",
+      "event_version": "0.1.0",
+      "purpose": "onboarding_abandonment",
+      "retention_class": "aggregate_90d",
+      "owner_question": "AI-01",
+      "fields": [
+        { "name": "step_id", "type": "string_id", "required": true },
+        { "name": "elapsed_ms", "type": "duration_ms", "required": true },
+        { "name": "assist_level", "type": "int", "required": false }
+      ]
+    },
+    {
+      "event_id": "telemetry.performance.frame_budget_exceeded",
+      "event_version": "0.1.0",
+      "purpose": "performance_drop",
+      "retention_class": "diagnostic_30d",
+      "owner_question": "AI-11",
+      "fields": [
+        { "name": "scene_id", "type": "string_id", "required": true },
+        { "name": "device_tier", "type": "enum", "required": true },
+        { "name": "worst_frame_ms", "type": "float", "required": true }
+      ]
+    },
+    {
+      "event_id": "telemetry.diagnostic.drop_summary",
+      "event_version": "0.1.0",
+      "purpose": "crash_diagnostic",
+      "retention_class": "session_only",
+      "owner_question": "AI-12",
+      "fields": [
+        { "name": "overflow", "type": "int", "required": true },
+        { "name": "rejected", "type": "int", "required": true },
+        { "name": "schema_mismatch", "type": "int", "required": true }
+      ]
+    }
+  ]
+}
