@@ -80,3 +80,25 @@ Cross-PR merge mechanics:
 Content coherence spot-checks (Phase 00 gate L-rows):
 - **L1/L2 (PR #10):** `PRODUCT_LOCK_V1.md` + `CUT_LIST_AND_COMPLEXITY_BUDGET.md` present; product truth and scope/cut list are coherent with the master bible. PD-025..029 recorded as Human Product Authority decisions.
 - **L4/L8 (PR #5):** terminology and story-canon registers present and machine-readable; the *only* blocking defect is the stale `silent_engine` chapter label/validator gap in CR-0011.
+
+## 6. Integrated-tree gate re-run (2026-10-10, write-enabled session)
+
+With write access restored, all 13 branches were merged into `integration` (steps 1-8 of `INTEGRATION_ORDER_AND_MERGE_SEQUENCE.md`), pushed as `integration@c4cc93e`. Every owner validator was then run **against the integrated tree**, not against separate PR heads. Results:
+
+| Owner validator | exit | note |
+|---|---|---|
+| `validate_registry.py --check-render` (AI-13) | 0 | 27 contracts, 27 DRAFT |
+| `validate_product_lock.py` (AI-01) | 0 | pass=14 fail=0 |
+| `AI02_DOMAIN_CONCEPT_REGISTER_VALIDATOR.py` (AI-02) | 0 | |
+| `validate_phase00_content.py` (AI-03) | 0 | 1 warning |
+| `validate_ai04_phase00.py` (AI-04) | 0 | |
+| `validate_environment_fixtures.py` (AI-05) | 0 | |
+| `validate_a11y_fixtures.py` (AI-07) | 0 | |
+| `validate_audio_cue_registry.py` (AI-08) | 0 | registry OK |
+| `validate_narrative_registry.py` (AI-09) | 0 | fixed via CR-0011 |
+| **`QA_PHASE00_VALIDATOR.py` (AI-10)** | **1** | **fail=20 - CR-0012 (new)** |
+| `validate_performance_budget.py` (AI-11) | 0 | |
+| `validate_release_fixtures.py` (AI-12) | 0 | |
+| `validate_ownership.py` (07_GITHUB) | 0 | |
+
+**CR-0012** is a genuine integration-time defect: AI-10's validator passes only in isolation and fails once other accounts' artifacts are present (C2 false positives on other accounts' declared forbidden-term lists/prose; E3 stale Product version baselines). It is the one remaining validator blocker. Phase 00 verdict therefore stays **NOT PASSED**.
