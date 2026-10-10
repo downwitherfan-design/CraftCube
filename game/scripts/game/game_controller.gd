@@ -221,6 +221,10 @@ func _face_word(face: String) -> String:
 func objective_progress() -> Dictionary:
 	return engine.objective_progress()
 
+## Per-face readiness for the HUD (U,D,L,R,F,B), so partial mastery is visible.
+func face_readiness() -> Array:
+	return engine.face_readiness()
+
 ## The level currently loaded, for presentation-layer readouts (title, objective faces, par).
 func current_level() -> Dictionary:
 	if current_index >= 0 and current_index < levels.size():

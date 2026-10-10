@@ -1,24 +1,25 @@
-CraftCube evidence — Session 10 (Milestones B & C: interactive camera, world progression)
+CraftCube evidence — Session 10 (Milestones B–D: interactive camera, world progression, face readiness)
 Date: 2026-10-10  Branch: godot-migration  Engine: Godot 4.7.2-stable (headless/opengl3)
 
 Unit tests (godot --headless --path game --script res://tests/run_tests.gd):
   Milestone A baseline: 277 passed, 0 failed
   Milestone B:          296 passed, 0 failed
   Milestone C:          310 passed, 0 failed
+  Milestone D:          341 passed, 0 failed
 
 Full Android CI (GODOT_BIN=<godot 4.7.2> bash game/ci/build_android.sh): exit 0, CI: PASS
   - import: OK
-  - domain unit tests: 310 passed, 0 failed
+  - domain unit tests: 341 passed, 0 failed
   - main scene smoke boot (--quit-after 30): OK
   - android export (debug): APK produced 28,359,497 bytes
-      dist/CraftCube.apk sha256 f0d9016fe830ff84c591e3d8ce6e25283a194976bf81a6444458a3a503a00995
+      dist/CraftCube.apk sha256 3b4c96e27f7ba23e33fad391f3f4e5efa7e5768cd30b2d01448700e518e95e0e
   - NDK/ADB warnings ("cannot connect to daemon at tcp:5037") are expected: no device attached.
 
 Rendered frames (xvfb-run, 720x1280, opengl3/Mesa llvmpipe) via res://tests/capture_frames.gd:
-  session10_initial.png        44e6915648bdf5051b1783c562478b9cec0b8d4643286bb759f191c55c583e39
-  session10_orbit.png          06ccb80c5363fd160619719c5cbf9c3ff1a006bd9a1d9d5ce41af90912cb2eb0
-  session10_hint.png           2d4b54c66f973e237982163ad3a272d219d12e279de2850d83f1a939ea0282d3
-  session10_world_complete.png 38426f9e433ce101be0ea52fe2d6839a2eb2b3f0daaa897a5a9eea4391013af7
+  session10_initial.png        a9fa533bcd6f8a699774c22e9daa73b55cfe6b43af7395970c294d6ba0c168a7
+  session10_orbit.png          3b6454c1fb9cebf590d92a16689298b74cfd02b52f02089baa944679b711e7a1
+  session10_hint.png           9752d3785df241d97d668404d6546ecfe448aaa1901b605539e0af39f1b40c18
+  session10_world_complete.png 01fa883857fb6987ab74a95ca7881d8f7fa4d811cade63a646651be766fe1d52
 
 Scope
   * Milestone B: orbit/zoom/reset camera verified; HUD labels ignore mouse so empty-space
@@ -26,6 +27,9 @@ Scope
   * Milestone C: the world reveals a distinct ward stone per Chapter 01 level, warms its
     ground, and shows Nox the companion on chapter completion; resume from a save restores
     exactly the matching revealed prefix.
+  * Milestone D: per-face readiness readout — every face is named and shown as "solid" or
+    "N shades", objective faces are marked, so the player can read puzzle mastery across the
+    whole cube, not only the win condition.
   * capture_frames.gd preserves and restores the player save (it plays the chapter for real).
 
 Limitations: rendering on a virtual X server only. There is no physical Android device in

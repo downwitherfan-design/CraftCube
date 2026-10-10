@@ -377,3 +377,49 @@ with ANIMATED turns; asserts render==truth after every turn + progression/reward
   **not** a device playtest.
 - QA validator (`08_QA_RELEASE/phase_00/QA_PHASE00_VALIDATOR.py`) still reports pre-existing failures in files this branch
   does not touch; E3 product-doc version drift is addressed by PR #12 (not this branch).
+
+## Session 10 — Epic 0.3: extended gameplay development (2026-10-10)
+
+- **Branch:** `godot-migration` (PR #11 → `integration`). Remote sync VERIFIED (`git push` succeeded this runtime).
+- **Commits this session:** `314d836` (Milestone A), `efda6de` (Milestone B), `a899179` (Milestone C, CI green
+  run `38086874943`), and the Milestone D commit (this section). Start of session: `5bf80b7`.
+- **Working tree:** clean at each commit; evidence committed alongside code.
+
+### Milestones (all real features, verified, committed)
+- **A — deterministic guided-solving.** `game/scripts/domain/puzzle_solver.gd` (`PuzzleSolver.route_to_solved()`):
+  free-group reduction of the engine's scramble+history, then reverse-replay, so a hint never merely undoes the
+  previous move (no hint loop) and always routes to solved. Controller guide API (`guide_status`/`guide_next_move`/
+  `guided_move`, cached route, invalidation on move/undo/restart/level); HUD Hint + "Guide: next step" controls.
+  Rewritten once after a test caught an oscillation defect.
+- **B — interactive orbit/zoom camera.** `game/scripts/presentation/orbit_camera.gd` (`class_name OrbitCamera`):
+  drag to orbit, wheel/pinch to zoom, clamped distance (4.2–12.0) and pitch (0.12–1.35), smoothed, `reset_view()`.
+  Reads only `_unhandled_input`, so a HUD tap never rotates the view; HUD labels set `MOUSE_FILTER_IGNORE` so
+  empty-space drags reach the camera while buttons still consume events. Wired into `Main.tscn` + `GameController`.
+- **C — world remembers progression.** `WorldView` now reveals one distinct ward stone per Chapter 01 level, warms
+  its ground, and shows Nox the companion only on chapter completion. One authoritative revealed count drives the
+  tally ring, wards and companion, so `sync_lit()` on resume restores exactly the matching prefix.
+- **D — per-face readiness readout.** `PuzzleEngine.face_readiness()` returns `{face, distinct, solid}` for all six
+  faces (U,D,L,R,F,B); HUD shows "Faces: top* solid · …" marking objective faces, so partial mastery across the
+  whole cube is visible, not only the win condition.
+
+### Verified results
+- Godot domain suite: **341 passed / 0 failed** (was 239 at Session 9 end; 277 after A, 296 after B, 310 after C).
+- `bash game/ci/build_android.sh` → **CI: PASS** on this tree. import 0, tests 341/0, main-scene boot 0, signed
+  debug APK (28,359,497 bytes, sha256 `3b4c96e2…`). Log: `game/docs/evidence/session10_build.log`.
+- Rendered evidence (Xvfb/GL, 720x1280) via new `game/tests/capture_frames.gd`:
+  `session10_initial/orbit/hint/world_complete.png`. The capture script now preserves/restores the player save it
+  used to overwrite (found because a leftover save broke save-sensitive tests in a later run).
+
+### New regressions (game/tests/run_tests.gd)
+`_test_guided_solver_domain`, `_test_guided_solver_controller`, `_test_orbit_camera`, `_test_world_progression_landmarks`,
+`_test_face_readiness`, `_test_hud_readiness_line`.
+
+### Next safe action
+- Continue Epic 0.3 with the remaining milestone tasks; keep PR #11 green.
+- Phase 00 gate remains **NOT PASSED**; PR #12 (AI-01 `PD-030`) must merge before PR #11. Human decisions still open:
+  OD-0001 (branch protection), OD-0005 (IP/title clearance).
+
+### Known limitations (Session 10)
+- No physical Android device / emulator in this runtime → the pipeline is VERIFIED; this is **not** a device playtest.
+- Rendering under Mesa llvmpipe is a software GL path; it validates layout/geometry, not device GPU performance.
+

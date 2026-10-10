@@ -22,6 +22,7 @@ var _restart_btn: Button
 var _guide: Label
 var _hint_btn: Button
 var _step_btn: Button
+var _readiness: Label
 
 const BTN_MIN := Vector2(88, 64)
 
@@ -83,12 +84,14 @@ func _build() -> void:
 	_hint = _label("", 20)
 	_story = _label("", 22)
 	_guide = _label("", 20)
+	_readiness = _label("", 18)
 	outer.add_child(_title)
 	outer.add_child(_status)
 
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	outer.add_child(spacer)
+	outer.add_child(_readiness)
 	outer.add_child(_onboard)
 	outer.add_child(_hint)
 	outer.add_child(_guide)
@@ -176,6 +179,7 @@ func _on_level_loaded(level: Dictionary) -> void:
 	_story.text = ""
 	_guide.text = ""
 	_refresh_legal()
+	_refresh_readiness()
 
 func _refresh_legal() -> void:
 	var legal: Array = controller.legal_faces()
@@ -195,6 +199,23 @@ func _refresh_status() -> void:
 	# confirmed by the domain predicate via "I solved it".
 	if controller.engine.is_solved():
 		_status.text = "All required faces aligned — press \"I solved it\"."
+	_refresh_readiness()
+
+## Per-face mastery readout: for every face, say whether it is solid (a single colour) or
+## still shows several shades, and mark the objective faces so the player can read progress
+## on the whole cube, not just the win condition.
+func _refresh_readiness() -> void:
+	var names := {"U": "top", "D": "bottom", "L": "left", "R": "right", "F": "front", "B": "back"}
+	var objective := {}
+	for f in controller.current_level().get("objective", {}).get("params", {}).get("faces", []):
+		objective[str(f)] = true
+	var parts := PackedStringArray()
+	for entry in controller.face_readiness():
+		var face := str(entry["face"])
+		var mark := "*" if objective.has(face) else ""
+		var state := "solid" if bool(entry["solid"]) else "%d shades" % int(entry["distinct"])
+		parts.append("%s%s %s" % [names.get(face, face), mark, state])
+	_readiness.text = "Faces: " + " · ".join(parts) + "   (* = required)"
 
 ## Names the objective's required faces in player terms, so "Align U" reads as "top".
 func _objective_faces_text() -> String:
@@ -312,8 +333,8 @@ func _on_solved(_level: Dictionary, _reward: Dictionary) -> void:
 func _on_big_text() -> void:
 	_big_text = not _big_text
 	var mult := 1.5 if _big_text else 1.0
-	for l in [_title, _status, _onboard, _hint, _story, _guide]:
-		var base := 34 if l == _title else (22 if (l == _status or l == _story) else 20)
+	for l in [_title, _status, _onboard, _hint, _story, _guide, _readiness]:
+		var base := 34 if l == _title else (22 if (l == _status or l == _story) else (18 if l == _readiness else 20))
 		l.add_theme_font_size_override("font_size", int(base * mult))
 	for entry in _face_buttons:
 		entry["button"].add_theme_font_size_override("font_size", int(24 * mult))

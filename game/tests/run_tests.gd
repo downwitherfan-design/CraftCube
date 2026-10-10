@@ -50,6 +50,8 @@ func _initialize() -> void:
 	_test_world_state_and_resume()
 	_test_world_progression_landmarks()
 	_test_objective_progress()
+	_test_face_readiness()
+	_test_hud_readiness_line()
 	_test_animated_chapter_end_to_end()
 	_test_guided_solver_domain()
 	_test_guided_solver_controller()
@@ -1024,6 +1026,63 @@ func _test_objective_progress() -> void:
 	var e2 := PuzzleEngine.new()
 	e2.setup(LevelCatalog.by_id("level.01.awaken"))
 	_eq("awaken objective totals one face", int(e2.objective_progress()["total"]), 1)
+
+## Milestone D: per-face readiness must reflect the real configuration for every face, not
+## only the objective's faces, and must agree with the solved predicate.
+func _test_face_readiness() -> void:
+	print("[face readiness]")
+	var e := PuzzleEngine.new()
+	e.setup(LevelCatalog.by_id("level.01.hollow_stone"))
+	var r0: Array = e.face_readiness()
+	_eq("readiness reports all six faces", r0.size(), 6)
+	_eq("readiness is ordered U,D,L,R,F,B",
+		[str(r0[0]["face"]), str(r0[1]["face"]), str(r0[2]["face"]), str(r0[3]["face"]), str(r0[4]["face"]), str(r0[5]["face"])],
+		["U", "D", "L", "R", "F", "B"])
+	for entry in r0:
+		_check("distinct is within 1..n*n for %s" % entry["face"],
+			int(entry["distinct"]) >= 1 and int(entry["distinct"]) <= e.state.n * e.state.n)
+		_check("solid flag matches distinct==1 for %s" % entry["face"],
+			bool(entry["solid"]) == (int(entry["distinct"]) == 1))
+	# A scrambled level must show at least one face short of solid, and a solved level all solid.
+	e.state.reset()
+	for m in e._scramble_moves:
+		e.state.apply_move(m)
+	var scrambled_any_unsolid := false
+	for entry in e.face_readiness():
+		if not bool(entry["solid"]):
+			scrambled_any_unsolid = true
+	_check("scrambled cube shows at least one unsolid face", scrambled_any_unsolid)
+	e.state.reset()
+	var r1: Array = e.face_readiness()
+	for entry in r1:
+		_check("%s face is solid when solved" % entry["face"], bool(entry["solid"]))
+	_check("all faces solid implies is_solved", e.is_solved())
+	# A single legal turn must perturb some face (readiness is not trivially constant).
+	e.state.reset()
+	e.apply_move(MoveTable.face_move("F", true))
+	var perturbed := false
+	for entry in e.face_readiness():
+		if not bool(entry["solid"]):
+			perturbed = true
+	_check("one turn leaves some face unsolid", perturbed)
+
+## Milestone D: the HUD readiness line must name every face, mark the objective faces, and
+## track the cube's real state (solid vs. several shades).
+func _test_hud_readiness_line() -> void:
+	print("[hud readiness line]")
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	var hud = m.get_node("HUD")
+	m.load_level(0)  # awaken: objective is U only
+	var text: String = hud._readiness.text
+	for word in ["top", "bottom", "left", "right", "front", "back"]:
+		_check("readiness names the %s face" % word, text.find(word) >= 0)
+	_check("readiness marks the required face", text.find("top*") >= 0)
+	var needs_top_only := text.find("bottom*") < 0 and text.find("front*") < 0
+	_check("readiness does not mark non-required faces as required", needs_top_only)
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
 
 ## Play the whole chapter through the real scene using ANIMATED turns (each turn started via
 ## the controller and settled through the tween path), asserting the rendered cube matches

@@ -111,6 +111,20 @@ func objective_progress() -> Dictionary:
 			aligned += 1
 	return {"aligned": aligned, "total": faces.size()}
 
+## Readiness of every face, ordered U,D,L,R,F,B: how close each is to being a single
+## colour. `distinct == 1` means solid. This lets the UI show partial mastery on any
+## face (including faces the current objective does not require), so the player can read
+## the puzzle rather than only the win condition.
+func face_readiness() -> Array:
+	var out := []
+	for i in range(MoveTable.ALL_FACES.size()):
+		out.append({
+			"face": str(MoveTable.ALL_FACES[i]),
+			"distinct": state.distinct_colours_on_face(i),
+			"solid": state.is_face_solid(i),
+		})
+	return out
+
 func _face_indices(letters: Array) -> Array:
 	var out := []
 	for l in letters:

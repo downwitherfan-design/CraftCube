@@ -15,6 +15,13 @@ Could not find version of build tools that matches Target SDK, using 35.0.0
 [  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
 [92m[ DONE ][39m [1mfirst_scan_filesystem[22m
 [0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (4 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | PuzzleEngine[39m[0m
+[  20% ] [90m[1mupdate_scripts_classes[22m | GameController[39m[0m
+[  40% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  60% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[92m[ DONE ][39m [1mupdate_scripts_classes[22m
+[0m
 [   0% ] [90m[1m_update_scan_actions[22m | Started Scanning actions... (4 steps)[39m[0m
 [   0% ] [90m[1m_update_scan_actions[22m | session10_hint.png[39m[0m
 [  20% ] [90m[1m_update_scan_actions[22m | session10_initial.png[39m[0m
@@ -61,7 +68,7 @@ WARNING: SaveManager: save version 9999 is newer than supported 1
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:56)
-         [1] _test_save_load (res://tests/run_tests.gd:174)
+         [1] _test_save_load (res://tests/run_tests.gd:176)
          [2] _initialize (res://tests/run_tests.gd:30)
 [level catalog]
 [end-to-end solve]
@@ -71,13 +78,13 @@ ERROR: Parse JSON failed. Error at line 0: Expected key
    at: parse_string (core/io/json.cpp:629)
    GDScript backtrace (most recent call first):
        [0] load_from_path (res://scripts/game/save_manager.gd:45)
-       [1] _test_save_hardening (res://tests/run_tests.gd:266)
+       [1] _test_save_hardening (res://tests/run_tests.gd:268)
        [2] _initialize (res://tests/run_tests.gd:34)
 WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:47)
-         [1] _test_save_hardening (res://tests/run_tests.gd:266)
+         [1] _test_save_hardening (res://tests/run_tests.gd:268)
          [2] _initialize (res://tests/run_tests.gd:34)
 [completion idempotency]
 [level advancement]
@@ -86,9 +93,9 @@ WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
 WARNING: generate_scramble: no non-solved scramble found; returning last attempt
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
-         [0] generate_scramble (res://scripts/domain/puzzle_engine.gd:138)
+         [0] generate_scramble (res://scripts/domain/puzzle_engine.gd:152)
          [1] setup (res://scripts/domain/puzzle_engine.gd:21)
-         [2] _test_level_rule_semantics (res://tests/run_tests.gd:362)
+         [2] _test_level_rule_semantics (res://tests/run_tests.gd:364)
          [3] _initialize (res://tests/run_tests.gd:38)
 [hud layout and wiring]
 [save corruption variants]
@@ -96,31 +103,31 @@ ERROR: Parse JSON failed. Error at line 0: Unknown error getting token
    at: parse_string (core/io/json.cpp:629)
    GDScript backtrace (most recent call first):
        [0] load_from_path (res://scripts/game/save_manager.gd:45)
-       [1] _test_save_corruption_variants (res://tests/run_tests.gd:449)
+       [1] _test_save_corruption_variants (res://tests/run_tests.gd:451)
        [2] _initialize (res://tests/run_tests.gd:40)
 WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:47)
-         [1] _test_save_corruption_variants (res://tests/run_tests.gd:449)
+         [1] _test_save_corruption_variants (res://tests/run_tests.gd:451)
          [2] _initialize (res://tests/run_tests.gd:40)
 ERROR: Parse JSON failed. Error at line 0: Expected ']'
    at: parse_string (core/io/json.cpp:629)
    GDScript backtrace (most recent call first):
        [0] load_from_path (res://scripts/game/save_manager.gd:45)
-       [1] _test_save_corruption_variants (res://tests/run_tests.gd:457)
+       [1] _test_save_corruption_variants (res://tests/run_tests.gd:459)
        [2] _initialize (res://tests/run_tests.gd:40)
 WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:47)
-         [1] _test_save_corruption_variants (res://tests/run_tests.gd:457)
+         [1] _test_save_corruption_variants (res://tests/run_tests.gd:459)
          [2] _initialize (res://tests/run_tests.gd:40)
 WARNING: SaveManager: save file has no usable version; quarantined, starting fresh
      at: push_warning (core/variant/variant_utility.cpp:1033)
      GDScript backtrace (most recent call first):
          [0] load_from_path (res://scripts/game/save_manager.gd:52)
-         [1] _test_save_corruption_variants (res://tests/run_tests.gd:464)
+         [1] _test_save_corruption_variants (res://tests/run_tests.gd:466)
          [2] _initialize (res://tests/run_tests.gd:40)
 [scene integration]
 [completion feedback]
@@ -134,12 +141,14 @@ WARNING: SaveManager: save file has no usable version; quarantined, starting fre
 [world state and resume]
 [world progression landmarks]
 [objective progress]
+[face readiness]
+[hud readiness line]
 [animated chapter end-to-end]
 [guided solver domain]
 [guided solver controller]
 [hud status text]
 [scramble fuzz]
-== Summary: 310 passed, 0 failed ==
+== Summary: 341 passed, 0 failed ==
 
 === main scene smoke boot ===
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
@@ -279,7 +288,7 @@ Signed
 [0m
 cannot connect to daemon at tcp:5037: Cannot assign requested address
 APK produced:
--rw------- 1 openhands openhands 28359497 Oct 10 21:14 /workspace/project/CraftCube/dist/CraftCube.apk
-f0d9016fe830ff84c591e3d8ce6e25283a194976bf81a6444458a3a503a00995  /workspace/project/CraftCube/dist/CraftCube.apk
+-rw------- 1 openhands openhands 28359497 Oct 10 21:17 /workspace/project/CraftCube/dist/CraftCube.apk
+3b4c96e27f7ba23e33fad391f3f4e5efa7e5768cd30b2d01448700e518e95e0e  /workspace/project/CraftCube/dist/CraftCube.apk
 
 CI: PASS

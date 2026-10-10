@@ -5,12 +5,12 @@ Compact, factual status for external reviewers. Companion to
 
 | Field | Value |
 |---|---|
-| Last verified (UTC) | 2026-10-10T17:23:09Z |
+| Last verified (UTC) | 2026-10-10T21:18:00Z |
 | Working branch | `godot-migration` |
-| Last commit (pushed) | tip of `godot-migration` (remote: **not pushed** — write access blocked, see below) |
+| Last commit (pushed) | tip of `godot-migration` (remote sync VERIFIED) |
 | Engine | Godot 4.7.2-stable + GDScript, Android-first |
-| Milestone | M1 — delivery path + deep audit + hardening + verified Android build |
-| Phase 00 gate | **NOT PASSED** (CR-0012 fix not yet on `integration`; CR-0013 + human ODs open) |
+| Milestone | Epic 0.3 — extended gameplay (A: guided solver, B: orbit camera, C: world progression, D: face readiness) |
+| Phase 00 gate | **NOT PASSED** (CR-0013 + human ODs open; PR #12 must merge before #11) |
 
 ## Completed work (this session)
 
