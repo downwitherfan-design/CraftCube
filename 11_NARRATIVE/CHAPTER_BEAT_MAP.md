@@ -96,7 +96,7 @@ Biome names/IDs follow `01_PREPRODUCTION/WORLD_BIOME_BIBLE_V7.md`. Mystery IDs a
 | Items (lore) | `nar.item_lore.ember_dial` |
 | Fail-safe sentence | "Sometimes breaking the pattern on purpose is the right move; Orin's traditions don't cover this." |
 
-### Ch.07 The Silent Engine — `nar.chapter.07_silent_engine`
+### Ch.07 The Quiet Engine — `nar.chapter.07_quiet_engine`
 | Field | Value |
 |---|---|
 | Biome | Quiet Engine outer ring (Tier 0 → 1) |

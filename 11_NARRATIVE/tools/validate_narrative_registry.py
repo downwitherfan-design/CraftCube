@@ -350,11 +350,18 @@ def main() -> int:
 
     # 11. markdown cross-references: every `nar.*` referenced in docs exists in registry;
     #     every concrete `loc.*` referenced exists in en fixture
+    superseded_map = {s["old"]: s["new"] for s in reg.get("superseded_ids", [])}
     for md in MD_FILES:
         text = md.read_text(encoding="utf-8")
-        for ref in set(NAR_REF_RE.findall(text)):
-            if ref not in nar_set:
-                fail(f"{md.relative_to(ROOT)}: references undefined ID `{ref}`")
+        refs_in_file = set(NAR_REF_RE.findall(text))
+        for ref in refs_in_file:
+            if ref in nar_set:
+                continue
+            # A superseded ID may be quoted in rename/version-history prose when the
+            # same document also cites its registered replacement (e.g. PD-028 §B).
+            if ref in superseded_map and superseded_map[ref] in refs_in_file:
+                continue
+            fail(f"{md.relative_to(ROOT)}: references undefined ID `{ref}`")
         patterns = set(LOC_PATTERN_RE.findall(text))
         for ref in set(LOC_REF_RE.findall(text)):
             if ref in patterns or ref.endswith(".*"):

@@ -65,8 +65,9 @@ python3 -c "import json;json.load(open('11_NARRATIVE/fixtures/narrative_canon_re
 python3 -c "import json;json.load(open('11_NARRATIVE/fixtures/loc/en.v0.1.0.json'))"                    # json ok
 python3 11_NARRATIVE/tools/validate_narrative_registry.py                                              # exit 0
 ```
-Result of final run: `24 pass groups, 0 failures — registry: 91 nar.* IDs | en fixture: 85 loc.* keys | flags: 10/12`.
+Result of final run: `35 pass groups, 0 failures — registry 0.1.1 [APPROVED_BASELINE]: 91 nar.* IDs | en 0.1.1: 85 loc.* keys | flags: 10/60 total, per-chapter cap 6`.
 First run found 3 defects (a truncated dialogue key, a bare namespace in backticks, an unregistered example flag ID); each fixed in its own checkpoint commit and re-validated.
+PD-028 follow-up (integration gate, CR-0011): the v7.1 baseline validator failed on the PR head — `Chapter Beat Map` still labelled Ch.07 "The Silent Engine" with the old ID, and the markdown cross-reference scan flagged the Story Bible's own rename-history row. Fixed by renaming the Chapter 7 heading to the canonical `nar.chapter.07_quiet_engine` and by making the scan exempt an old ID only when the same document also cites its registered `superseded_ids.new` (a genuinely orphaned old ID still fails — verified). Result on the PR head is now exit 0, 35 pass groups, 0 failures.
 Not run: any Unity/Flutter build, any device test, any CI (none exist in the repository — VERIFIED).
 
 EVIDENCE:
