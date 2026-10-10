@@ -20,7 +20,7 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 | CR-0009 | AI-01, AI-06, AI-09, AI-10, AI-11 (+ any account using `CC.*` for non-contracts) | 01 | Medium | OPEN |
 | CR-0010 | AI-13 (gate procedure) + all accounts (shared-file convention) | 00 (before merging the second account PR) | Low (process) | **RESOLVED** (2026-10-10) |
 | CR-0011 | AI-09 (PR #5) | 00 (before merge) | High (gate blocker) | **RESOLVED** (2026-10-10) |
-| CR-0012 | AI-10 (QA) | 00 (before Phase 00 gate can pass) | High (gate blocker) | OPEN |
+| CR-0012 | AI-10 (QA) | 00 (before Phase 00 gate can pass) | High (gate blocker) | **RESOLVED** (2026-10-10) |
 
 ---
 
@@ -133,4 +133,6 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 - **Rollback:** revert AI-10's fix commit; no other track is affected.
 - **Note:** returned to AI-10 (producer). AI-13 does not patch `ai-10-qa` (`05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`). PR #7 is already represented in `integration`; this CR must be resolved by a **follow-up commit on `ai-10-qa`**.
 - **Gate impact:** HIGH. AI-10 owns the G-case (measurability) of the gate; while its own validator fails on the integrated tree, L6/L12 measurability cannot be certified. Phase 00 verdict therefore remains **NOT PASSED**.
+- **Resolution (2026-10-10), commit `8bd03f0` on `ai-10-qa`:** executed as an explicitly scoped AI-10 task on the owner's branch (sequential multi-account recovery run). (a) C2 now scans JSON `IDENTIFIER` files **structurally**: a rejected term inside a declared forbidden-term list (including nested, e.g. `ipForbiddenTerms.terms[]`), a prose/`description` field, or a cut-list entry whose `status` is `REJECT*` is reported as INFO; a term used as a key, id, or ordinary value still FAILs. (b) E3 now accepts a product document that legitimately **advanced** past the baseline (baseline version still recorded AND the Version-table value is the highest version in the document); a rollback below the baseline or a never-recorded baseline still FAILs. Validator on the integrated tree: `exit 0`, `SUMMARY fail=0 info=727 skip=0` (was `exit 1`, `fail=20`). **No check was weakened:** no assertion removed, no scope severity lowered, no fixture relabelled; the self-test was extended from 16 to 23 negative cases, including an adversarial case proving a declaration cannot mask a real identifier use (verified by injected fixtures). Evidence: `08_QA_RELEASE/phase_00/evidence/validator_run_integrated_tree_after_cr0012_fix.log`; finding `QAF-013`.
+- **Integration step:** the `ai-10-qa` fix commit `8bd03f0` must be merged into `integration` for the gate to see the corrected validator. **Push/merge blocked in this runtime** — the injected `GITHUB_TOKEN` is read-only (Git push 403, refs API 403 "Resource not accessible by integration"); the commit exists only on the local `ai-10-qa` worktree at `/workspace/wt/ai10`. Human action required to push or to restore write credentials (see `OPENHANDS_RESUME_STATE.md` §1).
 
