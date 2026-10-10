@@ -30,10 +30,12 @@ func _ready() -> void:
 	if hud and hud.has_method("bind"):
 		hud.bind(self)
 	game_state = SaveManager.load_from_path()
-	# Resume at the saved position when valid; otherwise at the first unsolved level, so
-	# a stale/older save cannot point past the chapter or above the last level.
+	# Resume at the saved position when valid. If that position is already solved, resume at
+	# the first unsolved level so the player continues instead of replaying; if every level is
+	# solved, keep the saved position. Clamping keeps a stale/older save from pointing past
+	# the chapter.
 	var resume := clampi(game_state.current_level_index, 0, levels.size() - 1)
-	if resume >= levels.size() - 1 and game_state.is_solved(str(levels[resume]["level_id"])):
+	if game_state.is_solved(str(levels[resume]["level_id"])):
 		var first_open := game_state.first_unsolved_index(levels)
 		if first_open >= 0:
 			resume = first_open

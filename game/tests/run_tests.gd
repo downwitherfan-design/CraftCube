@@ -41,6 +41,7 @@ func _initialize() -> void:
 	_test_scene_integration()
 	_test_completion_feedback()
 	_test_camera_framing()
+	_test_resume_selection()
 	_test_scramble_fuzz()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -606,6 +607,49 @@ func _test_camera_framing() -> void:
 	if main.get_parent() != null:
 		main.get_parent().remove_child(main)
 	main.free()
+
+## Resume selection: relaunching after finishing a level must open the next unsolved
+## level, not replay the one just completed. Regression for a real UX defect.
+func _test_resume_selection() -> void:
+	print("[resume selection]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	var packed: PackedScene = load("res://scenes/Main.tscn")
+	if packed == null:
+		_check("Main.tscn loads for resume test", false)
+		return
+	# Case A: saved index points at a solved level with an open later level -> resume there.
+	SaveManager.delete_at_path(saved)
+	var gs := GameState.new()
+	gs.mark_solved("level.01.awaken")
+	gs.current_level_index = 0
+	SaveManager.save_to_path(gs)
+	var a = packed.instantiate()
+	a._ready()
+	_check("resume skips a solved current level", a.current_index == 1)
+	if a.get_parent() != null:
+		a.get_parent().remove_child(a)
+	a.free()
+	# Case B: every level solved -> keep the saved position (no bogus -1 resume).
+	SaveManager.delete_at_path(saved)
+	var gs2 := GameState.new()
+	for l in LevelCatalog.chapter_one():
+		gs2.mark_solved(str(l["level_id"]))
+	gs2.current_level_index = 2
+	SaveManager.save_to_path(gs2)
+	var b = packed.instantiate()
+	b._ready()
+	_check("all-solved keeps the saved position", b.current_index == 2)
+	if b.get_parent() != null:
+		b.get_parent().remove_child(b)
+	b.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
 
 ## Deterministic differential fuzz of the core engine: for many seeds, a randomly generated
 ## legal scramble must (a) be reachable by its own inverse and (b) leave every move an
