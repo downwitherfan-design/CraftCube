@@ -56,6 +56,7 @@ func _initialize() -> void:
 	_test_hud_resonance_line()
 	_test_settings_persistence()
 	_test_hud_big_text_persistence()
+	_test_progress_flush_on_exit()
 	_test_animated_chapter_end_to_end()
 	_test_guided_solver_domain()
 	_test_guided_solver_controller()
@@ -1174,6 +1175,39 @@ func _test_hud_big_text_persistence() -> void:
 		m2.get_parent().remove_child(m2)
 	m2.free()
 	SaveManager.delete_settings(p)
+
+## Milestone G: progress is flushed to disk on exit (Android back / window close), so an
+## interrupted session never loses progress. Verified via save_progress into an isolated file
+## and by asserting the controller actually calls it on a back request (without quitting the
+## running test tree).
+func _test_progress_flush_on_exit() -> void:
+	print("[progress flush on exit]")
+	var p := "user://t_exit_save.json"
+	SaveManager.delete_at_path(p)
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	m.save_path = p
+	# Solve level 1 through the real path, then flush as the OS would on exit.
+	m.cube_view.skip_animation()
+	for i in range(m.engine._scramble_moves.size() - 1, -1, -1):
+		m.engine.apply_move(MoveTable.inverse(m.engine._scramble_moves[i]))
+	_check("level 1 is solved before exit flush", m.engine.is_solved())
+	m.confirm_solve()
+	SaveManager.delete_at_path(p)  # prove the flush, not the in-play save, wrote the file
+	_check("flush reports success", m.save_progress())
+	var reloaded := SaveManager.load_from_path(p)
+	_check("flushed progress survives reload", reloaded.is_solved("level.01.awaken"))
+	# The back/close notification must itself flush. This instance is not inside the tree, so
+	# the handler persists and skips the quit — proving the write without ending the test run.
+	SaveManager.delete_at_path(p)
+	m._notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	_check("back request flushed progress without a prior save", FileAccess.file_exists(p))
+	var reloaded2 := SaveManager.load_from_path(p)
+	_check("back-request flush survives reload", reloaded2.is_solved("level.01.awaken"))
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+	SaveManager.delete_at_path(p)
 
 ## Play the whole chapter through the real scene using ANIMATED turns (each turn started via
 ## the controller and settled through the tween path), asserting the rendered cube matches

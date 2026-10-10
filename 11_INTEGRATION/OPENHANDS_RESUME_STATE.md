@@ -411,12 +411,15 @@ with ANIMATED turns; asserts render==truth after every turn + progression/reward
   fresh HUD, so it survives a restart. Progression and settings are independent: a corrupt or
   version-mismatched save cannot reset accessibility, and a malformed settings file falls back to
   normal text without failing.
+- **G — progress flush on exit.** `GameController.save_progress()` (idempotent, test-isolatable via `save_path`)
+  is called from `_notification()` on `NOTIFICATION_WM_CLOSE_REQUEST` / `NOTIFICATION_WM_GO_BACK_REQUEST`, so a
+  session ended by the Android back gesture or a window close persists progress and quits cleanly.
 
 ### Verified results
-- Godot domain suite: **359 passed / 0 failed** (was 239 at Session 9 end; 277 after A, 296 after B, 310 after C,
-  341 after D, 350 after E).
-- `bash game/ci/build_android.sh` → **CI: PASS** on this tree. import 0, tests 359/0, main-scene boot 0, signed
-  debug APK (28,359,497 bytes, sha256 `4f250244…`). Log: `game/docs/evidence/session10_build.log`.
+- Godot domain suite: **364 passed / 0 failed** (was 239 at Session 9 end; 277 after A, 296 after B, 310 after C,
+  341 after D, 350 after E, 359 after F).
+- `bash game/ci/build_android.sh` → **CI: PASS** on this tree. import 0, tests 364/0, main-scene boot 0, signed
+  debug APK (28,359,497 bytes, sha256 `bb702e3c…`). Log: `game/docs/evidence/session10_build.log`.
 - Rendered evidence (Xvfb/GL, 720x1280) via new `game/tests/capture_frames.gd`:
   `session10_initial/orbit/hint/world_complete.png`. The capture script now preserves/restores the player save it
   used to overwrite (found because a leftover save broke save-sensitive tests in a later run).
@@ -424,7 +427,7 @@ with ANIMATED turns; asserts render==truth after every turn + progression/reward
 ### New regressions (game/tests/run_tests.gd)
 `_test_guided_solver_domain`, `_test_guided_solver_controller`, `_test_orbit_camera`, `_test_world_progression_landmarks`,
 `_test_face_readiness`, `_test_hud_readiness_line`, `_test_equipment_capability`, `_test_hud_resonance_line`,
-`_test_settings_persistence`, `_test_hud_big_text_persistence`.
+`_test_settings_persistence`, `_test_hud_big_text_persistence`, `_test_progress_flush_on_exit`.
 
 ### Next safe action
 - Continue Epic 0.3 with the remaining milestone tasks; keep PR #11 green.

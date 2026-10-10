@@ -22,6 +22,9 @@ var cube_view: CubeView
 var world_view: WorldView
 var camera: OrbitCamera
 
+## Save file used by save_progress(); tests override it so they never touch the real save.
+var save_path := SaveManager.DEFAULT_PATH
+
 # When an animated turn ends the truth layer is advanced; this holds the in-flight move.
 var _pending_move: Dictionary = {}
 
@@ -108,6 +111,22 @@ func _on_move_animated(move: Dictionary) -> void:
 
 func is_animating() -> bool:
 	return cube_view != null and cube_view.is_animating()
+
+## Flush current progress to disk. Safe to call any time (idempotent). Used on exit so a
+## session interrupted by the Android back gesture or a window close never loses progress.
+## `save_path` is overridable so tests can isolate the real save file.
+func save_progress() -> bool:
+	return SaveManager.save_to_path(game_state, save_path)
+
+## Handle the OS close/back request: persist progress, then quit. On Android the back
+## gesture arrives as NOTIFICATION_WM_GO_BACK_REQUEST; on desktop a window close as
+## NOTIFICATION_WM_CLOSE_REQUEST. Both must be safe when progress is already saved.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		if engine != null and game_state != null:
+			save_progress()
+		if is_inside_tree():
+			get_tree().quit()
 
 func undo() -> bool:
 	if is_animating():
@@ -279,7 +298,7 @@ func confirm_solve() -> bool:
 			discovery_found.emit(disc)
 
 	game_state.current_level_index = current_index
-	SaveManager.save_to_path(game_state)
+	save_progress()
 	return true
 
 ## Advance to the nearest unsolved later level (never skips an unsolved level) and
@@ -296,6 +315,6 @@ func next_level() -> bool:
 		return false
 	load_level(target)
 	game_state.current_level_index = target
-	SaveManager.save_to_path(game_state)
+	save_progress()
 	level_advanced.emit(target)
 	return true
