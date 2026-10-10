@@ -49,6 +49,8 @@ func _initialize() -> void:
 	_test_world_state_and_resume()
 	_test_objective_progress()
 	_test_animated_chapter_end_to_end()
+	_test_guided_solver_domain()
+	_test_guided_solver_controller()
 	_test_hud_status_text()
 	_test_scramble_fuzz()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
@@ -927,7 +929,113 @@ func _test_animated_chapter_end_to_end() -> void:
 	else:
 		SaveManager.delete_at_path(saved)
 
-## The HUD status line must name the objective in player terms (top/bottom, not U/D), show
+## Milestone A validator: the guided route must actually return the cube to the fully
+## solved configuration for every Chapter 01 level, from the scramble and after arbitrary
+## player deviation, and must never propose an illegal turn.
+func _test_guided_solver_domain() -> void:
+	print("[guided solver domain]")
+	for lvl in LevelCatalog.chapter_one():
+		var e := PuzzleEngine.new()
+		e.setup(lvl)
+		var n: int = e.state.n
+		var route := PuzzleSolver.route_to_solved(e)
+		_check("%s route is non-empty on scramble" % lvl["level_id"], route.size() > 0)
+		var legal_all := true
+		for mv in route:
+			if not e.is_legal(mv):
+				legal_all = false
+		_check("%s route only proposes legal turns" % lvl["level_id"], legal_all)
+		for mv in route:
+			e.apply_move(mv)
+		_eq("%s route reaches fully solved fingerprint" % lvl["level_id"], e.state.fingerprint(), _solved_fp(n))
+		_check("%s route satisfies the objective predicate" % lvl["level_id"], e.is_solved())
+	# After arbitrary player deviation, the recomputed route still solves the cube.
+	var e2 := PuzzleEngine.new()
+	e2.setup(LevelCatalog.by_id("level.01.hollow_stone"))  # Y-locked: only side faces legal
+	e2.apply_move(MoveTable.face_move("L", true))
+	e2.apply_move(MoveTable.face_move("F", false))
+	e2.apply_move(MoveTable.face_move("R", true))
+	var route2 := PuzzleSolver.route_to_solved(e2)
+	_check("deviation route is non-empty", route2.size() > 0)
+	var dev_legal := true
+	for mv in route2:
+		if not e2.is_legal(mv):
+			dev_legal = false
+	_check("deviation route legal under Y-lock", dev_legal)
+	for mv in route2:
+		e2.apply_move(mv)
+	_eq("deviation route reaches solved", e2.state.fingerprint(), _solved_fp(e2.state.n))
+	# A player move that already walks back along the route must not be undone (no loop).
+	var e3 := PuzzleEngine.new()
+	e3.setup(LevelCatalog.by_id("level.01.awaken"))
+	var first := PuzzleSolver.route_to_solved(e3)
+	e3.apply_move(first[0])
+	var second := PuzzleSolver.route_to_solved(e3)
+	_check("executing a guided step strictly shortens the route", second.size() == first.size() - 1)
+	_check("reduced route does not immediately undo the step just taken",
+		second.size() > 0 and not PuzzleSolver._cancels(first[0], second[0]))
+	for mv in second:
+		e3.apply_move(mv)
+	_eq("advanced route still reaches solved", e3.state.fingerprint(), _solved_fp(e3.state.n))
+
+## Milestone A must work end-to-end through the real controller + animated turn path.
+func _test_guided_solver_controller() -> void:
+	print("[guided solver controller]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	for i in range(m.levels.size()):
+		m.load_level(i)
+		var st: Dictionary = m.guide_status()
+		_check("level %d hint is available" % (i + 1), bool(st.get("available", false)))
+		_check("level %d hint step is legal" % (i + 1), m.engine.is_legal(m.guide_next_move()))
+		var steps := 0
+		while not m.engine.is_solved() and steps < 40:
+			var before: int = m.engine.move_count()
+			if not m.guided_move():
+				break
+			while m.is_animating():
+				m.cube_view.skip_animation()
+			if m.engine.move_count() != before + 1:
+				break
+			steps += 1
+		_check("level %d solves by following the guide" % (i + 1), m.engine.is_solved())
+		_check("level %d guide finishes within a sane step count" % (i + 1), steps < 40)
+		_check("level %d guide reports solved" % (i + 1), bool(m.guide_status().get("solved", false)))
+		_check("level %d confirm_solve accepts the guided result" % (i + 1), m.confirm_solve())
+		if i < m.levels.size() - 1:
+			m.next_level()
+	# After independent moves the cached route is invalidated; the next hint still solves.
+	m.load_level(0)
+	m.try_move("R", true)
+	while m.is_animating():
+		m.cube_view.skip_animation()
+	m.try_move("F", false)
+	while m.is_animating():
+		m.cube_view.skip_animation()
+	_check("controller rebuilds a route after independent moves", m.ensure_guide().size() > 0)
+	var guard := 0
+	while not m.engine.is_solved() and guard < 40:
+		if not m.guided_move():
+			break
+		while m.is_animating():
+			m.cube_view.skip_animation()
+		guard += 1
+	_check("controller guide still reaches solved after deviation", m.engine.is_solved())
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+
 ## progress toward it, and show the level par so "good" play is legible without a manual.
 func _test_hud_status_text() -> void:
 	print("[hud status text]")

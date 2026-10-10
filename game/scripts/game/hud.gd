@@ -19,6 +19,9 @@ var _busy := false
 var _root: VBoxContainer
 var _undo_btn: Button
 var _restart_btn: Button
+var _guide: Label
+var _hint_btn: Button
+var _step_btn: Button
 
 const BTN_MIN := Vector2(88, 64)
 
@@ -77,6 +80,7 @@ func _build() -> void:
 	_onboard = _label("", 20)
 	_hint = _label("", 20)
 	_story = _label("", 22)
+	_guide = _label("", 20)
 	outer.add_child(_title)
 	outer.add_child(_status)
 
@@ -85,6 +89,7 @@ func _build() -> void:
 	outer.add_child(spacer)
 	outer.add_child(_onboard)
 	outer.add_child(_hint)
+	outer.add_child(_guide)
 	outer.add_child(_story)
 
 	_root = VBoxContainer.new()
@@ -114,11 +119,11 @@ func _build() -> void:
 	action_row.add_child(flip)
 	_flip_btn = flip
 	var undo := _button("Undo")
-	undo.pressed.connect(func(): if not controller.is_animating(): controller.undo(); _refresh_status())
+	undo.pressed.connect(func(): if not controller.is_animating(): controller.undo(); _refresh_guide(); _refresh_status())
 	action_row.add_child(undo)
 	_undo_btn = undo
 	var restart := _button("Restart")
-	restart.pressed.connect(func(): if not controller.is_animating(): controller.restart_level(); _refresh_status())
+	restart.pressed.connect(func(): if not controller.is_animating(): controller.restart_level(); _refresh_guide(); _refresh_status())
 	action_row.add_child(restart)
 	_restart_btn = restart
 
@@ -140,6 +145,21 @@ func _build() -> void:
 	big.pressed.connect(_on_big_text)
 	a11y_row.add_child(big)
 
+	# Guided solving: request a reliable route (not optimal) and step through it using the
+	# same engine/animation path as a manual turn.
+	var guide_row := HBoxContainer.new()
+	guide_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	guide_row.add_theme_constant_override("separation", 8)
+	_root.add_child(guide_row)
+	var hint := _button("Hint")
+	hint.pressed.connect(_on_hint)
+	guide_row.add_child(hint)
+	_hint_btn = hint
+	var step := _button("Guide: next step")
+	step.pressed.connect(_on_guided_step)
+	guide_row.add_child(step)
+	_step_btn = step
+
 func _on_level_loaded(level: Dictionary) -> void:
 	_title.text = "%d. %s" % [int(level.get("ordinal", 0)), str(level.get("title", ""))]
 	_hint.text = "Hint: " + str(level.get("hint", ""))
@@ -152,6 +172,7 @@ func _on_level_loaded(level: Dictionary) -> void:
 	_onboard.visible = int(level.get("ordinal", 1)) == 1
 	_onboard.text = "Tap a face to twist the cube. Make every required face one colour, then press \"I solved it\"."
 	_story.text = ""
+	_guide.text = ""
 	_refresh_legal()
 
 func _refresh_legal() -> void:
@@ -194,7 +215,42 @@ func _on_face_pressed(face: String) -> void:
 	if applied:
 		_haptic(18)
 		set_busy(true)
+	_refresh_guide()
 	_refresh_status()
+
+## Request/recompute a guided route and show the next actionable step. Recomputing on
+## request is safe (the route is a pure function of the engine's history).
+func _on_hint() -> void:
+	var st: Dictionary = controller.guide_status()
+	_guide.text = str(st.get("text", ""))
+	_refresh_guide_buttons()
+
+## Execute the next guided step through the real engine/animation path.
+func _on_guided_step() -> void:
+	if controller.is_animating():
+		return
+	if controller.guided_move():
+		_haptic(18)
+		set_busy(true)
+	_refresh_guide()
+	_refresh_status()
+
+## Refresh the guide line from the controller's current route (state-derived, not cached).
+func _refresh_guide() -> void:
+	var st: Dictionary = controller.guide_status()
+	if bool(st.get("solved", false)):
+		_guide.text = ""
+		_refresh_guide_buttons()
+		return
+	_guide.text = "Guide: turn the %s %s · %d step(s) to solved." % [
+		controller._face_word(str(st.get("face", ""))),
+		"clockwise" if bool(st.get("cw", true)) else "counter-clockwise",
+		int(st.get("remaining", 0))]
+	_refresh_guide_buttons()
+
+func _refresh_guide_buttons() -> void:
+	if _step_btn:
+		_step_btn.disabled = _busy or bool(controller.guide_status().get("solved", false))
 
 ## Lock the interactive controls while a turn animation is in flight so a second input can
 ## never start a competing turn (which would desync the rendered layer from the truth).
@@ -206,9 +262,13 @@ func set_busy(busy: bool) -> void:
 		_undo_btn.disabled = busy
 	if _restart_btn:
 		_restart_btn.disabled = busy
+	if _hint_btn:
+		_hint_btn.disabled = busy
+	_refresh_guide_buttons()
 
 func _on_move_applied() -> void:
 	set_busy(false)
+	_refresh_guide()
 	_refresh_status()
 
 func _on_solve() -> void:
@@ -250,7 +310,7 @@ func _on_solved(_level: Dictionary, _reward: Dictionary) -> void:
 func _on_big_text() -> void:
 	_big_text = not _big_text
 	var mult := 1.5 if _big_text else 1.0
-	for l in [_title, _status, _onboard, _hint, _story]:
+	for l in [_title, _status, _onboard, _hint, _story, _guide]:
 		var base := 34 if l == _title else (22 if (l == _status or l == _story) else 20)
 		l.add_theme_font_size_override("font_size", int(base * mult))
 	for entry in _face_buttons:
