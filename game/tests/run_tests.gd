@@ -40,6 +40,7 @@ func _initialize() -> void:
 	_test_save_corruption_variants()
 	_test_scene_integration()
 	_test_completion_feedback()
+	_test_camera_framing()
 	_test_scramble_fuzz()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -554,6 +555,57 @@ func _test_completion_feedback() -> void:
 		w.close()
 	else:
 		SaveManager.delete_at_path(saved)
+
+## The 3D cube must be visible and centred for the player. Regression for a real defect
+## where the camera transform was mis-ordered, leaving the cube off-centre and clipped at
+## the left edge on every viewport (verified by projecting the cube corners through the
+## scene camera).
+func _test_camera_framing() -> void:
+	print("[camera framing]")
+	var packed: PackedScene = load("res://scenes/Main.tscn")
+	if packed == null:
+		_check("Main.tscn loads for camera test", false)
+		return
+	var main = packed.instantiate()
+	root.add_child(main)
+	var cam = main.get_node_or_null("Camera3D")
+	_check("camera exists", cam != null)
+	if cam != null:
+		# Deterministic camera-space geometry (no rendered frame needed): transform the cube
+		# corners into camera space and check they fit the frustum, centred.
+		var vp_root := main.get_viewport()
+		var vp_size := vp_root.get_visible_rect().size if vp_root != null else Vector2(720, 1280)
+		var aspect: float = vp_size.x / maxf(1.0, vp_size.y)
+		var hhalf_deg: float = rad_to_deg(atan(tan(deg_to_rad(cam.fov * 0.5)) * aspect))
+		var inv: Transform3D = cam.transform.affine_inverse()
+		var max_h := 0.0
+		var max_v := 0.0
+		var sum_x := 0.0
+		var sum_y := 0.0
+		var count := 0
+		for sx in [-1.0, 1.0]:
+			for sy in [-1.0, 1.0]:
+				for sz in [-1.0, 1.0]:
+					var local: Vector3 = inv * Vector3(sx, sy, sz)
+					var h_ang: float = rad_to_deg(atan2(local.x, -local.z))
+					var v_ang: float = rad_to_deg(atan2(local.y, -local.z))
+					max_h = maxf(max_h, absf(h_ang))
+					max_v = maxf(max_v, absf(v_ang))
+					sum_x += h_ang
+					sum_y += v_ang
+					count += 1
+		var cx: float = sum_x / count
+		var cy: float = sum_y / count
+		_check("cube fits the horizontal frustum (max %.1f deg < %.1f deg)" % [max_h, hhalf_deg],
+				max_h < hhalf_deg * 0.9)
+		_check("cube fits the vertical frustum (max %.1f deg < %.1f deg)" % [max_v, cam.fov * 0.5],
+				max_v < cam.fov * 0.5 * 0.9)
+		_check("cube is centred on screen (h centre %.1f deg, v centre %.1f deg)" % [cx, cy],
+				absf(cx) < 2.0 and absf(cy) < 3.0)
+		_check("cube is not tiny (max %.1f deg > 3)" % max_h, max_h > 3.0)
+	if main.get_parent() != null:
+		main.get_parent().remove_child(main)
+	main.free()
 
 ## Deterministic differential fuzz of the core engine: for many seeds, a randomly generated
 ## legal scramble must (a) be reachable by its own inverse and (b) leave every move an
