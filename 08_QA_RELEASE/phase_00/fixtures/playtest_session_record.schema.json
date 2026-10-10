@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "CC.QA.PLAYTEST_SESSION_RECORD",
+  "title": "CraftCube playtest session record",
+  "description": "One record per participant per fresh-install protocol run (QA_FIRST10_PLAYTEST_PROTOCOL_V1.md). Owner AI-10. This is player-research instrumentation filled by a human observer and by build-side debug counters; it is NOT telemetry and never leaves the research device/spreadsheet. Pseudonymous by construction: no name, contact, device identifier or free-text quotes beyond coded answers. Version bump rules: adding an optional field = patch; adding a required field or changing an enum = minor; renaming/removing = major with migration note.",
+  "schemaVersion": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "sessionId",
+    "protocolVersion",
+    "buildId",
+    "deviceTier",
+    "iteration",
+    "observer",
+    "timing",
+    "observations",
+    "interruption",
+    "exitAnswers",
+    "continuation"
+  ],
+  "properties": {
+    "schemaVersion": {"type": "string", "const": "1.0.0"},
+    "sessionId": {
+      "type": "string",
+      "pattern": "^PT-[0-9]{4}-[0-9]{3}$",
+      "description": "PT-<iteration 4 digits>-<participant 3 digits>. Pseudonymous; the mapping to a real person is never stored."
+    },
+    "protocolVersion": {"type": "string", "description": "Version of QA_FIRST10_PLAYTEST_PROTOCOL_V1.md used."},
+    "buildId": {"type": "string", "description": "Build identifier as published by AI-12. Never invented; if unknown use 'UNKNOWN' and the record is UNDERPOWERED for build-dependent metrics."},
+    "deviceTier": {"type": "string", "enum": ["LOW", "MID", "HIGH", "TABLET", "UNKNOWN"], "description": "Tier from the AI-11 device matrix. UNKNOWN until the matrix exists."},
+    "iteration": {"type": "integer", "minimum": 1},
+    "observer": {"type": "string", "pattern": "^OBS-[0-9]{2}$", "description": "Observer code, not a name."},
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["appStartAtMs", "firstDeliberateTwistAtMs", "firstSolveAtMs", "protocolEndAtMs"],
+      "properties": {
+        "appStartAtMs": {"type": "integer", "minimum": 0, "description": "Reference 0 for all other timestamps (ms since app start)."},
+        "firstDeliberateTwistAtMs": {"type": ["integer", "null"], "minimum": 0, "description": "QAT-019 / F10-001. null = never happened within protocol."},
+        "firstSolveAtMs": {"type": ["integer", "null"], "minimum": 0, "description": "QAT-020 / F10-002. null = never happened within protocol."},
+        "firstWorldReactionAtMs": {"type": ["integer", "null"], "minimum": 0, "description": "Build-side timestamp (AI-02/AI-05 instrumentation). Latency = this minus solvedPredicateTrueAtMs. null until instrumentation exists."},
+        "solvedPredicateTrueAtMs": {"type": ["integer", "null"], "minimum": 0},
+        "protocolEndAtMs": {"type": "integer", "minimum": 0, "description": "Nominal 600000 (10:00)."}
+      }
+    },
+    "observations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unpromptedWorldChangeMention", "unpromptedCreatureMention", "unpromptedQuestionVoiced", "accidentalInputsObserved", "menusForcedOpen", "numericIndicatorSeen"],
+      "properties": {
+        "unpromptedWorldChangeMention": {"type": "boolean", "description": "F10-003."},
+        "unpromptedCreatureMention": {"type": "boolean", "description": "F10-003 / IGM-005c."},
+        "unpromptedQuestionVoiced": {"type": "boolean", "description": "F10-004 / PD-001."},
+        "accidentalInputsObserved": {"type": "integer", "minimum": 0, "description": "Observer tally; cross-check for the AI-04 debug counter (QAT-028)."},
+        "unintendedActionsCounter": {"type": ["integer", "null"], "minimum": 0, "description": "AI-04 build debug counter (IGM-006). null until the counter exists."},
+        "menusForcedOpen": {"type": "integer", "minimum": 0, "description": "Must be 0 per F10 non-negotiable 7."},
+        "numericIndicatorSeen": {"type": "boolean", "description": "F10-006 [BUILD]: any XP/level/score/currency rendered in minutes 0-10. Must be false."},
+        "maxAssistUsed": {"type": "boolean", "description": "Participant reached the highest assist level at least once (PD-007 sub-group)."}
+      }
+    },
+    "interruption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["performed", "atMs", "recoveryResult"],
+      "properties": {
+        "performed": {"type": "boolean"},
+        "atMs": {"type": ["integer", "null"], "minimum": 120000, "maximum": 360000, "description": "Must fall between 2:00 and 6:00 (F10-007)."},
+        "recoveryResult": {
+          "type": "string",
+          "enum": ["EXACT", "LOST_TWIST_ANIMATION_ONLY", "LOST_PUZZLE_STATE", "LOST_WORLD_STATE", "LOST_POSITION", "LOST_LOADOUT", "LOST_DISCOVERY_OR_FLAGS", "CRASH", "NOT_PERFORMED"],
+          "description": "Anything other than EXACT or LOST_TWIST_ANIMATION_ONLY is a HARD_STOP (IGM-006c)."
+        }
+      }
+    },
+    "exitAnswers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["q1_whatIsGameAbout", "q2_whatDidSolvingDo", "q3_wantToFindOut", "q4_objectLetYouDoNew", "q4b_recognizedChoice", "q5_howDoYouProgress", "q6_confusingOrFiddly", "q7_tooMuchReading", "q8_playAgainTomorrow", "q9_solveOwnership"],
+      "properties": {
+        "q1_whatIsGameAbout": {
+          "type": "object", "additionalProperties": false, "required": ["rater1", "rater2"],
+          "properties": {
+            "rater1": {"$ref": "#/$defs/q1Code"}, "rater2": {"$ref": "#/$defs/q1Code"}, "rater3": {"$ref": "#/$defs/q1Code"}
+          },
+          "description": "IGM-003 / F10-006. Coding lists owned by AI-01."
+        },
+        "q2_whatDidSolvingDo": {
+          "type": "object", "additionalProperties": false, "required": ["rater1", "rater2"],
+          "properties": {
+            "rater1": {"$ref": "#/$defs/q2Code"}, "rater2": {"$ref": "#/$defs/q2Code"}, "rater3": {"$ref": "#/$defs/q2Code"}
+          },
+          "description": "IGM-007 / F10-003."
+        },
+        "q3_wantToFindOut": {"type": "string", "enum": ["STORY_WORLD_QUESTION", "UI_QUESTION", "NONE"], "description": "IGM-005 / F10-004."},
+        "q4_objectLetYouDoNew": {"type": "string", "enum": ["BEHAVIORAL", "NUMERIC", "SOLVED_FOR_ME", "NONE"], "description": "IGM-004 / F10-005. SOLVED_FOR_ME feeds the HARD_STOP."},
+        "q4b_recognizedChoice": {"type": "boolean", "description": "F10-005: participant can say which restoration target they picked first."},
+        "q5_howDoYouProgress": {"type": "string", "enum": ["NUMBERS_LEVELS", "SKILL_TOOLS_PLACES_STORY", "OTHER"], "description": "F10-006."},
+        "q6_confusingOrFiddly": {
+          "type": "object", "additionalProperties": false, "required": ["accidentalInputComplaint", "menuComplaint"],
+          "properties": {
+            "accidentalInputComplaint": {"type": "boolean", "description": "F10-001 <= 5%."},
+            "menuComplaint": {"type": "boolean", "description": "PD-003 <= 10%."}
+          }
+        },
+        "q7_tooMuchReading": {"type": "boolean", "description": "IGM-005b <= 10% true."},
+        "q8_playAgainTomorrow": {
+          "type": "object", "additionalProperties": false, "required": ["answer", "reasonCodes"],
+          "properties": {
+            "answer": {"type": "string", "enum": ["YES", "MAYBE", "NO"]},
+            "reasonCodes": {
+              "type": "array", "uniqueItems": true,
+              "items": {"type": "string", "enum": ["UNEXPLORED_PLACES", "UNRESOLVED_MYSTERY", "MASTERY_CHALLENGE", "MEANINGFUL_COLLECTION", "WORLD_CHANGE", "COMPANION", "OPTIONAL_SECRETS", "NEW_PUZZLE_LANGUAGE", "DARK_PATTERN", "OTHER"]},
+              "description": "IGM-008. Healthy list = Bible §11. DARK_PATTERN must be 0% (a timer/streak/FOMO reason cannot exist)."
+            }
+          }
+        },
+        "q9_solveOwnership": {"type": "string", "enum": ["ME", "MIX", "GAME"], "description": "IGM-001b. HARD_STOP > 30% GAME."},
+        "q10_rememberMost": {
+          "type": "array", "uniqueItems": true,
+          "items": {"type": "string", "enum": ["NOX", "MIRA", "ORIN", "PLACE", "CUBE", "ITEM", "OTHER", "NOTHING"]},
+          "description": "IGM-005c (SHOULD). Optional in 1.0.0."
+        }
+      }
+    },
+    "continuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["offered", "continued", "continuationDurationMs"],
+      "properties": {
+        "offered": {"type": "boolean", "description": "Observer said 'You can stop here or keep going.'"},
+        "continued": {"type": "boolean"},
+        "continuationDurationMs": {"type": "integer", "minimum": 0, "description": "IGM-001 threshold: >= 180000 counts as continued."}
+      }
+    },
+    "goldSliceTasks": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Only present for Phase 06 Gold Slice sessions (QAT-027). Absent in first-10-minutes-only runs.",
+      "required": ["loadoutTaskFirstAttemptSuccess", "loadoutTapCount", "voluntaryLoadoutSwap"],
+      "properties": {
+        "loadoutTaskFirstAttemptSuccess": {"type": "boolean"},
+        "loadoutTapCount": {"type": "integer", "minimum": 0},
+        "voluntaryLoadoutSwap": {"type": "boolean"}
+      }
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Observer process notes only (e.g., 'build crashed at 4:10, restarted'). Never participant quotes, never personal details."
+    }
+  },
+  "$defs": {
+    "q1Code": {"type": "string", "enum": ["DISTINCT", "GENERIC", "COMPETITOR_FRAMED", "UNCODABLE"]},
+    "q2Code": {"type": "string", "enum": ["CONCRETE_WORLD_CHANGE", "ABSTRACT_REWARD", "UNSURE"]}
+  }
+}

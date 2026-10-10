@@ -133,3 +133,12 @@ This file is deliberately short. Each AI must update only its own section in the
 - Tests: `python3 12_RELEASE/tools/validate_release_fixtures.py` → exit 0, 10 passed / 0 failed (3 positive MOCK, 7 NEG_ each failing on its declared RG); validator self-test with a mislabelled negative → exit 1. No build/CI/device run exists to claim.
 - Known issues: RD-001 no `integration` branch on origin; RD-002 legacy `.github/`+`Release/`→AI-08 mapping in `07_GITHUB/*`; RD-003 `12_RELEASE/` path awaiting ratification; RD-004/005/006/007 Unity version, CI licence/keystore custody, applicationId/title, telemetry legal stance are UNKNOWN/HUMAN; RG-001..009/013..015 MISSING by design until domain owners publish validators
 - Next integration action: AI-13 create `integration`, ratify path + fix ownership mapping, register `BuildProvenance` and `RG/RD/RC` ID families; PR `ai-12-build` → `integration`. Handoff: `12_RELEASE/handoffs/AI-12_PHASE00_HANDOFF.md`
+### AI-10
+- Branch: `ai-10-qa`
+- Task: Phase 00 — make the product lock verifiable: traceability register for PD/F10/IGM/CUT criteria, IP/terminology rule set, first-10-minutes playtest protocol + pseudonymous session schema, deterministic validator, evidence-based findings.
+- Status: READY_FOR_REVIEW
+- Contract versions consumed: none frozen (all `TBD 1.0.0`). Contract family names referenced read-only from `06_CONTRACTS/`. Product inputs: `CC.PRODUCT.LOCK` / `DECISIONS` / `FIRST10` / `IGM` / `CUTLIST` 1.0.0 on `ai-01-product@2db84b5` (READY_FOR_REVIEW, unmerged).
+- Contract versions changed: none
+- Tests: `python3 08_QA_RELEASE/phase_00/QA_PHASE00_VALIDATOR.py` → exit 0, fail=0 (6 check groups A–F, 14 negative self-test cases). Evidence: `08_QA_RELEASE/phase_00/evidence/validator_run_ai-10-qa_only.log` (5 SOURCE_NOT_PRESENT skips) and `validator_run_with_ai-01-product_overlay.log` (all 8 sources cross-checked, 0 skips). No build/device/playtest executed — none exists.
+- Known issues: 12 findings in `08_QA_RELEASE/phase_00/QA_PHASE00_FINDINGS_REGISTER.md` (7 MAJOR, all Phase 01 contract inputs; 0 BLOCKER). 25/36 QAT items blocked on contracts/sources by design. Protocol exit-question wording is `1.0.0-draft` pending AI-01 (QAF-007).
+- Next integration action: PR `ai-10-qa` → `integration` after AI-01's PRODUCT docs merge (register cross-check E depends on them); AI-13 to register `QAT/QAR/QAF/PT` ID families (QAF-001).

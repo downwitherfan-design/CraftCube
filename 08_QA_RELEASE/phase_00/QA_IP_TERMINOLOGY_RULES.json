@@ -1,0 +1,135 @@
+{
+  "rulesId": "CC.QA.TERMRULES",
+  "rulesVersion": "1.0.0",
+  "status": "READY_FOR_REVIEW",
+  "owner": "AI-10",
+  "phase": "00",
+  "purpose": "Machine-checkable consumption of Product Lock v1.0.0 §6 (IP-safe direction and terminology policy) and Game Master Bible §1/§12. QA does not define vocabulary; AI-09 owns canon terms and AI-01 owns the policy. These rules only detect drift from the approved policy so a finding can be routed to the owner.",
+  "sourceOfTruth": [
+    {"path": "01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md", "section": "6.3 Product-approved top-level nouns", "version": "1.0.0", "owner": "AI-01"},
+    {"path": "00_CONTROL/CRAFTCUBE_GAME_MASTER_BIBLE.md", "section": "1 Product identity / 12 Non-goals", "owner": "AI-01"},
+    {"path": "10_SOURCE_REFERENCE/SOURCE_GDD_NOTES.md", "section": "IP separation note", "owner": "AI-01"}
+  ],
+  "idPolicy": {
+    "family": "QAR",
+    "pattern": "^QAR-[0-9]{3}$",
+    "rule": "Immutable once released. A rule is retired by setting status=RETIRED, never deleted."
+  },
+  "scopes": {
+    "DESIGN_DOC": {
+      "description": "Markdown planning/design documents. Rejected terms may legitimately appear when negated (e.g., 'not a Rubik simulator'). Matches here are reported as INFO for human review, never as failures.",
+      "pathGlobs": ["**/*.md"],
+      "excludePathGlobs": ["08_QA_RELEASE/phase_00/**", "10_SOURCE_REFERENCE/**"]
+    },
+    "IDENTIFIER": {
+      "description": "Stable IDs, event names, asset IDs, localization keys, JSON keys and enum values. Affirmative use is a failure because IDs are immutable once released.",
+      "pathGlobs": ["**/*.json", "**/*.yaml", "**/*.yml", "**/*.csv"],
+      "excludePathGlobs": ["08_QA_RELEASE/phase_00/QA_IP_TERMINOLOGY_RULES.json", "00_CONTROL/manifest.json"]
+    },
+    "PLAYER_FACING_STRING": {
+      "description": "Localized string values and UI copy. Not present in the repository until the LocalizationKey contract exists (Phase 01+). Scope is declared now so the rule set is complete; the validator reports SCOPE_EMPTY until files match.",
+      "pathGlobs": ["**/Localization/**/*.json", "**/localization/**/*.json", "**/*.strings.json"],
+      "excludePathGlobs": []
+    }
+  },
+  "severityByScope": {
+    "DESIGN_DOC": "INFO",
+    "IDENTIFIER": "FAIL",
+    "PLAYER_FACING_STRING": "FAIL"
+  },
+  "rules": [
+    {
+      "id": "QAR-001",
+      "title": "No proprietary franchise names as CraftCube vocabulary",
+      "source": "Product Lock §6.1; Bible §1; SOURCE_GDD_NOTES.md",
+      "terms": ["minecraft", "creeper", "enderman", "redstone", "netherite", "steve", "rubik", "rubik's"],
+      "matchMode": "word",
+      "caseSensitive": false,
+      "fixOwner": "AI-09",
+      "note": "Design documents may mention these only to negate them. Any occurrence in an identifier, asset name, localization key or player-facing string is a defect. Matches align with AI-02's FORBIDDEN_KEY_TERMS list in 02_ARCHITECTURE/AI02_DOMAIN_CONCEPT_REGISTER_VALIDATOR.py so the two validators agree."
+    },
+    {
+      "id": "QAR-002",
+      "title": "Puzzle object is 'the cube', never a trademark or generic-competitor term",
+      "source": "Product Lock §6.3 row 'Puzzle object'",
+      "terms": ["speedcube", "magic cube"],
+      "matchMode": "phrase",
+      "caseSensitive": false,
+      "fixOwner": "AI-09",
+      "note": "'rubik' is covered by QAR-001."
+    },
+    {
+      "id": "QAR-003",
+      "title": "Player role is 'Weaver', not a generic hero/miner/crafter",
+      "source": "Product Lock §6.3 row 'Player role'",
+      "terms": ["chosen one", "the hero", "miner", "crafter"],
+      "matchMode": "phrase",
+      "caseSensitive": false,
+      "fixOwner": "AI-09",
+      "note": "'crafter' as a substring of 'CraftCube' is not matched because matchMode=phrase requires word boundaries."
+    },
+    {
+      "id": "QAR-004",
+      "title": "Solve consequence is 'restoration' / 'the world answers', never loot/drop/XP",
+      "source": "Product Lock §6.3 row 'Solve consequence'; CUT-003; CUT-006",
+      "terms": ["loot", "xp", "gear score", "item level"],
+      "matchMode": "word",
+      "caseSensitive": false,
+      "fixOwner": "AI-09",
+      "note": "'drop' is intentionally excluded: too many legitimate uses (frame drop, drop-down). Random-drop policy is enforced structurally by QAT-003 instead."
+    },
+    {
+      "id": "QAR-005",
+      "title": "No combat vocabulary in item/equipment definitions",
+      "source": "PD-002 'No damage, defense, health or attack categories exist'; CUT-005",
+      "terms": ["weapon", "weapons", "armor", "armour", "damage", "attack", "health points", "hit points"],
+      "matchMode": "word",
+      "caseSensitive": false,
+      "fixOwner": "AI-02",
+      "note": "In IDENTIFIER scope only this is a hard failure. In DESIGN_DOC scope 'damage' has legitimate meanings (world damage, damaged cube) and is INFO."
+    },
+    {
+      "id": "QAR-006",
+      "title": "Assist feature is 'Smart Assist', never auto-solve/cheat",
+      "source": "Product Lock §6.3 row 'Assist feature'; PD-007",
+      "terms": ["auto-solve", "autosolve", "auto solve", "cheat"],
+      "matchMode": "phrase",
+      "caseSensitive": false,
+      "fixOwner": "AI-03",
+      "note": "Test names such as 'equipment_does_not_auto_solve' are expected and legitimate in QA-owned test code; QA test paths are excluded from IDENTIFIER scope by the validator's own-path exclusion."
+    },
+    {
+      "id": "QAR-007",
+      "title": "Generic mechanism names avoided for the Axis Loom",
+      "source": "Product Lock §6.3 row 'Central mechanism'",
+      "terms": ["the core", "the matrix", "the nexus"],
+      "matchMode": "phrase",
+      "caseSensitive": false,
+      "fixOwner": "AI-09",
+      "note": "INFO in design docs ('the core loop', 'protected core' are legitimate). FAIL only when used as an identifier or player-facing string naming the mechanism."
+    },
+    {
+      "id": "QAR-008",
+      "title": "Generic catastrophe names avoided for the Great Misalignment",
+      "source": "Product Lock §6.3 row 'Catastrophe'",
+      "terms": ["the fall", "the cataclysm"],
+      "matchMode": "phrase",
+      "caseSensitive": false,
+      "fixOwner": "AI-09",
+      "note": ""
+    }
+  ],
+  "approvedVocabularyReference": {
+    "note": "Copied from Product Lock §6.3 for cross-reference only. The Product Lock is authoritative; if this list drifts, the validator's product-doc cross-check reports it.",
+    "terms": [
+      "CraftCube", "Asterra", "Axis Loom", "the Loom", "Great Misalignment", "Weaver", "the cube",
+      "restoration", "Nox", "Hearthwild", "Glassroot", "Sunken Grid", "Ember Hollow", "Verdant Archive",
+      "The Quiet Engine", "Relics", "Tools", "Resonators", "Companion Gear", "Field Modules",
+      "Memory Collectibles", "Smart Assist"
+    ],
+    "knownConflictsReportedByProduct": [
+      "Product Lock §6.4: 'The Quiet Engine' (World Biome Bible) vs 'The Silent Engine' (Story Bible ch.7). Owner AI-09.",
+      "Product Lock §6.4: 'Verdant Archive' has no Story Bible chapter mapping. Owner AI-09 + AI-03."
+    ]
+  }
+}

@@ -1,0 +1,602 @@
+QA Phase 00 validator — repo root /tmp/cc_overlay
+[PASS] A register: 36 items, ids contiguous, enums/owners/contracts/sources/coverage consistent
+[PASS] B matrix markdown in sync with register
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/00_MASTER_CONTROL_PROMPT.md:148
+[INFO] C2 DESIGN_DOC QAR-005 'damage' in 01_PREPRODUCTION/STORY_CONTENT_ARCHITECTURE.md:32
+[INFO] C2 DESIGN_DOC QAR-004 'loot' in 01_PREPRODUCTION/QUEST_DISCOVERY_BIBLE_V7.md:41
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 01_PREPRODUCTION/INVESTMENT_GATE.md:35
+[INFO] C2 DESIGN_DOC QAR-005 'damage' in 01_PREPRODUCTION/EQUIPMENT_ITEM_MASTER_BIBLE_V7.md:87
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 01_PREPRODUCTION/EQUIPMENT_ITEM_MASTER_BIBLE_V7.md:154
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 00_CONTROL/V7_DESIGN_DECISION_REGISTER.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 00_CONTROL/V7_DESIGN_DECISION_REGISTER.md:48
+[INFO] C2 DESIGN_DOC QAR-005 'damage' in 00_CONTROL/V7_1_WORLDCLASS_UPGRADE.md:119
+[INFO] C2 DESIGN_DOC QAR-006 'cheat' in 00_CONTROL/V7_1_WORLDCLASS_UPGRADE.md:164
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 00_CONTROL/V7_1_WORLDCLASS_UPGRADE.md:27
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 00_CONTROL/FINAL_CHECKLIST.md:18
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 00_CONTROL/CRAFTCUBE_GAME_MASTER_BIBLE.md:7
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 00_CONTROL/CRAFTCUBE_GAME_MASTER_BIBLE.md:7
+[INFO] C2 DESIGN_DOC QAR-001 'rubik' in 00_CONTROL/CRAFTCUBE_GAME_MASTER_BIBLE.md:101
+[INFO] C2 DESIGN_DOC QAR-004 'loot' in 00_CONTROL/CRAFTCUBE_GAME_MASTER_BIBLE.md:103
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:79
+[INFO] C2 DESIGN_DOC QAR-001 'rubik' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:95
+[INFO] C2 DESIGN_DOC QAR-001 'rubik' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:149
+[INFO] C2 DESIGN_DOC QAR-002 'speedcube' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:95
+[INFO] C2 DESIGN_DOC QAR-002 'magic cube' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:95
+[INFO] C2 DESIGN_DOC QAR-003 'chosen one' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:94
+[INFO] C2 DESIGN_DOC QAR-003 'miner' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:94
+[INFO] C2 DESIGN_DOC QAR-003 'crafter' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:94
+[INFO] C2 DESIGN_DOC QAR-004 'loot' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:96
+[INFO] C2 DESIGN_DOC QAR-004 'loot' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:139
+[INFO] C2 DESIGN_DOC QAR-004 'loot' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:149
+[INFO] C2 DESIGN_DOC QAR-004 'xp' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:96
+[INFO] C2 DESIGN_DOC QAR-004 'gear score' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:99
+[INFO] C2 DESIGN_DOC QAR-005 'weapons' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:99
+[INFO] C2 DESIGN_DOC QAR-005 'armor' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:99
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:100
+[INFO] C2 DESIGN_DOC QAR-006 'cheat' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:100
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:138
+[INFO] C2 DESIGN_DOC QAR-008 'the fall' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:93
+[INFO] C2 DESIGN_DOC QAR-008 'the cataclysm' in 01_PREPRODUCTION/PRODUCT/PRODUCT_LOCK_V1.md:93
+[INFO] C2 DESIGN_DOC QAR-004 'xp' in 01_PREPRODUCTION/PRODUCT/PRODUCT_DECISION_REGISTER.md:103
+[INFO] C2 DESIGN_DOC QAR-004 'gear score' in 01_PREPRODUCTION/PRODUCT/PRODUCT_DECISION_REGISTER.md:76
+[INFO] C2 DESIGN_DOC QAR-004 'item level' in 01_PREPRODUCTION/PRODUCT/PRODUCT_DECISION_REGISTER.md:76
+[INFO] C2 DESIGN_DOC QAR-005 'damage' in 01_PREPRODUCTION/PRODUCT/PRODUCT_DECISION_REGISTER.md:56
+[INFO] C2 DESIGN_DOC QAR-005 'attack' in 01_PREPRODUCTION/PRODUCT/PRODUCT_DECISION_REGISTER.md:56
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 01_PREPRODUCTION/PRODUCT/INVESTMENT_GATE_METRICS.md:73
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 01_PREPRODUCTION/PRODUCT/INVESTMENT_GATE_METRICS.md:75
+[INFO] C2 DESIGN_DOC QAR-001 'rubik' in 01_PREPRODUCTION/PRODUCT/INVESTMENT_GATE_METRICS.md:73
+[INFO] C2 DESIGN_DOC QAR-001 'rubik' in 01_PREPRODUCTION/PRODUCT/INVESTMENT_GATE_METRICS.md:75
+[INFO] C2 DESIGN_DOC QAR-001 'rubik's' in 01_PREPRODUCTION/PRODUCT/INVESTMENT_GATE_METRICS.md:73
+[INFO] C2 DESIGN_DOC QAR-001 'rubik's' in 01_PREPRODUCTION/PRODUCT/INVESTMENT_GATE_METRICS.md:75
+[INFO] C2 DESIGN_DOC QAR-004 'xp' in 01_PREPRODUCTION/PRODUCT/FIRST_10_MINUTES_PROOF.md:69
+[INFO] C2 DESIGN_DOC QAR-004 'xp' in 01_PREPRODUCTION/PRODUCT/FIRST_10_MINUTES_PROOF.md:83
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 01_PREPRODUCTION/PRODUCT/CUT_LIST_AND_COMPLEXITY_BUDGET.md:36
+[INFO] C2 DESIGN_DOC QAR-004 'loot' in 01_PREPRODUCTION/PRODUCT/CUT_LIST_AND_COMPLEXITY_BUDGET.md:32
+[INFO] C2 DESIGN_DOC QAR-004 'xp' in 01_PREPRODUCTION/PRODUCT/CUT_LIST_AND_COMPLEXITY_BUDGET.md:35
+[INFO] C2 DESIGN_DOC QAR-005 'damage' in 01_PREPRODUCTION/PRODUCT/CUT_LIST_AND_COMPLEXITY_BUDGET.md:34
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_17/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_17/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_17/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_16/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_16/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_16/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_15/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_15/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_15/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_13.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_13.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_12.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_12.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_11.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_11.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_10.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_10.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_09.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_09.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_08.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_08.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_07.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_07.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_06.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_06.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_05.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_05.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_04.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_04.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_14/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_03.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_02.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_14/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_01.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_14/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_13/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_02.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_13/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_13/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_12/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_12/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_12/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_11/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_11/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_11/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_10/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_10/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_10/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_13.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_13.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_12.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_12.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_11.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_11.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_10.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_10.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_09.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_09.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_08.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_08.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_07.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_07.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_06.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_06.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_05.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_05.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_04.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_04.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_09/ai_03.md:96
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_03.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_02.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_09/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_01.md:6
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_01.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_09/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_08/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_08/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_08/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_07/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_07/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_07/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_07.md:92
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_06/ai_03.md:96
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_06/ai_03.md:99
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_06/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_06/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_05/ai_03.md:96
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_05/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_05/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_04/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_04/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_04/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_03/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_03/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_01.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_03/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_02/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_02/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_02/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_01/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_02.md:9
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_01/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_01/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_13.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_13.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_12.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_12.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_11.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_11.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_10.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_10.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_09.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_09.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_08.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_08.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_07.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_07.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_06.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_06.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_05.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_05.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_04.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_04.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_03.md:71
+[INFO] C2 DESIGN_DOC QAR-006 'auto-solve' in 05_PROMPTS/phase_00/ai_03.md:93
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_03.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_02.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_02.md:70
+[INFO] C2 DESIGN_DOC QAR-001 'minecraft' in 05_PROMPTS/phase_00/ai_01.md:71
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_01.md:70
+[INFO] C2 DESIGN_DOC QAR-007 'the core' in 05_PROMPTS/phase_00/ai_01.md:99
+[INFO] C2 PLAYER_FACING_STRING: SCOPE_EMPTY (no files match yet)
+[PASS] C terminology: 8 rules; no affirmative rejected term in IDENTIFIER/PLAYER_FACING scopes (593 INFO lines for human review)
+[PASS] D session schema/fixture: MOCK fixture validates; no personal-data fields
+[PASS] E product-doc cross-check: 8 source(s) present and consistent, 0 not present in this checkout
+[PASS] F selftest: all 14 negative cases produced failures as expected
+SUMMARY fail=0 info=593 skip=0
+exit=0
