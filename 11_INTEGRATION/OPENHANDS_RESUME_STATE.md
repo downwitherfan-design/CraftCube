@@ -321,14 +321,18 @@ integration token** — `POST /repos/.../git/refs` returned HTTP `403`
 ## Session 9 — Chapter 01 gameplay-quality sprint (2026-10-10)
 
 - **Branch:** `godot-migration` (PR #11 → `integration`). Remote sync VERIFIED.
-- **HEAD:** `44d099d` (pushed). Range this session: `958566a..44d099d`.
+- **HEAD:** `2067351` (pushed). Range this session: `958566a..2067351`.
 - **Working tree:** clean at session end.
 
 ### Verified results (this branch, this runtime)
-- Godot domain suite: **234 passed / 0 failed** (`godot --headless --path game --script res://tests/run_tests.gd`). Was 198 at session start.
-- `bash game/ci/build_android.sh` → **CI: PASS** on `44d099d`. import 0, tests 234/0, main-scene boot 0, signed debug APK.
-  Log: `game/docs/evidence/android_export_run_44d099d.log`. APK: 28,346,849 bytes, package
-  `com.downwitherfandesign.craftcube` v0.1.0, targetSdk 36; sha256 `0cb3d712…` (zip non-deterministic → per-run hash).
+- Godot domain suite: **239 passed / 0 failed** (`godot --headless --path game --script res://tests/run_tests.gd`). Was 198 at session start.
+- `bash game/ci/build_android.sh` → **CI: PASS** on `2067351`. import 0, tests 239/0, main-scene boot 0, signed debug APK.
+  Log: `game/docs/evidence/android_export_run_2067351.log`. APK: 28,346,849 bytes, package
+  `com.downwitherfandesign.craftcube` v0.1.0, targetSdk 36; sha256 `53c5c785…` (zip non-deterministic → per-run hash).
+  Earlier this session: `game/docs/evidence/android_export_run_44d099d.log` (CI: PASS, 234/0).
+- **Rendered playability evidence:** real 720x1280 frames from the running scene under Xvfb/GL
+  (`game/docs/evidence/screenshots/session9_initial.png`, `…_after_moves.png`); the cube visibly
+  changes colour after animated turns while the HUD stays laid out. See that folder's README.
 - Main scene boots clean headless (exit 0, no engine errors).
 
 ### Real defects fixed (found by running the slice)
@@ -342,11 +346,13 @@ integration token** — `POST /repos/.../git/refs` returned HTTP `403`
 4. No partial objective feedback → `PuzzleEngine.objective_progress()` + HUD "Aligned N/M required faces". `1307db2`.
 5. `confirm_solve`/`next_level` could fire mid-turn and free the animating pivot → both now refuse while a turn
    is in flight. Commit `44d099d`.
+6. Status line did not name the objective or show par → now "Align top, front · 1/2 aligned · Moves: 4 (par 7)".
+   Commit `3212201`.
 
 ### New regressions (game/tests/run_tests.gd)
 `_test_face_orientation`, `_test_layer_selection`, `_test_animation_locks_and_syncs`, `_test_world_state_and_resume`,
 `_test_objective_progress`, `_test_animated_chapter_end_to_end` (plays all 3 Chapter 01 levels through the real scene
-with ANIMATED turns; asserts render==truth after every turn + progression/rewards/discoveries).
+with ANIMATED turns; asserts render==truth after every turn + progression/rewards/discoveries), `_test_hud_status_text`.
 
 ### Next safe action
 - Run PR #11 through the Phase 00 gate; do NOT merge until the gate and human decisions permit.

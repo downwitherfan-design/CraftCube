@@ -154,11 +154,13 @@ This file is deliberately short. Each AI must update only its own section in the
 - Checkpoint: `11_INTEGRATION/OPENHANDS_RESUME_STATE.md` (Session 8).
 
 ### AI-13 — Session 9 (Chapter 01 gameplay-quality sprint, continued)
-- Branch: `godot-migration` (PR #11 → `integration`); commits `958566a..44d099d` (pushed; remote synced).
+- Branch: `godot-migration` (PR #11 → `integration`); commits `958566a..2067351` (pushed; remote synced).
 - Task: Phase 00 closure continuation — fix real, player-visible defects by RUNNING the Godot slice, then reproduce the Android build.
 - Defects fixed (verified at runtime): (1) domain labelled the BOTTOM face `U`, so the "U" control twisted an invisible face and contradicted authored "Align the top" hints — U now renders on top (`f3aa28b`); (2) `CubeView` was static-only → rebuilt as a position-based ANIMATED view (turn tweens about the cube centre, input locked in flight, re-synced to truth on settle) so overlapping inputs cannot desync render from logic (`f3aa28b`); (3) world rendered EMPTY after resume despite saved progress → `WorldView.sync_lit()` + capped `react()` (`1307db2`); (4) no partial objective feedback → `PuzzleEngine.objective_progress()` + HUD "Aligned N/M required faces" (`1307db2`); (5) `confirm_solve`/`next_level` could free the animating pivot mid-turn → now refuse while animating (`44d099d`).
-- Tests: `godot --headless --path game --script res://tests/run_tests.gd` → **234 passed / 0 failed** (was 198). New: `_test_face_orientation`, `_test_layer_selection`, `_test_animation_locks_and_syncs`, `_test_world_state_and_resume`, `_test_objective_progress`, `_test_animated_chapter_end_to_end`.
-- Build: `bash game/ci/build_android.sh` → **CI: PASS** on `44d099d` (import 0, tests 234/0, boot 0, signed debug APK). Log: `game/docs/evidence/android_export_run_44d099d.log`.
+- Defects fixed (additional): (6) status line now names the objective in player terms and shows par (`Align top, front · 1/2 aligned · Moves: 4 (par 7)`) — `3212201`.
+- Tests: `godot --headless --path game --script res://tests/run_tests.gd` → **239 passed / 0 failed** (was 198). New: `_test_face_orientation`, `_test_layer_selection`, `_test_animation_locks_and_syncs`, `_test_world_state_and_resume`, `_test_objective_progress`, `_test_animated_chapter_end_to_end`, `_test_hud_status_text`.
+- Build: `bash game/ci/build_android.sh` → **CI: PASS** on `2067351` (import 0, tests 239/0, boot 0, signed debug APK). Log: `game/docs/evidence/android_export_run_2067351.log`.
+- Rendering evidence: real 720x1280 frames from the running scene (`game/docs/evidence/screenshots/`) prove on-screen playability; the cube changes after animated turns.
 - Status: READY_FOR_REVIEW. Phase 00 gate remains **NOT PASSED**; no PR merged. Human decisions OD-0001 (branch protection) and OD-0005 (IP/title clearance) still open.
 - Known limitation: no physical Android device (no device playtest) — the pipeline is VERIFIED, not a device run.
 - Checkpoint: `11_INTEGRATION/OPENHANDS_RESUME_STATE.md` (Session 9).
