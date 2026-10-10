@@ -12,8 +12,11 @@
 set -uo pipefail
 
 GODOT_BIN="${GODOT_BIN:-godot}"
-PROJECT="game"
-DIST="dist"
+# Resolve repo root from this script's location so relative paths are never ambiguous.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PROJECT="$REPO_ROOT/game"
+DIST="$REPO_ROOT/dist"
 EXPORT_PRESET="${EXPORT_PRESET:-Android}"
 fail=0
 
@@ -37,7 +40,8 @@ step "android export (debug)"
 mkdir -p "$DIST"
 if "$GODOT_BIN" --headless --path "$PROJECT" --export-debug "$EXPORT_PRESET" "$DIST/CraftCube.apk"; then
   echo "APK produced:"
-  ls -la "$DIST" || true
+  ls -la "$DIST/CraftCube.apk"
+  sha256sum "$DIST/CraftCube.apk" 2>/dev/null || true
 else
   echo "EXPORT FAILED — check that export templates and the Android SDK/JDK are configured."
   fail=1

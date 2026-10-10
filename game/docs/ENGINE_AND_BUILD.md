@@ -100,11 +100,29 @@ bash game/ci/build_android.sh
 
 | Check | Command | Result |
 |---|---|---|
-| Unit tests | `godot --headless --path game --script res://tests/run_tests.gd` | **52 passed, 0 failed** |
+| Unit tests | `godot --headless --path game --script res://tests/run_tests.gd` | **116 passed, 0 failed** |
 | Scene smoke boot | `godot --headless --path game --quit-after 30` | clean, no errors |
 | Android export | `godot --headless --path game --export-debug Android dist/CraftCube.apk` | **signed APK produced (~27 MB)** |
+| Full CI | `bash game/ci/build_android.sh` | **PASS** |
 
 Logs: `game/docs/evidence/{unit_tests_run,main_scene_boot,android_export_run}.log`.
+
+## 6a. Generated artifact (debug)
+
+| Field | Value |
+|---|---|
+| Path | `dist/CraftCube.apk` (gitignored build output) |
+| Size | 28,338,657 bytes (~27.0 MB) |
+| SHA-256 | `110e106ad9e66c1fe926e15fbe0fba85bf03db47baef70ae34035645b3f1b486` |
+| Package | `com.downwitherfandesign.craftcube` |
+| Version | name `0.1.0`, code `1` |
+| min / target SDK | 24 / 36 |
+| ABI | arm64-v8a only |
+| Signer | `CN=Android Debug, O=Android, C=US` (local throwaway debug keystore; not committed) |
+
+The checksum changes on every rebuild (APK timestamps/signing), so treat it as an
+artifact fingerprint, not a reproducible-input hash. **This APK was built by CI on the
+hardened commit; it has not been run on a physical device in this environment.**
 
 ## 7. Known limitation — not a store release
 

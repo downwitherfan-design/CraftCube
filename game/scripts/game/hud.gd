@@ -144,6 +144,10 @@ func _on_flip() -> void:
 func _on_face_pressed(face: String) -> void:
 	controller.try_move(face, not _ccw_mode)
 	_refresh_status()
+	# Live cue so the player knows when the required faces are aligned; the win is still
+	# confirmed by the domain predicate via "I solved it".
+	if controller.engine.is_solved():
+		_status.text = "All required faces aligned — press \"I solved it\"."
 
 func _on_solve() -> void:
 	if not controller.confirm_solve():

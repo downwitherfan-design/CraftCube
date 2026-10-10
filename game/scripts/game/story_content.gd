@@ -54,7 +54,10 @@ static func reaction_for(hook: String) -> String:
 static func reward_for(reward_id: String) -> Dictionary:
 	return REWARDS.get(reward_id, {})
 
+## The equipment id granted by a reward ("" if none). Single source of truth so callers
+## never hard-code a reward->equipment mapping.
+static func equipment_id_for(reward_id: String) -> String:
+	return str(REWARDS.get(reward_id, {}).get("equipment", ""))
+
 static func equipment_for(reward_id: String) -> Dictionary:
-	var r: Dictionary = REWARDS.get(reward_id, {})
-	var eq: String = str(r.get("equipment", ""))
-	return EQUIPMENT.get(eq, {})
+	return EQUIPMENT.get(equipment_id_for(reward_id), {})

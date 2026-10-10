@@ -58,6 +58,13 @@ func equip(id: String) -> bool:
 func unequip(id: String) -> void:
 	loadout.erase(id)
 
+## Index of the first level in `levels` not yet solved, or -1 when all are solved.
+func first_unsolved_index(levels: Array) -> int:
+	for i in range(levels.size()):
+		if not is_solved(str(levels[i]["level_id"])):
+			return i
+	return -1
+
 func to_dict() -> Dictionary:
 	return {
 		"save_version": SAVE_VERSION,
@@ -69,12 +76,30 @@ func to_dict() -> Dictionary:
 		"current_level_index": current_level_index,
 	}
 
+## Rebuild a GameState from save data, defensively: a malformed field must never
+## silently corrupt progression (wrong types are coerced; non-string IDs dropped).
 static func from_dict(d: Dictionary) -> GameState:
 	var g := GameState.new()
-	g.solved_levels = (d.get("solved_levels", []) as Array).duplicate()
-	g.discoveries = (d.get("discoveries", []) as Array).duplicate()
-	g.owned_equipment = (d.get("owned_equipment", []) as Array).duplicate()
-	g.loadout = (d.get("loadout", []) as Array).duplicate()
-	g.world_flags = (d.get("world_flags", {}) as Dictionary).duplicate()
-	g.current_level_index = int(d.get("current_level_index", 0))
+	g.solved_levels = _string_list(d.get("solved_levels", []))
+	g.discoveries = _string_list(d.get("discoveries", []))
+	g.owned_equipment = _string_list(d.get("owned_equipment", []))
+	g.loadout = _string_list(d.get("loadout", []))
+	# Never trust a persisted loadout beyond the slot cap.
+	if g.loadout.size() > MAX_SLOTS:
+		g.loadout = g.loadout.slice(0, MAX_SLOTS)
+	var flags = d.get("world_flags", {})
+	if typeof(flags) == TYPE_DICTIONARY:
+		for k in flags.keys():
+			if typeof(k) == TYPE_STRING:
+				g.world_flags[k] = true
+	g.current_level_index = maxi(0, int(d.get("current_level_index", 0)))
 	return g
+
+static func _string_list(value) -> Array:
+	var out := []
+	if typeof(value) != TYPE_ARRAY:
+		return out
+	for v in value:
+		if typeof(v) == TYPE_STRING and not out.has(v):
+			out.append(v)
+	return out

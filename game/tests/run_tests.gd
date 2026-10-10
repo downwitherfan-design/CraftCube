@@ -30,6 +30,10 @@ func _initialize() -> void:
 	_test_save_load()
 	_test_level_catalog()
 	_test_end_to_end_solve()
+	_test_geometry_properties()
+	_test_save_hardening()
+	_test_completion_idempotency()
+	_test_level_advancement()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
 		print("  - ", f)
@@ -176,3 +180,143 @@ func _test_end_to_end_solve() -> void:
 				break
 		_check("%s solvable via legal moves" % level_id, ok)
 		_check("%s is solved after reverse replay" % level_id, e.is_solved())
+
+func _test_geometry_properties() -> void:
+	print("[geometry properties]")
+	# A move is a permutation: applying it preserves the multiset of facelet colours.
+	for n in [2, 3, 4]:
+		var c := CubeState.new(n)
+		var before := _colour_histogram(c)
+		c.apply_move(MoveTable.face_move("R", true))
+		_eq("permutation preserves colour multiset (n=%d)" % n, _histogram_str(_colour_histogram(c)), _histogram_str(before))
+	# Every face turn is order 4, regardless of size or direction.
+	for n in [2, 3, 4]:
+		for face in MoveTable.ALL_FACES:
+			for cw in [true, false]:
+				var c := CubeState.new(n)
+				var m := MoveTable.face_move(face, cw)
+				for i in range(4):
+					c.apply_move(m)
+				_eq("order-4 turn %s%s (n=%d)" % [face, "cw" if cw else "ccw", n], c.fingerprint(), _solved_fp(n))
+	# Inverse is exact: move then inverse restores the prior fingerprint.
+	for n in [2, 3, 4]:
+		var c := CubeState.new(n)
+		c.apply_move(MoveTable.face_move("F", true))
+		c.apply_move(MoveTable.face_move("R", false))
+		var before := c.fingerprint()
+		var m := MoveTable.face_move("U", false)
+		c.apply_move(m)
+		c.apply_move(MoveTable.inverse(m))
+		_eq("inverse restores state (n=%d)" % n, c.fingerprint(), before)
+	# Determinism: same move sequence => identical fingerprint.
+	var a := CubeState.new(3)
+	var b := CubeState.new(3)
+	for m in [MoveTable.face_move("R", true), MoveTable.face_move("U", false), MoveTable.face_move("F", true)]:
+		a.apply_move(m)
+		b.apply_move(m)
+	_eq("deterministic move sequence", a.fingerprint(), b.fingerprint())
+	# Clone is independent (mutating the clone must not affect the original).
+	var o := CubeState.new(3)
+	o.apply_move(MoveTable.face_move("L", true))
+	var cl := o.clone()
+	var fp := o.fingerprint()
+	cl.apply_move(MoveTable.face_move("U", true))
+	_eq("clone independent of source", o.fingerprint(), fp)
+
+func _test_save_hardening() -> void:
+	print("[save hardening]")
+	var path := "user://craftcube_hardening_save.json"
+	SaveManager.delete_at_path(path)
+	_check("missing save loads fresh state", SaveManager.load_from_path(path).solved_levels.is_empty())
+	var g := GameState.new()
+	g.mark_solved("level.01.awaken")
+	g.grant_equipment("equipment.rootweave_gauntlet")
+	g.add_discovery("discovery.01.first_pulse")
+	g.current_level_index = 1
+	_check("atomic save writes", SaveManager.save_to_path(g, path))
+	_check("no leftover temp file after save", not FileAccess.file_exists(path + ".tmp"))
+	var r := SaveManager.load_from_path(path)
+	_check("round trip solved", r.is_solved("level.01.awaken"))
+	_check("round trip equipment", r.owns("equipment.rootweave_gauntlet"))
+	# Malformed JSON is quarantined and must NOT load as completed progress.
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string("{ this is not json ")
+	f.close()
+	var bad := SaveManager.load_from_path(path)
+	_check("malformed save loads fresh state", not bad.is_solved("level.01.awaken"))
+	_check("malformed save quarantined to .corrupt", FileAccess.file_exists(path + ".corrupt"))
+	# Wrong-typed fields must not corrupt (string where an array is expected).
+	SaveManager.delete_at_path(path)
+	var f2 := FileAccess.open(path, FileAccess.WRITE)
+	f2.store_string('{"save_version":1,"solved_levels":"x","current_level_index":-5,"loadout":["a","b","c","d","e","f"]}')
+	f2.close()
+	var coerced := SaveManager.load_from_path(path)
+	_check("wrong-typed list coerced to empty", coerced.solved_levels.is_empty())
+	_check("negative index clamped to 0", coerced.current_level_index == 0)
+	_check("over-cap loadout truncated", coerced.loadout.size() <= GameState.MAX_SLOTS)
+	SaveManager.delete_at_path(path)
+
+func _test_completion_idempotency() -> void:
+	print("[completion idempotency]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	var gs := GameState.new()
+	SaveManager.save_to_path(gs, saved)
+	var ctrl := GameController.new()
+	ctrl.levels = LevelCatalog.chapter_one()
+	ctrl.game_state = SaveManager.load_from_path(saved)
+	# Level 2 (seed_bed) carries a reward AND a discovery, so all effects are exercised.
+	ctrl.current_index = 1
+	ctrl.engine.setup(ctrl.levels[1])
+	ctrl.world_view = WorldView.new()
+	ctrl.world_view.build()
+	for i in range(ctrl.engine._scramble_moves.size() - 1, -1, -1):
+		ctrl.engine.apply_move(MoveTable.inverse(ctrl.engine._scramble_moves[i]))
+	_check("reverse-replay solves level 2", ctrl.engine.is_solved())
+	var reactions := []
+	var rewards := []
+	var discos := []
+	ctrl.world_reacted.connect(func(h, t): reactions.append(h))
+	ctrl.reward_granted.connect(func(rid, e): rewards.append(rid))
+	ctrl.discovery_found.connect(func(d): discos.append(d))
+	_check("first confirm_solve returns true", ctrl.confirm_solve())
+	var lit_first := ctrl.world_view.lit_count()
+	_check("second confirm_solve is a no-op true", ctrl.confirm_solve())
+	_check("world reaction fired exactly once", reactions.size() == 1)
+	_check("reward fired exactly once", rewards.size() == 1)
+	_check("discovery fired exactly once", discos.size() == 1)
+	_eq("no duplicate world marker lit", ctrl.world_view.lit_count(), lit_first)
+	ctrl.world_view.free()
+	ctrl.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+func _test_level_advancement() -> void:
+	print("[level advancement]")
+	var gs := GameState.new()
+	var levels := LevelCatalog.chapter_one()
+	_eq("first unsolved with empty progress", gs.first_unsolved_index(levels), 0)
+	gs.mark_solved("level.01.awaken")
+	_eq("first unsolved after level 1", gs.first_unsolved_index(levels), 1)
+	gs.mark_solved("level.01.seed_bed")
+	gs.mark_solved("level.01.hollow_stone")
+	_eq("first unsolved when all solved", gs.first_unsolved_index(levels), -1)
+
+func _colour_histogram(c: CubeState) -> Dictionary:
+	var h := {}
+	for v in c.colours:
+		h[v] = int(h.get(v, 0)) + 1
+	return h
+
+func _histogram_str(h: Dictionary) -> String:
+	var keys := h.keys()
+	keys.sort()
+	var parts := PackedStringArray()
+	for k in keys:
+		parts.append("%s:%d" % [str(k), h[k]])
+	return ",".join(parts)

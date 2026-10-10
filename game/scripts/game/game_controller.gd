@@ -7,6 +7,7 @@ extends Node3D
 
 signal level_loaded(level: Dictionary)
 signal solved(level: Dictionary, reward: Dictionary)
+signal level_advanced(index: int)
 signal discovery_found(discovery: Dictionary)
 signal reward_granted(reward_id: String, equipment: Dictionary)
 signal world_reacted(hook: String, text: String)
@@ -29,8 +30,14 @@ func _ready() -> void:
 	if hud and hud.has_method("bind"):
 		hud.bind(self)
 	game_state = SaveManager.load_from_path()
-	current_index = clampi(game_state.current_level_index, 0, levels.size() - 1)
-	load_level(current_index)
+	# Resume at the saved position when valid; otherwise at the first unsolved level, so
+	# a stale/older save cannot point past the chapter or above the last level.
+	var resume := clampi(game_state.current_level_index, 0, levels.size() - 1)
+	if resume >= levels.size() - 1 and game_state.is_solved(str(levels[resume]["level_id"])):
+		var first_open := game_state.first_unsolved_index(levels)
+		if first_open >= 0:
+			resume = first_open
+	load_level(resume)
 
 func load_level(index: int) -> void:
 	current_index = clampi(index, 0, levels.size() - 1)
@@ -67,25 +74,29 @@ func legal_faces() -> Array:
 
 ## Called when the player believes the puzzle is solved: verifies against the real
 ## solve predicate, then drives world reaction -> reward -> progression -> save.
+## Idempotent: a repeated call for an already-solved level MUST NOT fire the world
+## reaction, reward, or discovery again (duplicate-completion guard).
 func confirm_solve() -> bool:
 	if not engine.is_solved():
 		return false
 	var lvl: Dictionary = levels[current_index]
-	game_state.mark_solved(str(lvl["level_id"]))
-	game_state.set_world_flag(str(lvl.get("world_hook", "")))
+	var level_id := str(lvl["level_id"])
+	if game_state.is_solved(level_id):
+		return true  # already completed; no duplicate effects, no re-save
+	game_state.mark_solved(level_id)
 	var hook := str(lvl.get("world_hook", ""))
+	game_state.set_world_flag(hook)
 	if world_view:
 		world_view.react()
-	var reaction := StoryContent.reaction_for(hook)
-	world_reacted.emit(hook, reaction)
+	world_reacted.emit(hook, StoryContent.reaction_for(hook))
 
 	var reward_id := str(lvl.get("reward_id", ""))
 	var reward := StoryContent.reward_for(reward_id)
 	if not reward.is_empty():
-		var eq := StoryContent.equipment_for(reward_id)
-		if not eq.is_empty():
-			game_state.grant_equipment(_equipment_id_for_reward(reward_id))
-		reward_granted.emit(reward_id, eq)
+		var equipment_id := StoryContent.equipment_id_for(reward_id)
+		if equipment_id != "":
+			game_state.grant_equipment(equipment_id)
+		reward_granted.emit(reward_id, StoryContent.equipment_for(reward_id))
 		solved.emit(lvl, reward)
 	else:
 		solved.emit(lvl, {})
@@ -100,14 +111,18 @@ func confirm_solve() -> bool:
 	SaveManager.save_to_path(game_state)
 	return true
 
-func _equipment_id_for_reward(reward_id: String) -> String:
-	for k in StoryContent.EQUIPMENT.keys():
-		if k == "equipment.rootweave_gauntlet" and reward_id == "reward.01.nox_meets":
-			return k
-	return ""
-
+## Advance to the nearest unsolved later level (never skips an unsolved level) and
+## persist the new position. Returns false when every later level is solved.
 func next_level() -> bool:
-	if current_index + 1 >= levels.size():
+	var target := -1
+	for i in range(current_index + 1, levels.size()):
+		if not game_state.is_solved(str(levels[i]["level_id"])):
+			target = i
+			break
+	if target < 0:
 		return false
-	load_level(current_index + 1)
+	load_level(target)
+	game_state.current_level_index = target
+	SaveManager.save_to_path(game_state)
+	level_advanced.emit(target)
 	return true

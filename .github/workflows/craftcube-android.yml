@@ -2,7 +2,7 @@ name: CraftCube Android build
 
 on:
   push:
-    branches: [integration, godot-migration, main]
+    branches: [integration, main, 'ai-*', 'godot-*']
     paths:
       - 'game/**'
       - '.github/workflows/craftcube-android.yml'
