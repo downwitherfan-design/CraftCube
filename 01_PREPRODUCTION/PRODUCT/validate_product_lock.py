@@ -19,7 +19,7 @@ Scope: product validation only (AI-01 ownership). Checks the Markdown files in
      never itself HUMAN_DECIDED/APPROVED-without-pointer (no two live verdicts
      for one subject).
   8. Phase 00 human-decision consistency (v1.2.0):
-     - PD-025: no numeric Unity/URP/SDK/NDK/JDK version is pinned in PRODUCT/.
+     - PD-025 (superseded by PD-030): original verdict kept; no numeric Godot/Unity/SDK/NDK/JDK version is pinned in PRODUCT/.
      - PD-026: CC. namespace independence from the public title is recorded.
      - PD-027: premium model recorded; no PRODUCT/ text re-approves ads, IAP
        store, subscription, premium currency, timers or paid assists.
@@ -262,7 +262,7 @@ def check_supersession(docs: dict[str, str], rep: Report) -> None:
 
 
 VERSION_PIN_RE = re.compile(
-    r"\b(Unity\s+6\.\d|Unity\s+20\d\d\.\d|URP\s+\d+\.\d|NDK\s*r?\d{2}|JDK\s*\d{1,2}\b|API\s+level\s+\d{2}|minSdk\s*=?\s*\d{2}|targetSdk\s*=?\s*\d{2})",
+    r"\b(Godot\s+\d+\.\d+|Unity\s+6\.\d|Unity\s+20\d\d\.\d|URP\s+\d+\.\d|NDK\s*r?\d{2}|JDK\s*\d{1,2}\b|API\s+level\s+\d{2}|minSdk\s*=?\s*\d{2}|targetSdk\s*=?\s*\d{2})",
     re.IGNORECASE,
 )
 
@@ -272,13 +272,26 @@ def check_human_decisions(docs: dict[str, str], rep: Report) -> None:
     blocks = _pd_blocks(reg)
     fails = []
 
-    # PD-025: engine decided, versions not pinned anywhere in PRODUCT/.
+    # PD-025 (superseded by PD-030): original verdict preserved, supersession pointer present.
     b = blocks.get("PD-025", "")
-    if "HUMAN_DECIDED" not in b or "Unity 6 + URP + Android" not in b:
-        fails.append("PD-025 must record HUMAN_DECIDED Unity 6 + URP + Android")
+    if "HUMAN_DECIDED" not in b:
+        fails.append("PD-025 must preserve its original HUMAN_DECIDED verdict")
+    if "Superseded by:** PD-030" not in b:
+        fails.append("PD-025 must carry a 'Superseded by: PD-030' pointer")
+    # PD-030: the canonical engine lock is now Godot 4.x + GDScript + Android-first.
+    b30 = blocks.get("PD-030", "")
+    if "HUMAN_DECIDED" not in b30:
+        fails.append("PD-030 must record HUMAN_DECIDED")
+    if "Supersedes:** PD-025" not in b30:
+        fails.append("PD-030 must carry a 'Supersedes: PD-025' pointer")
+    if "Godot 4.x stable" not in b30 or "Android-first" not in b30:
+        fails.append("PD-030 must record Godot 4.x stable + Android-first as the locked engine")
+    if "engine-independent" not in b30:
+        fails.append("PD-030 must preserve the engine-independent Domain/Simulation rule")
+    # No numeric toolchain version may be pinned anywhere in PRODUCT/ (policy extended to Godot).
     for name, text in docs.items():
         for m in VERSION_PIN_RE.finditer(text):
-            fails.append(f"{name}: pinned toolchain version '{m.group(0)}' forbidden by PD-025")
+            fails.append(f"{name}: pinned toolchain version '{m.group(0)}' forbidden in PRODUCT/")
 
     # PD-026: CC namespace independence + Asterra internal-only.
     b = blocks.get("PD-026", "")
@@ -333,7 +346,7 @@ def check_human_decisions(docs: dict[str, str], rep: Report) -> None:
     for f in fails:
         rep.fail(f"human-decision consistency: {f}")
     if not fails:
-        rep.ok("Phase 00 human decisions PD-025..028 recorded consistently; no toolchain versions pinned; monetization constraints coherent")
+        rep.ok("Phase 00 human decisions PD-025..028 + PD-030 engine re-confirmation recorded consistently; no toolchain versions pinned; monetization constraints coherent")
 
 
 def main() -> int:

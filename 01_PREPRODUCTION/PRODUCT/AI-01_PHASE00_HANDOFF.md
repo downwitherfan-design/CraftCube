@@ -4,6 +4,8 @@ Format: `05_PROMPTS/HANDOFF_TEMPLATE.md`. Labels per `05_PROMPTS/ANTI_HALLUCINAT
 
 STATUS: READY_FOR_REVIEW — all Phase 00 product deliverables exist, validate, and are downstream-consumable. Not COMPLETE/LOCKED: four Human gates remain open (listed under KNOWN_LIMITATIONS); Product cannot close them.
 
+UPDATE (v1.3.0, engine re-confirmation): The engine lock is now **PD-030 — Godot 4.x stable + GDScript + Android-first**, superseding the Unity entry in PD-025, per the Human Project Owner's directive recorded as `11_INTEGRATION/ENGINE_MIGRATION_UNITY_TO_GODOT.md` (CR-0013). Consequences: the PD-025 references below are HISTORICAL (read together with PD-030); the "pure C# / zero `UnityEngine`" acceptance criteria are restated engine-neutrally as "pure GDScript domain with no Godot Node/SceneTree dependency"; Unity-scoped decisions in AI-04/AI-06/AI-08 become Godot-scoped with no ID change. `validate_product_lock.py` §8 now checks Godot; `tests/test_product_lock_negatives.py` proves it fails for the intended reasons.
+
 TASK_ID: phase_00/ai_01 (`05_PROMPTS/phase_00/ai_01.md`)
 PHASE: 00 — Product/IP Lock
 ACCOUNT: AI-01 — Product / Game Direction

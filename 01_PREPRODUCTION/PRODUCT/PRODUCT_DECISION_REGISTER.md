@@ -386,6 +386,7 @@ The entries below record decisions **made by the Human Product Authority** after
 ## PD-025 — Engine / technology lock (resolves AI-13 OD-0002)
 
 **Verdict:** HUMAN_DECIDED
+**Superseded by:** PD-030 (HUMAN_DECIDED, v1.3.0) — engine changed to Godot 4.x stable + GDScript + Android-first by the owner's directive (CR-0013).
 **Previous decision:** none in this register. `PRODUCT_LOCK_V1.md` §5 listed the engine as "STATED IN BLUEPRINT, not yet instantiated in repo"; AI-13 raised OD-0002; RISK-0001 (H/H).
 **Superseding decision:** **Unity 6 + URP + Android is CONFIRMED** as the locked engine/technology direction (`02_ARCHITECTURE/TECHNICAL_BLUEPRINT.md` §Engine). The Domain/Simulation layer remains **pure C# and engine-independent** exactly as the existing architecture defines (Blueprint §Dependency rule). The Human Project Owner **provides and owns Unity licensing and the required CI/build environment before Phase 02 Bootstrap**.
 **Reason:** the repository documents exactly one engine candidate across the Technical Blueprint, Account Matrix, Roadmap and all Phase 00 track notes; no alternative was proposed; code sunk cost is zero, so confirming now removes RISK-0001 ambiguity before Phase 01 contracts name runtime DTOs.
@@ -483,8 +484,8 @@ The entries below record decisions **made by the Human Product Authority** after
 1. Final trademark/legal clearance of the public title (PD-026 §2) — before final commercial brand lock / Phase 14.
 2. Legal clearance for public use of "Asterra" (PD-026 §3).
 3. Exact retail price (PD-027) — commercial/store decision.
-4. Exact Unity / URP / SDK / NDK / JDK versions (PD-025) — technical freeze step, not a product decision, but human-owned licensing gates it.
-5. Unity licence custody and CI build environment provisioning (PD-025; AI-12 RD-005) — Human Project Owner, before Phase 02.
+4. Exact Godot / Android SDK / NDK / JDK build versions (PD-030) — technical freeze step, not a product decision; no numeric version is pinned in product documents, and toolchain provisioning is human-owned.
+5. Build/toolchain environment provisioning custody (PD-030; AI-12 RD-005) — Human Project Owner, before Phase 02. Release-signing key custody remains human-owned (item 7).
 6. Branch protection on `integration`/`main` (AI-13 OD-0001) — repository admin.
 7. Signing key custody and store-managed signing confirmation (AI-12 §7 item 3) — Phase 14.
 8. Release chapter count within the new ceiling of 9 (PD-015) — Product after Gold Slice evidence, not human unless scope grows.
@@ -494,9 +495,25 @@ The entries below record decisions **made by the Human Product Authority** after
 
 ---
 
+## PD-030 — Engine / technology lock re-confirmation: Godot 4.x stable + GDScript + Android-first (supersedes PD-025)
+
+**Verdict:** HUMAN_DECIDED
+**Supersedes:** PD-025 (HUMAN_DECIDED, v1.2.0).
+**Previous decision:** PD-025 locked "Unity 6 + URP + Android" with a pure C# engine-independent Domain/Simulation layer.
+**Superseding decision:** **Godot 4.x stable + GDScript + Android-first is CONFIRMED** as the locked engine/technology direction, per the Human Project Owner's official engine-change directive (recorded and executed as `11_INTEGRATION/ENGINE_MIGRATION_UNITY_TO_GODOT.md`; CR-0013). Rationale: remove the Unity licence/CI dependency and produce a runnable, offline-first Android build. The Domain/Simulation layer remains **pure and engine-independent** exactly as the Blueprint §Dependency rule requires — no scene-tree/Node dependencies; all engine access stays behind the presentation layer. GDScript is the implementation language; only the surface of the engine-independence rule changes (no `UnityEngine` → no Godot `Node`/`SceneTree` in the domain).
+**Reason:** the owner authorized the migration; confirming it here removes the engine ambiguity before Phase 01 freezes runtime DTOs and keeps the product decision register consistent with the delivered technical slice.
+**Effective scope:** all tracks; Phase 01 onward.
+**Explicitly NOT decided here:** exact Godot / Android SDK / NDK / JDK build versions. These remain a later technical-freeze step based on verified compatibility — no number is to be written in `01_PREPRODUCTION/PRODUCT/` (technical build configuration under `game/` and `.github/` may pin and document tested toolchain versions).
+**Downstream impact:** AI-13 keeps RISK-0001 rated "environment provisioning pending, owner Human"; AI-12 RD-004 remains UNKNOWN by design until pinning; RD-005 owner = Human Project Owner; Unity-scoped drafts in AI-04/AI-06/AI-08 become Godot-scoped with no ID change; `PRODUCT_LOCK_V1.md` §5/§11 engine row status becomes HUMAN_DECIDED (PD-030).
+
+**Acceptance criteria:**
+- `[VALIDATOR]` No document in `01_PREPRODUCTION/PRODUCT/` states a numeric Godot/SDK/NDK/JDK version (AI-01 self-check; AI-13 gate check on other tracks).
+- `[VALIDATOR]` `PD-025` carries a `Superseded by: PD-030` pointer and `PD-030` carries `Supersedes: PD-025` (AI-01; AI-13 gate).
+- `[EVIDENCE]` Before Phase 02 kickoff, a human-provided record exists naming the build/toolchain environment provisioning custody (AI-12 RD-005 closed by Human). Release-signing key custody remains human-owned (PD-029 item 7; CR-0013).
+
 ## Register integrity rules
 
-- IDs `PD-001` … `PD-016` are released with v1.0.0 of this register. `PD-017` … `PD-024` are released with v1.1.0 (Phase 00, second pass — resolving open decisions routed to AI-01 by AI-13 and AI-09). `PD-025` … `PD-029` are released with v1.2.0 (Phase 00 closure — Human Product Authority decisions recorded by AI-01). Never renumber.
+- IDs `PD-001` … `PD-016` are released with v1.0.0 of this register. `PD-017` … `PD-024` are released with v1.1.0 (Phase 00, second pass — resolving open decisions routed to AI-01 by AI-13 and AI-09). `PD-025` … `PD-029` are released with v1.2.0 (Phase 00 closure — Human Product Authority decisions recorded by AI-01). `PD-030` is released with v1.3.0 (engine re-confirmation to Godot). Never renumber.
 - New decisions append `PD-030+`.
 - Superseded entries (PD-013, PD-014, PD-017-canon-pending) keep their original text; their status is read together with the superseding entry. A `Superseded by:` line is the only in-place addition permitted.
 - A verdict change is recorded as a **new** entry that supersedes the old one (`Supersedes: PD-0xx`), never an in-place rewrite.
