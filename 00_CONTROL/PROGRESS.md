@@ -106,3 +106,12 @@ This file is deliberately short. Each AI must update only its own section in the
 - Tests: `python3 11_UIUX/tools/validate_a11y_fixtures.py` → 6 fixtures, 0 failures, exit 0; mutation checks recorded in `11_UIUX/evidence/phase_00_validator_run.md`
 - Known issues: no `integration` branch on remote (IR-AI07-001); ownership example files contradict execution manual (IR-AI07-002); 7 Product decisions pending (D-UX-01..07)
 - Next integration action: AI-13 to confirm PR target branch and register `11_UIUX/` ownership; AI-01 to rule on D-UX decisions; Phase 01 freeze of `AccessibilityPreference`
+### AI-08
+- Branch: `ai-08-audio`
+- Task: PHASE00-AI08-AUDIO-IDENTITY-LOCK — audio identity, IP-safe direction, adaptive audio language, DRAFT cue-ID contract + fixture + validator
+- Status: READY_FOR_REVIEW
+- Contract versions consumed: none released (all `TBD 1.0.0`); design references intended families by name only
+- Contract versions changed: new DRAFT `CC.AUDIO.CUE` 0.1.0 (owner AI-08) — requires AI-13 registration; freeze targeted for Phase 01
+- Tests: `python3 09_ART_AUDIO/AUDIO/scripts/test_validate_audio_cue_registry.py` → 17/17 passed; fixture validates with exit 0
+- Known issues: `integration` branch MISSING on remote (PR target unavailable); CONFLICT in `07_GITHUB/CODEOWNERS_EXAMPLE.txt`/`validate_ownership.py` maps `/Assets/Audio/` to AI-06 (reported, not edited); open decisions AUD-OD-01..04
+- Next integration action: AI-13 creates `integration`, registers `CC.AUDIO.CUE` DRAFT, opens PR `ai-08-audio` → `integration`; details in `09_ART_AUDIO/AUDIO/PHASE_00_HANDOFF_AI-08.md`
