@@ -49,6 +49,23 @@ Branches with **no PR yet**: `ai-03-puzzle`, `ai-06-creatures`, `ai-08-audio`. V
 - **Combined-tree gate check (PR #9 + PR #10 simulated on `integration`):** the two merge cleanly except `00_CONTROL/PROGRESS.md` (both append an `### AI-XX` section → `UU`). Resolved by keeping both sections; both validators then PASS on the combined tree (registry PASS; product pass=14 fail=0). Filed **CR-0010** for this shared-append conflict. VERIFIED.
 - **PR #5 (AI-09) content gate review performed locally:** `validate_narrative_registry.py` **FAILS on the PR head** (`187b1da`) → exit 1, 2 failures (`nar.chapter.07_silent_engine` undefined, referenced from `CHAPTER_BEAT_MAP.md` and `STORY_BIBLE_V7.md`). AI-09's handoff claims "exit 0 / 0 failures" — not reproducible. Filed **CR-0011** (High, gate blocker). PR #5 also carries CR-0008 (wrong base). VERIFIED.
 - **CR-0008 retarget safety verified:** `ai-09-narrative` and `ai-02-core` have no dependency on `ai-13-integration` (`diff --name-only origin/ai-13-integration...origin/ai-09-narrative` ∩ `11_INTEGRATION` = 0), and both merge cleanly onto `integration`. Retargeting base `ai-13-integration` → `integration` is safe. VERIFIED (not applied — write access blocked).
+- **Bulk validator gate check (all account branches merged onto `integration` one at a time):**
+
+  | Branch | merge | validator exit | result |
+  |---|---|---|---|
+  | ai-02-core | clean | 0 | PASS (10 groups, 0 findings) |
+  | ai-03-puzzle | clean | 0 | 33 unittest cases OK; validator PASS (1 warning) |
+  | ai-04-gameplay | clean | 0 | 32 passed, 0 failed |
+  | ai-05-world | clean | 0 | 9 passed, 0 failed |
+  | ai-06-creatures | clean | 0 | 187 passed, 0 failed |
+  | ai-07-uiux | clean | 0 | 6 fixtures, 0 failures |
+  | ai-08-audio | clean | 0 | registry OK; 17/17 test cases pass |
+  | ai-10-qa | clean | 0 | fail=0 info=556 skip=5 |
+  | ai-11-performance | clean | 0 | positives=1 negatives=4 failures=0 |
+  | ai-12-build | clean | 0 | 10 passed, 0 failed, 10 fixtures |
+  | **ai-09-narrative** | clean | **1** | **FAIL — 2 findings (CR-0011)** |
+
+  Every account branch merges cleanly onto `integration` (only `00_CONTROL/PROGRESS.md` may conflict; see CR-0010). Exactly one PR is a validated gate blocker: **#5 (AI-09)**. VERIFIED.
 - Created this checkpoint.
 
 ## 5. Open decisions / blockers
@@ -82,10 +99,18 @@ python3 11_INTEGRATION/scripts/validate_registry.py --check-render   # → same 
 
 ## 8. Next safe action
 
-1. Merge PR #9 into `integration` (step 1) if authorized, then tag `phase-00-gate-pass` only when the full gate passes (not now).
-2. Apply **CR-0008**: retarget PRs #1 and #5 base `ai-13-integration` → `integration` (metadata-only; verify no content dependency on the ai-13 branch first).
-3. Gate-review **PR #10** (AI-01) for content coherence (L1/L2/L5–L7/L9) after #9 lands; then #5 (AI-09), #1 (AI-02), etc. in merge order.
-4. Record PD-002/PD-004/PD-023 effects on OD-0004/0006/0007 and `COMPLEXITY_BUDGET.md` once PR #10 merges.
+**Requires GitHub write access (currently BLOCKED for this token) — for the human/admin or a write-enabled agent:**
+
+1. Grant write access OR apply the recorded changes manually:
+   - Push `ai-13-integration` (3 local commits: checkpoint, CR-0010, CR-0011) to update PR #9.
+   - Merge PR #9 into `integration` (step 1) with a merge commit. Do **not** tag `phase-00-gate-pass` until the whole gate passes.
+   - Apply **CR-0008**: retarget PRs #1 and #5 base `ai-13-integration` → `integration` (verified safe; metadata-only).
+   - Merge PR #10 (AI-01, step 2), resolving the `00_CONTROL/PROGRESS.md` conflict by keeping both sections (CR-0010).
+   - Return **CR-0011** to AI-09 on PR #5 (validator fails on its own head; also wrong base per CR-0008).
+2. After the above, re-run the gate: `python3 11_INTEGRATION/scripts/validate_registry.py --check-render` plus each merged account's validator on the integrated tree.
+3. Record PD-002/PD-004/PD-023 effects on OD-0004/0006/0007 and `COMPLEXITY_BUDGET.md` once PR #10 merges.
+
+**Does not require write access:** continue AI-13 Phase 01 preparation locally (ID-family registry table, fixture-path fields in the registry, validator cross-check of the dependency matrix) — but this should begin only after Phase 00 passes, per the kickoff procedure.
 
 ## 9. Rollback
 
