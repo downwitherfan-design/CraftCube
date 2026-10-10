@@ -105,7 +105,7 @@ python3 11_INTEGRATION/scripts/validate_registry.py --check-render   # â†’ same 
 
 **Next safe actions (in order):**
 
-1. **AI-10 must fix CR-0012** (follow-up commit on `ai-10-qa`): make `QA_PHASE00_VALIDATOR.py` exit 0 on the integrated tree (C2 structural/semantic exclusion for other accounts' forbidden-term declarations and prose `description` fields; update E3 `sourceBaseline` versions to the merged Product versions). This is the only remaining validator blocker.
+1. **Land the CR-0012 fix onto `integration`.** The fix is committed on `ai-10-qa@8bd03f0` and referenced by `ai-13-integration@f01be1b`, but is **not** in `origin/integration`. Verified read-only: merging `8bd03f0` onto `integration@55f6b9b` makes `QA_PHASE00_VALIDATOR.py` exit 0 (`fail=0 info=727`, F self-test 23 cases) while the product/registry/narrative validators also pass. This is the only remaining validator-gate action; it needs **remote write access** (currently BLOCKED — see §1 regression / §11).
 2. On the human owner: decide **OD-0001** (branch protection), **OD-0002** (engine lock), **OD-0005** (IP/title clearance). Phase 00 cannot be declared PASSED while these and CR-0012 are open.
 3. Optional process decision (Product/AI-01): confirm the `00_CONTROL/PROGRESS.md` merge convention before Phase 01 re-triggers CR-0010 on every merge.
 4. Only after the gate passes: AI-13 Phase 01 preparation per `05_PROMPTS/phase_01/` and the phase-kickoff procedure.
