@@ -48,6 +48,7 @@ func _initialize() -> void:
 	_test_layer_selection()
 	_test_animation_locks_and_syncs()
 	_test_world_state_and_resume()
+	_test_world_progression_landmarks()
 	_test_objective_progress()
 	_test_animated_chapter_end_to_end()
 	_test_guided_solver_domain()
@@ -943,6 +944,65 @@ func _test_world_state_and_resume() -> void:
 		var w := FileAccess.open(saved, FileAccess.WRITE)
 		w.store_string(backup)
 		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## Milestone C: the world must respond distinctly per level and remember progress, so the
+## environment conveys progression rather than only a tally of solved levels.
+func _test_world_progression_landmarks() -> void:
+	print("[world progression landmarks]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	var w = m.world_view
+	_check("world builds three ward stones", w._wards.size() == 3)
+	_check("world builds exactly one companion", w._nox != null)
+	_check("fresh world hides the companion", not w.nox_visible())
+	# Play the chapter through the real controller path and watch the wards reveal in order.
+	for i in range(m.levels.size()):
+		m.load_level(i)
+		var guard := 0
+		while not m.engine.is_solved() and guard < 40:
+			if not m.guided_move():
+				break
+			while m.is_animating():
+				m.cube_view.skip_animation()
+			guard += 1
+		m.confirm_solve()
+		_eq("ward %d awakened after level %d" % [i + 1, i + 1], w.wards_lit(), i + 1)
+		_eq("world tally matches solved levels after level %d" % (i + 1), w.lit_count(), i + 1)
+		if i < m.levels.size() - 1:
+			m.next_level()
+	_check("companion appears once the chapter is complete", w.nox_visible())
+	# Resuming from a full save restores all wards and the companion without replaying.
+	var gs := GameState.new()
+	for lvl in m.levels:
+		gs.mark_solved(str(lvl["level_id"]))
+	SaveManager.save_to_path(gs)
+	var r = load("res://scenes/Main.tscn").instantiate()
+	r._ready()
+	_eq("resume restores all ward stones", r.world_view.wards_lit(), 3)
+	_check("resume restores the companion", r.world_view.nox_visible())
+	# A partial save reveals exactly the matching prefix of wards, not all of them.
+	SaveManager.delete_at_path(saved)
+	var gs2 := GameState.new()
+	gs2.mark_solved("level.01.awaken")
+	SaveManager.save_to_path(gs2)
+	var p = load("res://scenes/Main.tscn").instantiate()
+	p._ready()
+	_eq("one solved level reveals exactly one ward", p.world_view.wards_lit(), 1)
+	_check("one solved level still hides the companion", not p.world_view.nox_visible())
+	for node in [p, r, m]:
+		if node.get_parent() != null:
+			node.get_parent().remove_child(node)
+		node.free()
+	if had:
+		var fh := FileAccess.open(saved, FileAccess.WRITE)
+		fh.store_string(backup)
+		fh.close()
 	else:
 		SaveManager.delete_at_path(saved)
 
