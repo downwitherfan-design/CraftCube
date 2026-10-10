@@ -1,0 +1,142 @@
+{
+  "schema_id": "CC.CONTENT.CHAPTER_SIGNATURE",
+  "schema_version": "0.1.0",
+  "status": "DRAFT",
+  "owner": "AI-03",
+  "note": "Phase 00 DRAFT fixture. IDs are PROPOSED, not RELEASED. Chapter/biome names from STORY_BIBLE_V7 / WORLD_BIOME_BIBLE_V7. Chapters 8-10 intentionally absent (biome mapping UNKNOWN).",
+  "chapters": [
+    {
+      "chapter_id": "chapter.01.first_light",
+      "ordinal": 1,
+      "act": 1,
+      "story_theme": "First Light",
+      "biome_slug": "hearthwild",
+      "primary_family": "objective.align",
+      "signature": {
+        "introduces": {
+          "objective_families": ["objective.align"],
+          "tile_types": ["tile.standard", "tile.seed"],
+          "level_rules": ["rule.axis_lock"],
+          "topologies": ["topology.cube.2"]
+        },
+        "recombines": []
+      },
+      "world_verb": "grow",
+      "origin_chapter": true
+    },
+    {
+      "chapter_id": "chapter.02.broken_path",
+      "ordinal": 2,
+      "act": 1,
+      "story_theme": "The Broken Path",
+      "biome_slug": "hearthwild",
+      "primary_family": "objective.align",
+      "signature": {
+        "introduces": {
+          "objective_families": [],
+          "tile_types": ["tile.anchor"],
+          "level_rules": ["rule.layer_lock"],
+          "topologies": ["topology.cube.3"]
+        },
+        "recombines": ["objective.align", "tile.seed"]
+      },
+      "world_verb": "reconnect",
+      "origin_chapter": false
+    },
+    {
+      "chapter_id": "chapter.03.echoes_in_stone",
+      "ordinal": 3,
+      "act": 1,
+      "story_theme": "Echoes in Stone",
+      "biome_slug": "hearthwild",
+      "primary_family": "objective.pattern",
+      "signature": {
+        "introduces": {
+          "objective_families": ["objective.pattern"],
+          "tile_types": ["tile.resonant"],
+          "level_rules": [],
+          "topologies": []
+        },
+        "recombines": ["objective.align", "tile.anchor"]
+      },
+      "world_verb": "remember",
+      "origin_chapter": false
+    },
+    {
+      "chapter_id": "chapter.04.glassroot",
+      "ordinal": 4,
+      "act": 2,
+      "story_theme": "Glassroot",
+      "biome_slug": "glassroot",
+      "primary_family": "objective.pattern",
+      "signature": {
+        "introduces": {
+          "objective_families": [],
+          "tile_types": ["tile.veiled"],
+          "level_rules": ["rule.fog"],
+          "topologies": []
+        },
+        "recombines": ["objective.pattern", "tile.resonant"]
+      },
+      "world_verb": "reveal",
+      "origin_chapter": false
+    },
+    {
+      "chapter_id": "chapter.05.sunken_grid",
+      "ordinal": 5,
+      "act": 2,
+      "story_theme": "The Sunken Grid",
+      "biome_slug": "sunken_grid",
+      "primary_family": "objective.sequence",
+      "signature": {
+        "introduces": {
+          "objective_families": ["objective.sequence"],
+          "tile_types": [],
+          "level_rules": [],
+          "topologies": []
+        },
+        "recombines": ["tile.anchor", "tile.veiled"]
+      },
+      "world_verb": "reconnect",
+      "origin_chapter": false
+    },
+    {
+      "chapter_id": "chapter.06.ember_hollow",
+      "ordinal": 6,
+      "act": 2,
+      "story_theme": "Ember Hollow",
+      "biome_slug": "ember_hollow",
+      "primary_family": "objective.stabilize",
+      "signature": {
+        "introduces": {
+          "objective_families": ["objective.stabilize"],
+          "tile_types": ["tile.fractured"],
+          "level_rules": ["rule.fracture_cost"],
+          "topologies": []
+        },
+        "recombines": ["objective.sequence", "tile.resonant"]
+      },
+      "world_verb": "redirect",
+      "origin_chapter": false
+    },
+    {
+      "chapter_id": "chapter.07.engine",
+      "ordinal": 7,
+      "act": 2,
+      "story_theme": "CONFLICT: 'The Silent Engine' (Story Bible) vs 'The Quiet Engine' (World Bible) - AI-09 decides",
+      "biome_slug": "engine",
+      "primary_family": "objective.compose",
+      "signature": {
+        "introduces": {
+          "objective_families": ["objective.compose"],
+          "tile_types": [],
+          "level_rules": ["rule.move_budget"],
+          "topologies": []
+        },
+        "recombines": ["objective.pattern", "objective.stabilize", "tile.anchor"]
+      },
+      "world_verb": "rearrange",
+      "origin_chapter": false
+    }
+  ]
+}

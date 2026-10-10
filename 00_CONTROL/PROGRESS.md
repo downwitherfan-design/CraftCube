@@ -61,3 +61,12 @@ This file is deliberately short. Each AI must update only its own section in the
 - Tests: `python3 02_ARCHITECTURE/AI02_DOMAIN_CONCEPT_REGISTER_VALIDATOR.py` → PASS (10 check groups, 0 findings; 11 bounded contexts, 39 concepts, 13/13 GDD bullets covered). Negative tests (duplicate key, bad enum/owner, missing source path, undefined open item, invented contract family, uncovered GDD bullet, IP-unsafe key) each produced FAIL on a throwaway copy.
 - Known issues: source GDD ZIP not in repo (U-01); no `integration` branch exists, only `ai-13-integration` (U-05); ownership conflicts C-01/C-02 (narrative flags, quest state) and decisions D-01…D-07 routed to AI-13/AI-01 — see `02_ARCHITECTURE/AI02_CORE_DOMAIN_BOUNDARY_AUDIT_PHASE00.md` §10.
 - Next integration action: AI-13 to confirm PR target branch and record decisions on §9 ownership splits; then AI-02 proceeds to Phase 01 contract freeze scoped by the 11 bounded contexts.
+### AI-03
+- Branch: `ai-03-puzzle`
+- Task: Phase 00 — Product/IP Lock — puzzle vocabulary, mechanic families, level grammar, content principles (`05_PROMPTS/phase_00/ai_03.md`)
+- Status: READY_FOR_REVIEW
+- Contract versions consumed: none RELEASED exist (all `TBD 1.0.0`); design bibles and decision register consumed as intent
+- Contract versions changed: none released. DRAFT shapes offered for Phase 01 freeze: `CC.CONTENT.CHAPTER_SIGNATURE 0.1.0`, `CC.CONTENT.LEVEL 0.1.0`, `CC.REWARD.DEFINITION 0.1.0`, `CC.DISCOVERY.DEFINITION 0.1.0` (`tracks/ai-03-puzzle-content/fixtures/phase00/`)
+- Tests: `python3 tracks/ai-03-puzzle-content/validators/validate_phase00_content.py` → PASS (0 errors, 1 warning); `python3 -m unittest tracks/ai-03-puzzle-content/validators/test_validate_phase00_content.py` → 33 tests OK. Evidence: `tracks/ai-03-puzzle-content/evidence/phase00/validator_run.txt`
+- Known issues: reachability/par unverified (no solver until Phase 03); Act III chapter↔biome mapping UNKNOWN; decisions AI03-D1..D5 and conflicts AI03-C1..C4 open — see `tracks/ai-03-puzzle-content/phase_00/08_OPEN_DECISIONS_AND_CONFLICTS.md`
+- Next integration action: AI-13 to register `tracks/ai-03-puzzle-content/` ownership and name the PR target branch (`integration` does not exist on remote); AI-01 to decide AI03-D1..D5; AI-09 to resolve AI03-C1
