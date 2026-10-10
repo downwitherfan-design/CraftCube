@@ -48,6 +48,7 @@ func _initialize() -> void:
 	_test_animation_locks_and_syncs()
 	_test_world_state_and_resume()
 	_test_objective_progress()
+	_test_animated_chapter_end_to_end()
 	_test_scramble_fuzz()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -778,6 +779,7 @@ func _test_animation_locks_and_syncs() -> void:
 	_check("second input during animation is rejected", not second)
 	# Undo/restart are also locked while animating.
 	_check("undo is locked during animation", not m.undo())
+	_check("next level locked during animation", not m.next_level())
 	# Complete the in-flight turn through the same settle path the tween callback uses
 	# (headless frames run too fast for the 0.22s tween to advance deterministically).
 	m.cube_view.skip_animation()
@@ -876,6 +878,53 @@ func _test_objective_progress() -> void:
 	var e2 := PuzzleEngine.new()
 	e2.setup(LevelCatalog.by_id("level.01.awaken"))
 	_eq("awaken objective totals one face", int(e2.objective_progress()["total"]), 1)
+
+## Play the whole chapter through the real scene using ANIMATED turns (each turn started via
+## the controller and settled through the tween path), asserting the rendered cube matches
+## the truth layer after every turn and that progression/rewards/discoveries advance.
+func _test_animated_chapter_end_to_end() -> void:
+	print("[animated chapter end-to-end]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	var total_mismatches := 0
+	for i in range(m.levels.size()):
+		var pend: Array = []
+		for k in range(m.engine._scramble_moves.size() - 1, -1, -1):
+			pend.append(MoveTable.inverse(m.engine._scramble_moves[k]))
+		for mv in pend:
+			var started: bool = m.try_move(str(mv["face"]), bool(mv["cw"]))
+			while m.is_animating():
+				m.cube_view.skip_animation()
+			if not started:
+				total_mismatches += 1  # a rejected legal move is itself a defect signal
+		var n: int = m.engine.state.n
+		for face in range(6):
+			for r in range(n):
+				for c in range(n):
+					var idx := face * n * n + r * n + c
+					var want: int = (m.engine.state.colours[idx] / (n * n)) % 6
+					if m.cube_view._facelets[idx].material_override != m.cube_view._materials[want]:
+						total_mismatches += 1
+		_check("animated level %d reaches solved" % (i + 1), m.engine.is_solved())
+		_check("animated level %d confirms" % (i + 1), m.confirm_solve())
+		_check("world lit for %d solved levels" % (i + 1), m.world_view.lit_count() == i + 1)
+		if i < m.levels.size() - 1:
+			_check("animated advance past level %d" % (i + 1), m.next_level())
+	_check("render matched truth across the animated playthrough", total_mismatches == 0)
+	_eq("chapter fully solved", m.game_state.solved_levels.size(), m.levels.size())
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
 
 func _colour_histogram(c: CubeState) -> Dictionary:
 	var h := {}

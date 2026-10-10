@@ -117,6 +117,8 @@ func legal_faces() -> Array:
 ## Idempotent: a repeated call for an already-solved level MUST NOT fire the world
 ## reaction, reward, or discovery again (duplicate-completion guard).
 func confirm_solve() -> bool:
+	if is_animating():
+		return false
 	if not engine.is_solved():
 		return false
 	var lvl: Dictionary = levels[current_index]
@@ -157,6 +159,8 @@ func confirm_solve() -> bool:
 ## Advance to the nearest unsolved later level (never skips an unsolved level) and
 ## persist the new position. Returns false when every later level is solved.
 func next_level() -> bool:
+	if is_animating():
+		return false
 	var target := -1
 	for i in range(current_index + 1, levels.size()):
 		if not game_state.is_solved(str(levels[i]["level_id"])):
