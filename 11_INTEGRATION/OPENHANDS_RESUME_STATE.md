@@ -201,3 +201,65 @@ integration token** — `POST /repos/.../git/refs` returned HTTP `403`
   Chapter-01 binding confirmation. Merging now would bypass the documented order
   (governance -> product/IP lock -> narrative/core -> remaining tracks). No `main` push and no
   release was performed.
+
+## 15. Session 7 (2026-10-10) — engine-migration completion, Chapter 01 quality, Phase 00 closure work (AI-13)
+
+- **Engine:** locked to **Godot 4.x + GDScript, Android-first**. This session provisioned **Godot
+  4.7.2-stable locally** and ran the *real* engine, so the game evidence below is from Godot itself,
+  not a model. VERIFIED.
+- **Live remote heads at session start (VERIFIED):** `main` 584141ce; `integration` 3df70ae7;
+  `ai-01-product` 8846a7b8; `ai-13-integration` f01be1b6; `godot-migration` a3243323.
+  Only **PR #11** (`godot-migration -> integration`) and **PR #12** (`ai-01-product-godot -> integration`)
+  are open; PRs #1–#10 are closed/merged on the live repo.
+
+### Workstream A — AI-01 product / CR-0013 (DONE)
+- Branch `ai-01-product-godot`; **PD-030** (HUMAN_DECIDED, v1.3.0) records **Godot 4.x stable + GDScript,
+  Android-first**, superseding PD-025; PD-029 items 4/5 restated engine-neutrally; PRODUCT_LOCK engine row
+  updated; `validate_product_lock.py` §8 checks the Godot decision. PR **#12**.
+- **Integration finding (fixed):** PD-030 was labelled `v1.3.0` while the register header stayed 1.2.0
+  (CUT 1.1.0). AI-10's `QA_PHASE00_VALIDATOR.py` check **E3** (source-baseline drift) rejects exactly this
+  -> 2 E3 FAILs. Fixed: register -> 1.3.0, CUT -> 1.2.0. QA E3 FAILs **2 -> 0**.
+- **Artifact-leak fix:** a commit accidentally staged `dist/CraftCube.apk` (~28 MB) + `game/.godot/*`
+  (the root `.gitignore` is owned on the Godot branch and was absent on the product branch). Removed from
+  the index; those paths are gitignored once the branches integrate.
+
+### Workstream C — Chapter 01 rule semantics (DONE)
+- Characterized the AI-03 draft `rule.axis_lock {axes:[X,Z]}` on `level.01.awaken` against the **real engine**:
+  legal=`[U,D]`, **solved on scramble**, min_solve=**0** -> degenerate. The implemented binding already drops
+  that lock; the chapter's single "introduce one constraint" moment stays on `level.01.hollow_stone`
+  (Y-lock -> U/D illegal; verified min_solve 6 vs 4 without the lock).
+- Recorded the resolved conflict in `game/scripts/domain/level_catalog.gd`; added
+  `_test_level_rule_semantics()` regression proof. No further engine change was needed.
+
+### Workstream D — gameplay/mobile audit (DONE)
+- **Real defect:** the HUD face controls were a **six-wide row** (min 96px => ~624px) -> overflow on a
+  360px portrait phone. Rebuilt as a **3-column grid** inside a **ScrollContainer**.
+- **Real defect:** the scene-integration test called `remove_child(main)` on an unparented node -> engine
+  `ERROR` on every run. Guarded on `get_parent() != null`.
+- Added `_test_hud_layout_and_wiring()` (grid fits ~360px; Y-lock level disables U/D) and
+  `_test_save_corruption_variants()` (empty / truncated / zero-version / wrong-typed / negative-index).
+
+### Workstream B — doc reconciliation (DONE)
+- `11_INTEGRATION/ENGINE_MIGRATION_UNITY_TO_GODOT.md`, `game/docs/ENGINE_AND_BUILD.md`,
+  `game/docs/OPENHANDS_STATUS.md` updated to the resolved PD-030 state and the new test count.
+
+### Verified results on the intended combined tree (`godot-migration` + `ai-01-product-godot`)
+- Godot domain suite: **166 passed / 0 failed** (was 134). VERIFIED.
+- QA content validator: **fail=0** (was 2). VERIFIED.
+- Validator sweep: **13 / 13 PASS**. VERIFIED.
+- `game/ci/build_android.sh` and remote CI re-verification are the remaining step (Workstream F).
+- **Branch/commit:** `godot-migration` @ `862698b` (pushed, PR #11); `ai-01-product-godot` @ `e2bc430`
+  (pushed, PR #12).
+
+### Gate status (UNCHANGED)
+- **Phase 00 integration gate: NOT PASSED.** Human-controlled decisions still open (OD-0001 branch
+  protection, OD-0005 IP/title clearance; OD-0002 engine now answered by PD-030) and the AI-03 Chapter-01
+  binding confirmation is requested in `AI03-DRAFT-RULE-001`. No PR was self-merged.
+
+### Next safe action
+1. Re-run the Android export (`bash game/ci/build_android.sh`) on `godot-migration@862698b` and refresh
+   `game/docs/evidence/` (Workstream F).
+2. Land PD-030 (PR #12) and the Godot slice (PR #11) into `integration` **only** when the gate conditions
+   and human decisions permit.
+3. AI-03 confirms/rescinds the Chapter-01 binding (`AI03-DRAFT-RULE-001`); human owner decides OD-0001/OD-0005.
+
