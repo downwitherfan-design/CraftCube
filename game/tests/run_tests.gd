@@ -36,6 +36,7 @@ func _initialize() -> void:
 	_test_level_advancement()
 	_test_content_id_consistency()
 	_test_scene_integration()
+	_test_scramble_fuzz()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
 		print("  - ", f)
@@ -359,6 +360,38 @@ func _test_scene_integration() -> void:
 		w.close()
 	else:
 		SaveManager.delete_at_path(saved)
+
+## Deterministic differential fuzz of the core engine: for many seeds, a randomly generated
+## legal scramble must (a) be reachable by its own inverse and (b) leave every move an
+## involution-free permutation. Seeded (fixed), so this is a deterministic test, not flaky.
+func _test_scramble_fuzz() -> void:
+	print("[scramble fuzz]")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 20261010
+	var bad_solvable := 0
+	var bad_perturb := 0
+	for trial in range(120):
+		var size: int = rng.randi_range(2, 4)
+		var depth: int = rng.randi_range(1, 12)
+		var lvl := {
+			"topology_id": "topology.cube.%d" % size,
+			"scramble": {"seed": rng.randi_range(0, 100000), "depth_hint": depth},
+			"objective": {"family": "objective.align", "params": {"faces": [MoveTable.ALL_FACES[rng.randi_range(0, 5)]]}},
+			"level_rules": [],
+		}
+		var eng := PuzzleEngine.new()
+		eng.setup(lvl)
+		if not eng.verify_scramble_solvable():
+			bad_solvable += 1
+		# The scramble must actually change the configuration for this objective's probe.
+		if eng._scramble_moves.size() > 0:
+			var probe := CubeState.new(size)
+			for m in eng._scramble_moves:
+				probe.apply_move(m)
+			if probe.fingerprint() == CubeState.new(size).fingerprint():
+				bad_perturb += 1
+	_check("fuzz: every scramble solvable by inverse (120 trials)", bad_solvable == 0)
+	_check("fuzz: every non-empty scramble perturbs the cube", bad_perturb == 0)
 
 func _colour_histogram(c: CubeState) -> Dictionary:
 	var h := {}

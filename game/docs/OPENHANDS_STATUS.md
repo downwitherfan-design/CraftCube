@@ -44,13 +44,13 @@ Compact, factual status for external reviewers. Companion to
 | Artifact field | Value |
 |---|---|
 | Size | 28,338,657 bytes |
-| SHA-256 | `d0e6fc1b3d42c64d3ec7d5985796f9652a245903944965afd31471a6a470f757` |
+| SHA-256 | `0ebcefbbca3cfbcd5a0b2a2ade25e03229037846a4ce34ed874126138b025ab9` |
 | Package / version | `com.downwitherfandesign.craftcube` / 0.1.0 (code 1) |
 | min / target SDK | 24 / 36 |
 | ABI | arm64-v8a |
 | Signature | verified (`CN=Android Debug`) — throwaway debug key, not committed |
 
-6. **Tests.** Domain suite **132 passed / 0 failed**; main scene headless boot clean.
+6. **Tests.** Domain suite **134 passed / 0 failed**; main scene headless boot clean.
    Evidence logs in `game/docs/evidence/`.
 7. **Phase-00 validator sweep (read-only) — all pass on this tree:** product-lock 14/0;
    registry 27 contracts; AI-04 32/0; ownership OK; AI-08 audio OK; environment 9/0;

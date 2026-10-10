@@ -156,7 +156,7 @@ python3 11_INTEGRATION/scripts/validate_registry.py --check-render   # â†’ 
   5. Hardcoded reward→equipment map → `StoryContent.equipment_id_for()`.
   6. **`build_android.sh` resolved a relative export path against `game/`**, so the export silently failed and a *stale* APK could read as fresh. Fixed to absolute paths + SHA-256 output.
   7. **`level.01.hollow_stone` referenced `discovery.01.stone_mark`, which was undefined and could never fire.** Added a `DISCOVERIES` registry authoritative by ID; the controller resolves any `discovery_id` generically.
-- **Tests/evidence (VERIFIED):** domain suite **132 passed / 0 failed** (was 52), including a real `Main.tscn` scene-integration test; headless boot clean; **`game/ci/build_android.sh` → CI: PASS**; signed debug APK `dist/CraftCube.apk` (arm64-v8a, minSdk 24) — digest in `game/docs/OPENHANDS_STATUS.md`. Logs refreshed under `game/docs/evidence/`.
+- **Tests/evidence (VERIFIED):** domain suite **134 passed / 0 failed** (was 52), including a real `Main.tscn` scene-integration test; headless boot clean; **`game/ci/build_android.sh` → CI: PASS**; signed debug APK `dist/CraftCube.apk` (arm64-v8a, minSdk 24) — digest in `game/docs/OPENHANDS_STATUS.md`. Logs refreshed under `game/docs/evidence/`.
 - **Governance/docs:** added `game/docs/OPENHANDS_STATUS.md`; refreshed `game/docs/ENGINE_AND_BUILD.md` evidence + APK digest; CI workflow now triggers on `ai-*`/`godot-*` branches.
 - **Gate status unchanged:** Phase 00 remains **NOT PASSED** (CR-0012 not in `origin/integration`; CR-0013 + human ODs open).
 - **Next safe action:** identical to §11 (unblock write, publish, land CR-0012, record PD-030).
