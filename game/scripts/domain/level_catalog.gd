@@ -27,6 +27,15 @@ extends RefCounted
 ## Rule semantics implemented by the engine: `rule.axis_lock {axes:[...]}` marks the
 ## listed axes as ILLEGAL to turn (the documented meaning). See game/tests/run_tests.gd
 ## `_test_level_rule_semantics` for the regression proof.
+##
+## EPIC 0.3 PROTOTYPE EXTENSION (levels 4–6): the first three levels above are AI-03's
+## canonical authored slice and are unchanged. Levels 4–6 are implementation-level prototype
+## content authored for this task under the "Level 4–6" design intentions, and are NOT yet
+## ratified canonical content. They are routed for ratification via the change-request
+## workflow (see 11_INTEGRATION/CHANGE_REQUESTS.md, CR-0017). The chapter signature
+## (topology + objective.align + deterministic scramble) is preserved; the newly exposed
+## topology.cube.3 and the axis_lock constraints were verified against the real engine
+## (see game/tests/run_tests.gd `_test_chapter_campaign_levels`).
 
 const CHAPTER_ID := "chapter.01.first_light"
 
@@ -77,6 +86,57 @@ static func chapter_one() -> Array:
 			"world_hook": "stone_marks_awaken",
 			"reward_id": "reward.01.nox_meets",
 			"discovery_id": "discovery.01.stone_mark",
+		},
+		# --- Prototype levels 4–6 (EPIC 0.3; see header). Difficulty rises by topology and
+		# constraint rather than scramble length alone: level 4 moves to a 3x3 with a
+		# three-face objective, level 5 constrains one axis, level 6 combines both.
+		{
+			"level_id": "level.01.deeper_resonance",
+			"ordinal": 4,
+			"topology_id": "topology.cube.3",
+			"scramble": {"seed": 104, "depth_hint": 10},
+			"objective": {"family": "objective.align", "params": {"faces": ["U", "F", "R"]}},
+			"level_rules": [],
+			"par_moves": 10,
+			"title": "Deeper Resonance",
+			"hint": "A larger loom. Bring three faces home: top, front and right.",
+			"world_hook": "resonance_deepens",
+			"reward_id": "reward.01.deeper_resonance",
+			"discovery_id": "discovery.01.deeper_resonance",
+		},
+		{
+			"level_id": "level.01.constrained_paths",
+			"ordinal": 5,
+			"topology_id": "topology.cube.3",
+			# X-axis lock: the left/right faces (L/R) are sealed. Only U/D/F/B are legal, so
+			# the required top face must be brought home through the front and back turns.
+			# Verified: legal faces = U,D,F,B; objective not auto-satisfied; solvable.
+			"scramble": {"seed": 105, "depth_hint": 8},
+			"objective": {"family": "objective.align", "params": {"faces": ["U"]}},
+			"level_rules": [{"rule_id": "rule.axis_lock", "params": {"axes": ["X"]}, "relaxable": false}],
+			"par_moves": 8,
+			"title": "Constrained Paths",
+			"hint": "The sides are sealed. Only the front and back will turn — reason before you twist.",
+			"world_hook": "paths_converge",
+			"reward_id": "reward.01.paths",
+			"discovery_id": "",
+		},
+		{
+			"level_id": "level.01.closing_trial",
+			"ordinal": 6,
+			"topology_id": "topology.cube.3",
+			# Z-axis lock: the front/back faces (F/B) are sealed, so the front objective must be
+			# reached without turning F or B directly. The chapter's closing trial combines a
+			# multi-face objective with a constraint. Verified: legal = U,D,L,R; solvable.
+			"scramble": {"seed": 106, "depth_hint": 12},
+			"objective": {"family": "objective.align", "params": {"faces": ["U", "F"]}},
+			"level_rules": [{"rule_id": "rule.axis_lock", "params": {"axes": ["Z"]}, "relaxable": false}],
+			"par_moves": 12,
+			"title": "The Closing Trial",
+			"hint": "Front and back are sealed. Settle the top and the front together to close the chapter.",
+			"world_hook": "chapter_sealed",
+			"reward_id": "reward.01.chapter_seal",
+			"discovery_id": "discovery.01.chapter_seal",
 		},
 	]
 

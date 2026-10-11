@@ -179,6 +179,10 @@ func _build() -> void:
 	var rm := _button("Reduced motion")
 	rm.pressed.connect(_on_reduced_motion)
 	a11y_row.add_child(rm)
+	# Return to the application menu. The app shell owns navigation; this only asks for it.
+	var menu := _button("Menu")
+	menu.pressed.connect(func(): controller.request_menu())
+	a11y_row.add_child(menu)
 
 	# Guided solving: request a reliable route (not optimal) and step through it using the
 	# same engine/animation path as a manual turn.
@@ -382,13 +386,13 @@ func _on_solved(_level: Dictionary, _reward: Dictionary) -> void:
 
 func _on_big_text() -> void:
 	_apply_big_text(not _big_text)
-	SaveManager.save_settings({"big_text": _big_text, "reduced_motion": _reduced_motion}, settings_path)
+	SaveManager.update_settings({"big_text": _big_text, "reduced_motion": _reduced_motion}, settings_path)
 
 ## Reduced-motion toggle: face turns settle instantly for players who prefer less movement.
 ## Persisted together with the other accessibility choices.
 func _on_reduced_motion() -> void:
 	_apply_reduced_motion(not _reduced_motion)
-	SaveManager.save_settings({"big_text": _big_text, "reduced_motion": _reduced_motion}, settings_path)
+	SaveManager.update_settings({"big_text": _big_text, "reduced_motion": _reduced_motion}, settings_path)
 
 ## Apply reduced motion to the cube view. Shared by the toggle and the settings restore path.
 func _apply_reduced_motion(on: bool) -> void:
@@ -406,3 +410,13 @@ func _apply_big_text(on: bool) -> void:
 		l.add_theme_font_size_override("font_size", int(base * mult))
 	for entry in _face_buttons:
 		entry["button"].add_theme_font_size_override("font_size", int(24 * mult))
+
+## App-facing setter: apply a large-text preference pushed down from the application shell
+## (settings screen), without re-persisting. Keeps the app and the in-game HUD in agreement.
+func set_big_text(on: bool) -> void:
+	_apply_big_text(on)
+
+## App-facing setter: apply a reduced-motion preference pushed down from the application
+## shell, reaching the cube view through the same shared path the in-game toggle uses.
+func set_reduced_motion(on: bool) -> void:
+	_apply_reduced_motion(on)

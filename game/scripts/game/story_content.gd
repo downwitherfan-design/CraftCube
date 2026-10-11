@@ -6,10 +6,14 @@ extends RefCounted
 ## names). IDs follow AI-03's `reward.<ch>.<slug>` / `discovery.<ch>.<slug>` scheme.
 
 ## World reaction shown when a level's world_hook fires (puzzle mastery -> world).
+## Levels 4–6 hooks are prototype content (EPIC 0.3), written in the existing register.
 const WORLD_REACTIONS := {
 	"mechanism_awakens": "The Loom shivers awake. Light crawls across the stone.",
 	"seed_grows": "A seed of light takes root where the cube settled.",
 	"stone_marks_awaken": "Old marks glow along the hollowed stone.",
+	"resonance_deepens": "The hum widens. The Loom grows a ring of light around you.",
+	"paths_converge": "Sealed paths remember their way and draw together.",
+	"chapter_sealed": "Every ward answers at once. The first light steadies overhead.",
 }
 
 ## Equipment granted by rewards. Each declares a player-facing purpose (PD-002:
@@ -39,6 +43,20 @@ const REWARDS := {
 		"class": "narrative", "equipment": "equipment.rootweave_gauntlet",
 		"narrative": "Nox, a small stone companion, wakes and presses close to the cube. It offers the Rootweave Gauntlet it has carried.",
 	},
+	# --- Prototype rewards (EPIC 0.3, levels 4–6). No equipment: they are world/knowledge
+	# beats, so completing them cannot duplicate the Rootweave Gauntlet grant.
+	"reward.01.deeper_resonance": {
+		"class": "knowledge", "equipment": "",
+		"narrative": "The resonance settles deeper. You can feel the whole Loom lean toward the cube.",
+	},
+	"reward.01.paths": {
+		"class": "world_change", "equipment": "",
+		"narrative": "The sealed paths hold steady under your hand — a route you chose, not one given.",
+	},
+	"reward.01.chapter_seal": {
+		"class": "narrative", "equipment": "",
+		"narrative": "The first light steadies. Chapter One closes, and Nox turns to face the road ahead.",
+	},
 }
 
 ## Chapter 01 optional discoveries (chapter-level, non-blocking), keyed by ID so any
@@ -54,10 +72,43 @@ const DISCOVERIES := {
 		"name": "The Stone Mark",
 		"text": "A pale groove runs along the sealed stone. It is not decoration — it is a tally of every layer you have brought home.",
 	},
+	# --- Prototype discoveries (EPIC 0.3, levels 4–6).
+	"discovery.01.deeper_resonance": {
+		"id": "discovery.01.deeper_resonance",
+		"name": "The Wider Hum",
+		"text": "On the larger loom the pulse returns twice: once as the layers settle, once as the whole cube agrees.",
+	},
+	"discovery.01.chapter_seal": {
+		"id": "discovery.01.chapter_seal",
+		"name": "The First Light",
+		"text": "When the last face settles, the overhead light no longer flickers. It holds — waiting for the chapter you will walk next.",
+	},
+}
+
+## Nox dialogue: the companion's authored lines, shown only once it has genuinely awakened
+## (world hook `stone_marks_awaken` / `reward.01.nox_meets`). Original CraftCube prose;
+## prototype content for EPIC 0.3, written to match the existing companion register.
+const NOX_DIALOGUE := {
+	"greeting": "Nox settles beside the cube, its surface still warm from the stone marks.",
+	"awakened": "Nox: \"You set the layers home without ever forcing them. That is the whole art.\"",
+	"resonance": "Nox: \"The Loom answers near-solutions with a pulse. The gauntlet you carry can read it — the rest is patience.\"",
+	"closing": "Nox: \"The chapter closes, but the road keeps going. I will walk it with you.\"",
 }
 
 static func reaction_for(hook: String) -> String:
 	return str(WORLD_REACTIONS.get(hook, ""))
+
+## A single authored Nox line by key ("" when unknown).
+static func nox_line(key: String) -> String:
+	return str(NOX_DIALOGUE.get(key, ""))
+
+## All discovery records as an ordered array, so the journal can list every entry
+## (discovered and undiscovered) without hard-coding IDs. Order follows DISCOVERIES.
+static func all_discoveries() -> Array:
+	var out := []
+	for id in DISCOVERIES.keys():
+		out.append(DISCOVERIES[id])
+	return out
 
 static func discovery_for(id: String) -> Dictionary:
 	return DISCOVERIES.get(id, {})

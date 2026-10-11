@@ -12,11 +12,29 @@ signal discovery_found(discovery: Dictionary)
 signal reward_granted(reward_id: String, equipment: Dictionary)
 signal world_reacted(hook: String, text: String)
 signal move_applied()
+## Fires on every successful completion (first time AND replays) with the derived result, so
+## the results screen is driven by real state rather than cosmetic variables.
+signal result_ready(result: Dictionary)
+## Player asked to return to the application menu (HUD "Menu" button). The app shell owns
+## navigation, so the controller only announces the request.
+signal menu_requested()
+
+## When true, a platform back/close request quits the tree (standalone gameplay). When the
+## app shell is present it sets this false so back navigation stays with the app.
+var exit_quits := true
 
 var engine := PuzzleEngine.new()
 var game_state := GameState.new()
 var levels: Array = []
 var current_index := 0
+
+## The most recent completion result and the stored best record it produced. Cleared when a
+## new level is loaded so a stale panel can never be shown for a different level.
+var last_result: Dictionary = {}
+var last_record: Dictionary = {}
+## Guided steps used since the current level was entered (recorded for feedback, never a
+## penalty: using the guide still earns the same stars).
+var _hint_uses := 0
 
 var cube_view: CubeView
 var world_view: WorldView
@@ -56,18 +74,37 @@ func _ready() -> void:
 		var first_open := game_state.first_unsolved_index(levels)
 		if first_open >= 0:
 			resume = first_open
-	load_level(resume)
+	# Never resume onto a locked level: a stale or edited save that points past the unlocked
+	# frontier falls back to the furthest level the progression actually allows.
+	if not game_state.is_level_unlocked(levels, resume):
+		resume = game_state.highest_unlocked_index(levels)
+	load_level(resume, true)
 
-func load_level(index: int) -> void:
-	current_index = clampi(index, 0, levels.size() - 1)
+## Load a level by index. Returns false (and changes nothing) when the level is not yet
+## unlocked, so a direct controller call cannot skip an unsolved prerequisite level. Pass
+## `force=true` only for explicit replay of an already-solved level.
+func load_level(index: int, force: bool = false) -> bool:
+	if index < 0 or index >= levels.size():
+		return false
+	if not force and not game_state.is_level_unlocked(levels, index):
+		return false
+	current_index = index
 	var lvl: Dictionary = levels[current_index]
 	engine.setup(lvl)
+	last_result = {}
+	last_record = {}
+	_hint_uses = 0
 	invalidate_guide()
 	if cube_view:
 		cube_view.build(engine.state)
 	if world_view:
 		world_view.sync_lit(game_state.solved_levels.size())
 	level_loaded.emit(lvl)
+	return true
+
+## True when `index` may be entered right now (first level, or predecessor solved).
+func is_level_unlocked(index: int) -> bool:
+	return game_state.is_level_unlocked(levels, index)
 
 func restart_level() -> void:
 	if is_animating():
@@ -125,8 +162,25 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if engine != null and game_state != null:
 			save_progress()
-		if is_inside_tree():
+		if exit_quits and is_inside_tree():
 			get_tree().quit()
+
+## Announce that the player wants to leave gameplay for the application menu. Persists first
+## so leaving can never lose progress.
+func request_menu() -> void:
+	save_progress()
+	menu_requested.emit()
+
+## Discard all progression and start Chapter One from level 1. Used only by the app shell's
+## confirmed "New Game". Resets in-memory state and reloads the first level.
+func start_new_game() -> void:
+	game_state = GameState.new()
+	current_index = 0
+	last_result = {}
+	last_record = {}
+	_hint_uses = 0
+	load_level(0, true)
+	save_progress()
 
 func undo() -> bool:
 	if is_animating():
@@ -205,12 +259,14 @@ func guided_move(animated: bool = true) -> bool:
 			_guide_following = false
 			return false
 		_pending_move = m
+		_hint_uses += 1
 		return true
 	_guide_following = true
 	var applied := engine.apply_move(m)
 	_guide_following = false
 	if applied:
 		_guide_cursor += 1
+		_hint_uses += 1
 		if cube_view:
 			cube_view.refresh(engine.state)
 		move_applied.emit()
@@ -268,38 +324,93 @@ func confirm_solve() -> bool:
 		return false
 	var lvl: Dictionary = levels[current_index]
 	var level_id := str(lvl["level_id"])
-	if game_state.is_solved(level_id):
-		return true  # already completed; no duplicate effects, no re-save
-	game_state.mark_solved(level_id)
-	var hook := str(lvl.get("world_hook", ""))
-	game_state.set_world_flag(hook)
-	if world_view:
-		world_view.react()
-	if cube_view:
-		cube_view.flash_solved(engine.state)
-	world_reacted.emit(hook, StoryContent.reaction_for(hook))
+	var par := int(lvl.get("par_moves", 0))
+	var moves := engine.move_count()
+	var stars := GameState.stars_for(moves, par)
+	var first_time := not game_state.is_solved(level_id)
+	# Record the attempt (best-result policy). This is safe on replays: a weaker result never
+	# overwrites a stronger record. Attempt/hint stats accumulate for feedback only.
+	var rec := game_state.record_attempt(level_id, moves, stars, _hint_uses)
+	last_record = rec["record"]
+	last_result = {
+		"level_id": level_id,
+		"title": str(lvl.get("title", "")),
+		"ordinal": int(lvl.get("ordinal", 0)),
+		"moves": moves,
+		"par": par,
+		"stars": stars,
+		"best_stars": int(rec["record"].get("best_stars", stars)),
+		"best_moves": int(rec["record"].get("best_moves", moves)),
+		"is_best": bool(rec["is_best"]),
+		"improved": bool(rec["improved"]),
+		"first_time": first_time,
+		"hints": _hint_uses,
+		"campaign_complete": false,
+		"next_index": -1,
+	}
+	_hint_uses = 0
 
-	var reward_id := str(lvl.get("reward_id", ""))
-	var reward := StoryContent.reward_for(reward_id)
-	if not reward.is_empty():
-		var equipment_id := StoryContent.equipment_id_for(reward_id)
-		if equipment_id != "":
-			game_state.grant_equipment(equipment_id)
-		reward_granted.emit(reward_id, StoryContent.equipment_for(reward_id))
-		solved.emit(lvl, reward)
-	else:
-		solved.emit(lvl, {})
+	# One-time effects (world reaction, reward, discovery) fire only on the first completion,
+	# so revisiting a level or its results screen never duplicates them.
+	if first_time:
+		game_state.mark_solved(level_id)
+		var hook := str(lvl.get("world_hook", ""))
+		game_state.set_world_flag(hook)
+		if world_view:
+			world_view.react()
+		if cube_view:
+			cube_view.flash_solved(engine.state)
+		world_reacted.emit(hook, StoryContent.reaction_for(hook))
 
-	# Optional, non-blocking discovery check (chapter-level), resolved by ID.
-	var disc_id := str(lvl.get("discovery_id", ""))
-	if disc_id != "":
-		var disc := StoryContent.discovery_for(disc_id)
-		if not disc.is_empty() and game_state.add_discovery(disc_id):
-			discovery_found.emit(disc)
+		var reward_id := str(lvl.get("reward_id", ""))
+		var reward := StoryContent.reward_for(reward_id)
+		if not reward.is_empty():
+			var equipment_id := StoryContent.equipment_id_for(reward_id)
+			if equipment_id != "":
+				game_state.grant_equipment(equipment_id)
+			reward_granted.emit(reward_id, StoryContent.equipment_for(reward_id))
+			last_result["reward_id"] = reward_id
+			last_result["reward_narrative"] = str(reward.get("narrative", ""))
+			solved.emit(lvl, reward)
+		else:
+			solved.emit(lvl, {})
+
+		# Optional, non-blocking discovery check (chapter-level), resolved by ID.
+		var disc_id := str(lvl.get("discovery_id", ""))
+		if disc_id != "":
+			var disc := StoryContent.discovery_for(disc_id)
+			if not disc.is_empty() and game_state.add_discovery(disc_id):
+				last_result["discovery_id"] = disc_id
+				last_result["discovery_name"] = str(disc.get("name", ""))
+				discovery_found.emit(disc)
+
+	# The next actionable level (first unsolved later level), or -1 when the chapter is done.
+	var next_index := -1
+	for i in range(current_index + 1, levels.size()):
+		if not game_state.is_solved(str(levels[i]["level_id"])):
+			next_index = i
+			break
+	last_result["next_index"] = next_index
+	last_result["campaign_complete"] = game_state.campaign_complete(levels)
 
 	game_state.current_level_index = current_index
 	save_progress()
+	result_ready.emit(last_result)
 	return true
+
+## The most recent completion result ({} before any completion). Used by the results screen.
+func last_result_data() -> Dictionary:
+	return last_result
+
+## Best stored record for a level index ({} when never completed).
+func best_record_for(index: int) -> Dictionary:
+	if index < 0 or index >= levels.size():
+		return {}
+	return game_state.best_for(str(levels[index]["level_id"]))
+
+## Guided steps used since the current level was entered.
+func hint_uses() -> int:
+	return _hint_uses
 
 ## Advance to the nearest unsolved later level (never skips an unsolved level) and
 ## persist the new position. Returns false when every later level is solved.
@@ -313,7 +424,8 @@ func next_level() -> bool:
 			break
 	if target < 0:
 		return false
-	load_level(target)
+	if not load_level(target):
+		return false
 	game_state.current_level_index = target
 	save_progress()
 	level_advanced.emit(target)

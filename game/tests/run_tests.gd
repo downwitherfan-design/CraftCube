@@ -65,6 +65,17 @@ func _initialize() -> void:
 	_test_guided_solver_controller()
 	_test_hud_status_text()
 	_test_scramble_fuzz()
+	# EPIC 0.3 additions
+	_test_chapter_campaign_levels()
+	_test_3x3_rendered_sync()
+	_test_mastery_ratings()
+	_test_best_result_persistence()
+	_test_save_v1_migration()
+	_test_campaign_unlock_rules()
+	_test_app_shell_navigation()
+	_test_app_campaign_flow()
+	_test_journal_visibility()
+	_test_nox_interaction()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
 		print("  - ", f)
@@ -188,7 +199,7 @@ func _test_save_load() -> void:
 func _test_level_catalog() -> void:
 	print("[level catalog]")
 	var levels := LevelCatalog.chapter_one()
-	_eq("chapter 01 has 3 levels", levels.size(), 3)
+	_eq("chapter 01 has 6 levels", levels.size(), 6)
 	for l in levels:
 		_check("level %s has objective.align" % l["level_id"],
 			str(l["objective"]["family"]) == "objective.align")
@@ -334,8 +345,8 @@ func _test_level_advancement() -> void:
 	_eq("first unsolved with empty progress", gs.first_unsolved_index(levels), 0)
 	gs.mark_solved("level.01.awaken")
 	_eq("first unsolved after level 1", gs.first_unsolved_index(levels), 1)
-	gs.mark_solved("level.01.seed_bed")
-	gs.mark_solved("level.01.hollow_stone")
+	for l in levels:
+		gs.mark_solved(str(l["level_id"]))
 	_eq("first unsolved when all solved", gs.first_unsolved_index(levels), -1)
 
 func _test_content_id_consistency() -> void:
@@ -430,7 +441,10 @@ func _test_hud_layout_and_wiring() -> void:
 			enabled += 1
 	_eq("level 1 enables all six face buttons", enabled, 6)
 	# Level 3 (Y-lock) must disable the U and D buttons via the wired controller.
-	main.load_level(2)
+	# Unlock it through real progression (solve levels 1 and 2) so the gate is satisfied.
+	main.game_state.mark_solved("level.01.awaken")
+	main.game_state.mark_solved("level.01.seed_bed")
+	_check("level 3 loads once its prerequisites are solved", main.load_level(2))
 	hud._refresh_legal()
 	var u_disabled := false
 	var d_disabled := false
@@ -547,7 +561,10 @@ func _test_completion_feedback() -> void:
 		return
 	var main = packed.instantiate()
 	main._ready()
-	main.load_level(2)  # level 3: world hook + narrative reward + discovery
+	# Unlock level 3 through real progression, then load it (world hook + reward + discovery).
+	main.game_state.mark_solved("level.01.awaken")
+	main.game_state.mark_solved("level.01.seed_bed")
+	_check("feedback: level 3 loads after prerequisites", main.load_level(2))
 	var hud = main.get_node_or_null("HUD")
 	_check("HUD bound for feedback test", hud != null and hud._story != null)
 	if hud != null:
@@ -774,9 +791,8 @@ func _test_chapter_playthrough() -> void:
 	var hud = main.get_node_or_null("HUD")
 	_check("playthrough: HUD bound", hud != null)
 	_check("playthrough: starts at level 1", main.current_index == 0)
-	var expect_hooks := ["mechanism_awakens", "seed_grows", "stone_marks_awaken"]
-	for i in range(3):
-		main.load_level(i)
+	for i in range(main.levels.size()):
+		_check("playthrough: level %d is unlocked at this point" % (i + 1), main.load_level(i))
 		for k in range(main.engine._scramble_moves.size() - 1, -1, -1):
 			main.engine.apply_move(MoveTable.inverse(main.engine._scramble_moves[k]))
 		main.cube_view.refresh(main.engine.state)
@@ -784,11 +800,12 @@ func _test_chapter_playthrough() -> void:
 		_check("playthrough: level %d confirms" % (i + 1), main.confirm_solve())
 		var lid: String = str(main.levels[i]["level_id"])
 		_check("playthrough: level %d recorded" % (i + 1), main.game_state.is_solved(lid))
+		var hook := str(main.levels[i].get("world_hook", ""))
 		_check("playthrough: level %d story reaction shown" % (i + 1),
-				hud._story.text.contains(StoryContent.reaction_for(expect_hooks[i])))
+				hud._story.text.contains(StoryContent.reaction_for(hook)))
 	_check("playthrough: chapter complete", main.game_state.first_unsolved_index(main.levels) == -1)
 	_check("playthrough: equipment persists", main.game_state.owns("equipment.rootweave_gauntlet"))
-	_check("playthrough: all three world markers lit", main.world_view.lit_count() == 3)
+	_check("playthrough: all six world markers lit", main.world_view.lit_count() == 6)
 	if main.get_parent() != null:
 		main.get_parent().remove_child(main)
 	main.free()
@@ -968,9 +985,10 @@ func _test_world_progression_landmarks() -> void:
 	var m = load("res://scenes/Main.tscn").instantiate()
 	m._ready()
 	var w = m.world_view
-	_check("world builds three ward stones", w._wards.size() == 3)
+	_check("world builds six ward stones", w._wards.size() == 6)
 	_check("world builds exactly one companion", w._nox != null)
 	_check("fresh world hides the companion", not w.nox_visible())
+	_check("companion is a multi-part figure, not a single sphere", w.nox_part_count() >= 6)
 	# Play the chapter through the real controller path and watch the wards reveal in order.
 	for i in range(m.levels.size()):
 		m.load_level(i)
@@ -984,9 +1002,14 @@ func _test_world_progression_landmarks() -> void:
 		m.confirm_solve()
 		_eq("ward %d awakened after level %d" % [i + 1, i + 1], w.wards_lit(), i + 1)
 		_eq("world tally matches solved levels after level %d" % (i + 1), w.lit_count(), i + 1)
+		# The companion awakens at the chapter's third level (the `nox_meets` beat) and stays.
+		if i + 1 >= WorldView.NOX_AWAKEN_LEVELS:
+			_check("companion visible from level %d onward" % (i + 1), w.nox_visible())
+		else:
+			_check("companion still hidden before level %d" % WorldView.NOX_AWAKEN_LEVELS, not w.nox_visible())
 		if i < m.levels.size() - 1:
 			m.next_level()
-	_check("companion appears once the chapter is complete", w.nox_visible())
+	_check("companion still present at chapter completion", w.nox_visible())
 	# Resuming from a full save restores all wards and the companion without replaying.
 	var gs := GameState.new()
 	for lvl in m.levels:
@@ -994,7 +1017,7 @@ func _test_world_progression_landmarks() -> void:
 	SaveManager.save_to_path(gs)
 	var r = load("res://scenes/Main.tscn").instantiate()
 	r._ready()
-	_eq("resume restores all ward stones", r.world_view.wards_lit(), 3)
+	_eq("resume restores all ward stones", r.world_view.wards_lit(), 6)
 	_check("resume restores the companion", r.world_view.nox_visible())
 	# A partial save reveals exactly the matching prefix of wards, not all of them.
 	SaveManager.delete_at_path(saved)
@@ -1005,7 +1028,16 @@ func _test_world_progression_landmarks() -> void:
 	p._ready()
 	_eq("one solved level reveals exactly one ward", p.world_view.wards_lit(), 1)
 	_check("one solved level still hides the companion", not p.world_view.nox_visible())
-	for node in [p, r, m]:
+	# A save with exactly the awakening threshold reveals the companion.
+	SaveManager.delete_at_path(saved)
+	var gs3 := GameState.new()
+	for i in range(WorldView.NOX_AWAKEN_LEVELS):
+		gs3.mark_solved(str(m.levels[i]["level_id"]))
+	SaveManager.save_to_path(gs3)
+	var q = load("res://scenes/Main.tscn").instantiate()
+	q._ready()
+	_check("threshold save reveals the companion", q.world_view.nox_visible())
+	for node in [p, q, r, m]:
 		if node.get_parent() != null:
 			node.get_parent().remove_child(node)
 		node.free()
@@ -1475,13 +1507,507 @@ func _test_hud_status_text() -> void:
 	_check("status names the top face for a U objective", hud._status.text.contains("top"))
 	_check("status shows progress fraction", hud._status.text.contains("/1 aligned"))
 	_check("status shows par", hud._status.text.contains("par 3"))
-	m.load_level(2)  # Hollow Stone: align top+front
+	# Unlock level 3 (Hollow Stone: align top+front) through real progression, then load it.
+	m.game_state.mark_solved("level.01.awaken")
+	m.game_state.mark_solved("level.01.seed_bed")
+	m.load_level(2)
 	hud._refresh_status()
 	_check("status names both required faces", hud._status.text.contains("top") and hud._status.text.contains("front"))
 	_check("status shows /2 for a two-face objective", hud._status.text.contains("/2 aligned"))
 	if m.get_parent() != null:
 		m.get_parent().remove_child(m)
 	m.free()
+
+# =======================================================================================
+# EPIC 0.3 — campaign, mastery, migration, application flow
+# =======================================================================================
+
+## The three prototype levels (4–6) must be genuinely playable: unique stable IDs, a recorded
+## seed, unsolved at the start, reachable under their own legal move set, not trivially solved,
+## a par that matches the scramble depth, and correct placement in the six-level chapter.
+func _test_chapter_campaign_levels() -> void:
+	print("[chapter campaign levels]")
+	var levels := LevelCatalog.chapter_one()
+	_eq("chapter has six levels", levels.size(), 6)
+	var ids := {}
+	for i in range(levels.size()):
+		var lvl: Dictionary = levels[i]
+		var lid := str(lvl["level_id"])
+		_check("%s id is unique" % lid, not ids.has(lid))
+		ids[lid] = true
+		_eq("%s ordinal matches position" % lid, int(lvl.get("ordinal", -1)), i + 1)
+		_check("%s has a recorded scramble seed" % lid, int(lvl.get("scramble", {}).get("seed", -1)) >= 0)
+		var e := PuzzleEngine.new()
+		e.setup(lvl)
+		_check("%s starts unsolved" % lid, not e.is_solved())
+		_check("%s scramble is solvable by inverse replay" % lid, e.verify_scramble_solvable())
+		_check("%s scramble actually perturbs the cube" % lid, e._scramble_moves.size() > 0)
+		_eq("%s par matches the scramble depth" % lid, int(lvl.get("par_moves", -1)), e._scramble_moves.size())
+		# The objective must be reachable through the level's own legal move set: follow the
+		# guided route (which is derived from the engine's own history) to completion.
+		var route := PuzzleSolver.route_to_solved(e)
+		var legal_all := true
+		for mv in route:
+			if not e.is_legal(mv):
+				legal_all = false
+		_check("%s guided route only uses legal moves" % lid, legal_all)
+		for mv in route:
+			e.apply_move(mv)
+		_check("%s objective reachable via legal moves" % lid, e.is_solved())
+	# The 3x3 topology must actually be exposed (not silently coerced to 2x2).
+	var l4 := LevelCatalog.by_id("level.01.deeper_resonance")
+	var e4 := PuzzleEngine.new()
+	e4.setup(l4)
+	_eq("level 4 uses the 3x3 topology", e4.state.n, 3)
+	# Constrained levels must genuinely restrict the legal set and remain solvable.
+	var l5 := LevelCatalog.by_id("level.01.constrained_paths")
+	var e5 := PuzzleEngine.new()
+	e5.setup(l5)
+	_check("level 5 seals the left/right faces", not e5._legal_faces.has("L") and not e5._legal_faces.has("R"))
+	_check("level 5 still exposes front/back/top/bottom", e5._legal_faces.has("F") and e5._legal_faces.has("B") and e5._legal_faces.has("U") and e5._legal_faces.has("D"))
+	_check("level 5 objective is not auto-satisfied", not e5.is_solved())
+	var l6 := LevelCatalog.by_id("level.01.closing_trial")
+	var e6 := PuzzleEngine.new()
+	e6.setup(l6)
+	_check("level 6 seals the front/back faces", not e6._legal_faces.has("F") and not e6._legal_faces.has("B"))
+	_check("level 6 objective is not auto-satisfied", not e6.is_solved())
+
+## The newly exposed 3x3 topology must render and animate without logical/rendered divergence.
+## Load level 4, build the real view, perform an animated turn through the real input path,
+## and verify the facelet count and rendered colours match the truth layer exactly.
+func _test_3x3_rendered_sync() -> void:
+	print("[3x3 rendered sync]")
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	m.game_state.mark_solved("level.01.awaken")
+	m.game_state.mark_solved("level.01.seed_bed")
+	m.game_state.mark_solved("level.01.hollow_stone")
+	_check("3x3 level 4 loads through the gate", m.load_level(3))
+	_eq("engine reports the 3x3 topology", m.engine.state.n, 3)
+	_eq("view builds one facelet per cube facelet", m.cube_view._facelets.size(), 6 * 3 * 3)
+	# An animated turn through the real controller path, settled deterministically.
+	var ok: bool = m.try_move("U", true)
+	_check("3x3 animated turn is accepted", ok)
+	m.cube_view.skip_animation()
+	_check("3x3 animation settles and releases the lock", not m.is_animating())
+	var n: int = m.engine.state.n
+	var mismatches := 0
+	for face in range(6):
+		for r in range(n):
+			for c in range(n):
+				var idx := face * n * n + r * n + c
+				var want: int = (m.engine.state.colours[idx] / (n * n)) % 6
+				var mi = m.cube_view._facelets[idx]
+				if mi.material_override.albedo_color != m.cube_view._materials[want].albedo_color:
+					mismatches += 1
+	_check("3x3 rendered facelets match the truth layer after a turn", mismatches == 0)
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+
+## The deterministic rating rule: 3 stars at/below par, 2 within 150%, else 1. Integer only.
+func _test_mastery_ratings() -> void:
+	print("[mastery ratings]")
+	_eq("at par is three stars", GameState.stars_for(10, 10), 3)
+	_eq("below par is three stars", GameState.stars_for(8, 10), 3)
+	_eq("one over par is two stars", GameState.stars_for(11, 10), 2)
+	_eq("exactly 150% of par is two stars", GameState.stars_for(15, 10), 2)
+	_eq("just past 150% is one star", GameState.stars_for(16, 10), 1)
+	# Odd par: floor(1.5*par) is the two-star ceiling, computed with integer arithmetic.
+	_eq("floor(1.5*7)=10 is two stars", GameState.stars_for(10, 7), 2)
+	_eq("11 moves on par 7 is one star", GameState.stars_for(11, 7), 1)
+	_eq("par 0 is a free completion (three stars)", GameState.stars_for(99, 0), 3)
+
+## Best-result policy: a better replay improves the record, a worse replay never overwrites it.
+func _test_best_result_persistence() -> void:
+	print("[best result persistence]")
+	var path := "user://t_best_save.json"
+	SaveManager.delete_at_path(path)
+	var g := GameState.new()
+	var r1 := g.record_attempt("level.01.awaken", 12, GameState.stars_for(12, 3), 0)
+	_check("first attempt is a best", bool(r1["is_best"]))
+	_eq("first best moves stored", g.best_moves("level.01.awaken"), 12)
+	_eq("first best stars stored", g.best_stars("level.01.awaken"), 1)
+	# A worse replay must not change the record.
+	var r2 := g.record_attempt("level.01.awaken", 30, GameState.stars_for(30, 3), 2)
+	_check("worse replay is not a best", not bool(r2["is_best"]))
+	_eq("worse replay keeps best moves", g.best_moves("level.01.awaken"), 12)
+	_eq("worse replay keeps best stars", g.best_stars("level.01.awaken"), 1)
+	_eq("attempts accumulate", int(g.best_for("level.01.awaken").get("attempts", 0)), 2)
+	_eq("hints accumulate", int(g.best_for("level.01.awaken").get("hints", 0)), 2)
+	# A better replay improves it.
+	var r3 := g.record_attempt("level.01.awaken", 3, GameState.stars_for(3, 3), 0)
+	_check("better replay is a best", bool(r3["is_best"]))
+	_check("better replay reports improvement", bool(r3["improved"]))
+	_eq("best moves improved", g.best_moves("level.01.awaken"), 3)
+	_eq("best stars improved", g.best_stars("level.01.awaken"), 3)
+	# Persistence across a save/reload.
+	SaveManager.save_to_path(g, path)
+	var r := SaveManager.load_from_path(path)
+	_eq("best moves survive reload", r.best_moves("level.01.awaken"), 3)
+	_eq("best stars survive reload", r.best_stars("level.01.awaken"), 3)
+	_eq("attempt count survives reload", int(r.best_for("level.01.awaken").get("attempts", 0)), 3)
+	# Ties on stars are broken by fewer moves, but never by more.
+	g.record_attempt("level.01.awaken", 2, 3, 0)
+	_eq("fewer moves at equal stars improves", g.best_moves("level.01.awaken"), 2)
+	g.record_attempt("level.01.awaken", 9, 3, 0)
+	_eq("more moves at equal stars does not regress", g.best_moves("level.01.awaken"), 2)
+	SaveManager.delete_at_path(path)
+
+## A version-1 save (no level_records) must load with every field preserved and no records,
+## then be upgraded to version 2 on the next write. Nothing legitimate is reset.
+func _test_save_v1_migration() -> void:
+	print("[save v1 migration]")
+	var path := "user://t_migrate_save.json"
+	SaveManager.delete_at_path(path)
+	var v1 := {
+		"save_version": 1,
+		"solved_levels": ["level.01.awaken", "level.01.seed_bed"],
+		"discoveries": ["discovery.01.first_pulse"],
+		"owned_equipment": ["equipment.rootweave_gauntlet"],
+		"loadout": ["equipment.rootweave_gauntlet"],
+		"world_flags": {"mechanism_awakens": true, "seed_grows": true},
+		"current_level_index": 2,
+	}
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify(v1))
+	f.close()
+	var g := SaveManager.load_from_path(path)
+	_check("v1 solved levels preserved", g.is_solved("level.01.awaken") and g.is_solved("level.01.seed_bed"))
+	_eq("v1 discoveries preserved", g.discoveries, ["discovery.01.first_pulse"])
+	_check("v1 equipment preserved", g.owns("equipment.rootweave_gauntlet"))
+	_check("v1 loadout preserved", g.is_equipped("equipment.rootweave_gauntlet"))
+	_check("v1 world flags preserved", g.world_flags.has("mechanism_awakens") and g.world_flags.has("seed_grows"))
+	_eq("v1 campaign position preserved", g.current_level_index, 2)
+	_check("v1 save has no mastery records (empty table)", g.level_records.is_empty())
+	# The next write must be schema version 2 and still carry the v1 data.
+	SaveManager.save_to_path(g, path)
+	var reread := SaveManager.load_from_path(path)
+	_check("upgraded save is version 2", int(reread.to_dict().get("save_version", 0)) == 2)
+	_check("upgrade keeps solved levels", reread.is_solved("level.01.seed_bed"))
+	_check("upgrade keeps discoveries", reread.discoveries.has("discovery.01.first_pulse"))
+	# A malformed level_records table is coerced to empty, never trusted.
+	var v2bad := {
+		"save_version": 2, "solved_levels": [], "level_records": {
+			"ok": {"best_moves": 5, "best_stars": 3, "attempts": 1, "hints": 0},
+			"bad_stars": {"best_moves": 5, "best_stars": 9},
+			"bad_type": "nope",
+		},
+	}
+	f = FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify(v2bad))
+	f.close()
+	var gb := SaveManager.load_from_path(path)
+	_eq("valid record kept", gb.best_stars("ok"), 3)
+	_check("out-of-range stars record dropped", gb.best_for("bad_stars").is_empty())
+	_check("wrong-typed record dropped", gb.best_for("bad_type").is_empty())
+	SaveManager.delete_at_path(path)
+
+## Sequential unlock rule: level 1 always open; each later level needs its predecessor solved.
+func _test_campaign_unlock_rules() -> void:
+	print("[campaign unlock rules]")
+	var levels := LevelCatalog.chapter_one()
+	var g := GameState.new()
+	_check("level 1 is unlocked with no progress", g.is_level_unlocked(levels, 0))
+	_check("level 2 is locked with no progress", not g.is_level_unlocked(levels, 1))
+	_check("highest unlocked with no progress is level 1", g.highest_unlocked_index(levels) == 0)
+	g.mark_solved("level.01.awaken")
+	_check("solving level 1 unlocks level 2", g.is_level_unlocked(levels, 1))
+	_check("level 3 still locked", not g.is_level_unlocked(levels, 2))
+	# Solving out of order does not open a gap: level 3 needs level 2 specifically.
+	g.mark_solved("level.01.hollow_stone")
+	_check("level 3 stays locked without level 2", not g.is_level_unlocked(levels, 2))
+	g.mark_solved("level.01.seed_bed")
+	_check("level 3 unlocks once level 2 is solved", g.is_level_unlocked(levels, 2))
+	_check("campaign is not complete yet", not g.campaign_complete(levels))
+	for l in levels:
+		g.mark_solved(str(l["level_id"]))
+	_check("campaign completes when all levels solved", g.campaign_complete(levels))
+	_check("highest unlocked reaches the last level", g.highest_unlocked_index(levels) == levels.size() - 1)
+	_check("out-of-range index is not unlocked", not g.is_level_unlocked(levels, 99))
+
+## The application shell must boot into a working flow and route into the real gameplay scene
+## through real application state (not static mockups).
+func _test_app_shell_navigation() -> void:
+	print("[app shell navigation]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var packed: PackedScene = load("res://scenes/App.tscn")
+	_check("App.tscn loads as PackedScene", packed != null)
+	if packed == null:
+		return
+	var app = _mount_app(packed)
+	_check("app boots into the title screen", app.current_screen() == "title")
+	_check("app mounts exactly one gameplay controller", app.game != null)
+	_check("gameplay starts hidden behind the title", not app.game.visible)
+	_check("continue is disabled with no progress", app._screens["title_continue"].disabled)
+	# New Game with no progress starts immediately and enters the game.
+	app._on_new_game_pressed()
+	_check("new game enters gameplay", app.current_screen() == "game")
+	_check("gameplay is visible in game", app.game.visible)
+	_check("new game loaded level 1", app.game.current_index == 0)
+	# Menu navigation paths.
+	app._open_map()
+	_check("chapter map opens", app.current_screen() == "map")
+	_check("map builds one card per level", app._screens["map_grid"].get_child_count() == 6)
+	app._open_journal()
+	_check("journal opens", app.current_screen() == "journal")
+	app._open_settings()
+	_check("settings opens", app.current_screen() == "settings")
+	app._open_title()
+	_check("back returns to the title", app.current_screen() == "title")
+	_check("continue stays disabled with no solved levels", app._screens["title_continue"].disabled)
+	# Solving a level enables Continue (real progress, not just entering gameplay).
+	app._play_level(0)
+	_check("level 1 solves through the app", _solve_current(app))
+	app._open_title()
+	_check("continue is enabled after solving a level", not app._screens["title_continue"].disabled)
+	# The gameplay HUD offers a menu path that routes back to the app.
+	app._play_level(0)
+	_check("playing a level shows gameplay", app.current_screen() == "game")
+	app.game.request_menu()
+	_check("HUD menu request returns to the chapter map", app.current_screen() == "map")
+	# Settings have a real effect on the gameplay cube view.
+	app._toggle_reduced_motion()
+	_check("reduced motion reaches the cube view", app.game.cube_view.reduced_motion)
+	app._toggle_reduced_motion()
+	_check("reduced motion can be turned back off", not app.game.cube_view.reduced_motion)
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## Drive the full six-level campaign through the application shell's real screens and the real
+## gameplay engine, then verify results, mastery, unlock progression and the campaign end state.
+func _test_app_campaign_flow() -> void:
+	print("[app campaign flow]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var app = _mount_app(load("res://scenes/App.tscn"))
+	app._begin_new_game()
+	_check("campaign flow starts at level 1", app.game.current_index == 0)
+	var seen_stars := []
+	for i in range(app.game.levels.size()):
+		var ok: bool = app._play_level(i)
+		_check("campaign flow enters level %d" % (i + 1), ok and app.game.current_index == i)
+		# Solve through the real animated turn path (guided route), settling each turn.
+		var guard := 0
+		while not app.game.engine.is_solved() and guard < 60:
+			if not app.game.guided_move():
+				break
+			while app.game.is_animating():
+				app.game.cube_view.skip_animation()
+			guard += 1
+		_check("campaign flow level %d solved" % (i + 1), app.game.engine.is_solved())
+		var before_solved: int = app.game.game_state.solved_levels.size()
+		_check("campaign flow level %d confirms" % (i + 1), app.game.confirm_solve())
+		var r: Dictionary = app.game.last_result_data()
+		_check("result carries a title for level %d" % (i + 1), str(r.get("title", "")) != "")
+		_check("result carries par for level %d" % (i + 1), int(r.get("par", 0)) > 0)
+		_check("result stars are in range for level %d" % (i + 1), int(r.get("stars", 0)) >= 1 and int(r.get("stars", 0)) <= 3)
+		seen_stars.append(int(r.get("stars", 0)))
+		if i < app.game.levels.size() - 1:
+			_check("solving level %d unlocks the next" % (i + 1),
+				app.game.game_state.solved_levels.size() == before_solved + 1
+				and app.game.is_level_unlocked(i + 1))
+	# A locked level must be rejected by the controller even via a direct call.
+	SaveManager.delete_at_path(saved)
+	var fresh = _mount_app(load("res://scenes/App.tscn"))
+	fresh._begin_new_game()
+	_check("direct load of a locked level is rejected", not fresh.game.load_level(3))
+	_check("direct load does not move the campaign position", fresh.game.current_index == 0)
+	_check("locked level 4 cannot be entered from the map", not fresh._play_level(3))
+	if fresh.get_parent() != null:
+		fresh.get_parent().remove_child(fresh)
+	fresh.free()
+	# Campaign completion state.
+	_check("campaign is complete after six levels", app.game.game_state.campaign_complete(app.game.levels))
+	var completed: Dictionary = app.game.last_result_data()
+	_check("final result reports campaign completion", bool(completed.get("campaign_complete", false)))
+	# Replay a completed level: best result is preserved and no reward duplicates.
+	var best_before: int = app.game.game_state.best_stars(str(app.game.levels[2]["level_id"]))
+	app._play_level(2)
+	var guard2 := 0
+	while not app.game.engine.is_solved() and guard2 < 60:
+		if not app.game.guided_move():
+			break
+		while app.game.is_animating():
+			app.game.cube_view.skip_animation()
+		guard2 += 1
+	app.game.confirm_solve()
+	_check("replay keeps the best star rating", app.game.game_state.best_stars(str(app.game.levels[2]["level_id"])) >= best_before)
+	_check("replay does not add a duplicate solved entry",
+		app.game.game_state.solved_levels.size() == app.game.levels.size())
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## The journal must show discovered entries with their real text and hide undiscovered text.
+func _test_journal_visibility() -> void:
+	print("[journal visibility]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var app = _mount_app(load("res://scenes/App.tscn"))
+	app._begin_new_game()
+	# Fresh journal: nothing discovered, no hidden text leaked.
+	app._open_journal()
+	var list: VBoxContainer = app._screens["journal_list"]
+	_eq("journal lists every discovery entry", list.get_child_count(), StoryContent.all_discoveries().size())
+	var fresh_text := _all_label_text(list)
+	var d1 := StoryContent.discovery_for("discovery.01.first_pulse")
+	_check("undiscovered entry is labelled locked", fresh_text.contains("Undiscovered"))
+	_check("undiscovered entry hides its real text", not fresh_text.contains(str(d1.get("text", ""))))
+	# Discover entry 1 by completing levels 1 and 2 through the real controller path
+	# (level 2 is gated behind level 1, so it must be reached sequentially).
+	_check("level 1 solves for journal", _solve_current(app))
+	app._play_level(1)
+	_check("level 2 solves for journal", _solve_current(app))
+	_check("level 2 recorded its discovery", app.game.game_state.discoveries.has("discovery.01.first_pulse"))
+	app._open_journal()
+	var shown := _all_label_text(list)
+	_check("discovered entry shows its name", shown.contains(str(d1.get("name", ""))))
+	_check("discovered entry shows its real text", shown.contains(str(d1.get("text", ""))))
+	# The journal state must survive a reload from the save.
+	app.game.save_progress()
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+	var app2 = _mount_app(load("res://scenes/App.tscn"))
+	app2._open_journal()
+	var shown2 := _all_label_text(app2._screens["journal_list"])
+	_check("journal state restores after reload", shown2.contains(str(d1.get("text", ""))))
+	if app2.get_parent() != null:
+		app2.get_parent().remove_child(app2)
+	app2.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## Nox must be unavailable before awakening, available after, restore from a save, and be a
+## recognisable multi-part figure. Its dialogue must not replay one-time reward logic.
+func _test_nox_interaction() -> void:
+	print("[nox interaction]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var app = _mount_app(load("res://scenes/App.tscn"))
+	app._begin_new_game()
+	_check("Nox is unavailable before awakening", not app.nox_available())
+	_check("Nox offers no dialogue before awakening", app.nox_dialogue_text() == "")
+	_check("Nox is hidden in the world before awakening", not app.game.world_view.nox_visible())
+	# Complete the chapter's third level through the real path to awaken Nox.
+	for i in range(3):
+		app._play_level(i)
+		var guard := 0
+		while not app.game.engine.is_solved() and guard < 60:
+			if not app.game.guided_move():
+				break
+			while app.game.is_animating():
+				app.game.cube_view.skip_animation()
+			guard += 1
+		app.game.confirm_solve()
+	_check("Nox is available after the third level", app.nox_available())
+	_check("Nox is visible in the world after awakening", app.game.world_view.nox_visible())
+	var text: String = app.nox_dialogue_text()
+	_check("Nox dialogue uses the authored greeting", text.contains(StoryContent.nox_line("greeting")))
+	_check("Nox dialogue uses the authored line", text.contains(StoryContent.nox_line("awakened")))
+	# Equipment from the awakening is granted exactly once.
+	_check("awakening granted the Rootweave Gauntlet", app.game.game_state.owns("equipment.rootweave_gauntlet"))
+	var owned_before: int = app.game.game_state.owned_equipment.size()
+	app._play_level(2)
+	var guard2 := 0
+	while not app.game.engine.is_solved() and guard2 < 60:
+		if not app.game.guided_move():
+			break
+		while app.game.is_animating():
+			app.game.cube_view.skip_animation()
+		guard2 += 1
+	app.game.confirm_solve()
+	_eq("replaying the awakening level does not duplicate equipment",
+		app.game.game_state.owned_equipment.size(), owned_before)
+	# Restore from a save: Nox is available again without replaying the awakening.
+	app.game.save_progress()
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+	var app2 = _mount_app(load("res://scenes/App.tscn"))
+	_check("Nox restores as available after reload", app2.nox_available())
+	_check("Nox is visible in the world after reload", app2.game.world_view.nox_visible())
+	_check("Nox dialogue is revisitable after reload", app2.nox_dialogue_text().contains(StoryContent.nox_line("awakened")))
+	if app2.get_parent() != null:
+		app2.get_parent().remove_child(app2)
+	app2.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## Instantiate the application shell and add it to the real scene tree so its `_ready` runs
+## (mounting the gameplay child, building screens) exactly as at runtime.
+func _mount_app(packed: PackedScene) -> Node:
+	var app := packed.instantiate()
+	get_root().add_child(app)
+	# The test SceneTree runs entirely inside `_initialize`, before the tree's first frame, so
+	# node `_ready` is not delivered automatically. Invoke the app's `_ready` (which mounts the
+	# single gameplay instance), then ready that subtree bottom-up — the same order Godot uses —
+	# so the HUD readies before the controller, exactly as at runtime.
+	app._ready()
+	_force_ready(app.game)
+	return app
+
+func _force_ready(node: Node) -> void:
+	if node == null:
+		return
+	for c in node.get_children():
+		_force_ready(c)
+	if not node.is_node_ready() and node.has_method("_ready"):
+		node._ready()
+
+## Solve the level currently loaded in an app's gameplay controller through the real guided
+## turn path (settling each animation), then confirm. Returns true when the level completed.
+func _solve_current(app: Node) -> bool:
+	var guard := 0
+	while not app.game.engine.is_solved() and guard < 80:
+		if not app.game.guided_move():
+			break
+		while app.game.is_animating():
+			app.game.cube_view.skip_animation()
+		guard += 1
+	if not app.game.engine.is_solved():
+		return false
+	return app.game.confirm_solve()
+
+## Concatenate every Label's text in a subtree (for asserting what a screen really shows).
+func _all_label_text(node: Node) -> String:
+	var out := ""
+	if node is Label:
+		out += str(node.text) + "\n"
+	for c in node.get_children():
+		out += _all_label_text(c)
+	return out
 
 func _colour_histogram(c: CubeState) -> Dictionary:
 	var h := {}

@@ -6,19 +6,22 @@ extends Node3D
 ## progress:
 ##   * a ground plane that warms as the chapter advances,
 ##   * a tally ring of 12 markers (one per solved level, capped) — this is `lit_count()`,
-##   * three larger "ward" stones, one per Chapter 01 level, each awakening as its level is
+##   * six larger "ward" stones, one per Chapter 01 level, each awakening as its level is
 ##     solved, so every level's completion leaves a distinct, spatially separate landmark,
-##   * Nox, the stone companion from `reward.01.nox_meets`, who appears once the chapter's
-##     third level is solved.
+##   * Nox, the stone companion from `reward.01.nox_meets`, who awakens once the chapter's
+##     third level is solved and is presented as a small recognisable figure.
 ## This is presentation only — the trigger is domain content (world hooks / solved count).
 
 const RING_MARKERS := 12
-const WARD_COUNT := 3
+const WARD_COUNT := 6
+## Nox awakens at the chapter's third level (the authored `reward.01.nox_meets` beat).
+const NOX_AWAKEN_LEVELS := 3
 
 var _ground: MeshInstance3D
 var _growth: Array = []
 var _wards: Array = []
-var _nox: MeshInstance3D
+var _nox: Node3D
+var _nox_parts: Array = []
 var _lit := 0
 var _lit_ground := Color(0.12, 0.14, 0.12)
 var _warm_ground := Color(0.2, 0.21, 0.16)
@@ -61,16 +64,20 @@ func build() -> void:
 	_build_wards()
 	_build_nox()
 
-## Three ward stones placed at increasing radius and turn, one per Chapter 01 level.
+## One ward stone per Chapter 01 level, placed at increasing radius and turn so each level's
+## completion leaves a distinct, spatially separate landmark.
 func _build_wards() -> void:
 	var palette := [
 		Color(0.55, 0.85, 0.95),  # level 1 — cool "mechanism awakens" light
 		Color(0.6, 0.95, 0.55),   # level 2 — green "seed grows"
 		Color(0.98, 0.82, 0.45),  # level 3 — amber "stone marks awaken"
+		Color(0.62, 0.78, 0.98),  # level 4 — "resonance deepens"
+		Color(0.78, 0.62, 0.95),  # level 5 — "paths converge"
+		Color(0.98, 0.9, 0.62),   # level 6 — "chapter sealed"
 	]
 	for i in range(WARD_COUNT):
-		var a := -0.7 + float(i) * 1.1
-		var radius := 2.9 + float(i) * 0.35
+		var a := -0.7 + float(i) * 0.62
+		var radius := 2.9 + float(i) * 0.16
 		var pillar := CylinderMesh.new()
 		pillar.top_radius = 0.16
 		pillar.bottom_radius = 0.22
@@ -95,21 +102,65 @@ func _build_wards() -> void:
 		node.add_child(cap)
 		_wards.append({"node": node, "material": mat, "cap": cap_mat, "colour": palette[i]})
 
-## Nox: a small stone companion near the cube, hidden until the chapter is complete.
+## Nox: a small stone companion near the cube, hidden until it awakens (chapter's third
+## level). Assembled from a few primitives into a recognisable figure — a body, a head with
+## two eyes, two arm nubs and a crest — rather than a single decorative sphere. Still
+## lightweight (six primitive meshes) and entirely procedural.
 func _build_nox() -> void:
-	_nox = MeshInstance3D.new()
-	var body := SphereMesh.new()
-	body.radius = 0.22
-	body.height = 0.44
-	_nox.mesh = body
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.62, 0.6, 0.66)
-	mat.emission_enabled = true
-	mat.emission = Color(0.22, 0.3, 0.4)
-	_nox.material_override = mat
-	_nox.position = Vector3(1.7, -1.2, 1.4)
+	_nox = Node3D.new()
+	_nox.position = Vector3(1.7, -1.05, 1.4)
 	_nox.visible = false
+	_nox_parts.clear()
+
+	var body_mat := StandardMaterial3D.new()
+	body_mat.albedo_color = Color(0.6, 0.58, 0.66)
+	body_mat.emission_enabled = true
+	body_mat.emission = Color(0.2, 0.27, 0.38)
+
+	var eye_mat := StandardMaterial3D.new()
+	eye_mat.albedo_color = Color(0.85, 0.95, 1.0)
+	eye_mat.emission_enabled = true
+	eye_mat.emission = Color(0.5, 0.8, 1.0)
+
+	var crest_mat := StandardMaterial3D.new()
+	crest_mat.albedo_color = Color(0.72, 0.9, 0.95)
+	crest_mat.emission_enabled = true
+	crest_mat.emission = Color(0.3, 0.6, 0.7)
+
+	var body := SphereMesh.new()
+	body.radius = 0.2
+	body.height = 0.34
+	_add_nox_part(body, body_mat, Vector3(0, 0, 0))
+	var head := SphereMesh.new()
+	head.radius = 0.14
+	head.height = 0.26
+	_add_nox_part(head, body_mat, Vector3(0, 0.3, 0))
+	var eye := SphereMesh.new()
+	eye.radius = 0.035
+	eye.height = 0.07
+	_add_nox_part(eye, eye_mat, Vector3(-0.05, 0.32, 0.11))
+	_add_nox_part(eye, eye_mat, Vector3(0.05, 0.32, 0.11))
+	var arm := CylinderMesh.new()
+	arm.top_radius = 0.03
+	arm.bottom_radius = 0.03
+	arm.height = 0.18
+	_add_nox_part(arm, body_mat, Vector3(-0.19, 0.02, 0), Vector3(0, 0, deg_to_rad(28)))
+	_add_nox_part(arm, body_mat, Vector3(0.19, 0.02, 0), Vector3(0, 0, deg_to_rad(-28)))
+	var crest := CylinderMesh.new()
+	crest.top_radius = 0.0
+	crest.bottom_radius = 0.06
+	crest.height = 0.12
+	_add_nox_part(crest, crest_mat, Vector3(0, 0.46, 0))
 	add_child(_nox)
+
+func _add_nox_part(mesh: Mesh, mat: Material, pos: Vector3, rot: Vector3 = Vector3.ZERO) -> void:
+	var mi := MeshInstance3D.new()
+	mi.mesh = mesh
+	mi.material_override = mat
+	mi.position = pos
+	mi.rotation = rot
+	_nox.add_child(mi)
+	_nox_parts.append(mi)
 
 ## Light up the next growth marker; represents a world hook firing. Idempotent in effect:
 ## lighting is capped at the marker count so a repeated/extra call cannot exceed the ring.
@@ -155,8 +206,10 @@ func sync_lit(count: int) -> void:
 	if _ground != null:
 		var t := clampf(float(target) / float(WARD_COUNT), 0.0, 1.0)
 		(_ground.material_override as StandardMaterial3D).albedo_color = _lit_ground.lerp(_warm_ground, t)
+	# Nox awakens at the chapter's third level, not at full completion — the companion joins
+	# the player for the last three levels (matches the `reward.01.nox_meets` beat).
 	if _nox != null:
-		_nox.visible = target >= WARD_COUNT
+		_nox.visible = target >= NOX_AWAKEN_LEVELS
 	_lit = target
 
 func lit_count() -> int:
@@ -168,3 +221,8 @@ func wards_lit() -> int:
 
 func nox_visible() -> bool:
 	return _nox != null and _nox.visible
+
+## Number of primitive meshes composing the companion (0 before it is built). Lets a test
+## prove Nox is a recognisable multi-part figure rather than a single decorative sphere.
+func nox_part_count() -> int:
+	return _nox_parts.size()

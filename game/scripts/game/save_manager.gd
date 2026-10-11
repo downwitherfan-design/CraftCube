@@ -87,6 +87,14 @@ static func save_settings(settings: Dictionary, path: String = SETTINGS_PATH) ->
 		DirAccess.remove_absolute(_abs(tmp))
 	return true
 
+## Merge a partial patch into the existing settings file rather than replacing it, so one
+## screen changing one preference can never silently drop another preference's key.
+static func update_settings(patch: Dictionary, path: String = SETTINGS_PATH) -> bool:
+	var current := load_settings(path)
+	for k in patch.keys():
+		current[k] = patch[k]
+	return save_settings(current, path)
+
 static func load_settings(path: String = SETTINGS_PATH) -> Dictionary:
 	if not FileAccess.file_exists(path):
 		return {}
