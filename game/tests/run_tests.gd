@@ -99,6 +99,10 @@ func _initialize() -> void:
 	_test_audio_director_cues()
 	_test_audio_event_wiring()
 	_test_audio_settings_persistence()
+	# EPIC 0.4 Milestone F additions (world item loop)
+	_test_world_cache_item_loop()
+	_test_veiled_mark_item_use()
+	_test_item_loop_persistence()
 	_restore_ambient_save()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -2720,4 +2724,140 @@ func _test_audio_settings_persistence() -> void:
 		d3.get_parent().remove_child(d3)
 	d3.free()
 	SaveManager.delete_settings(p)
+# =======================================================================================
+# EPIC 0.4 Milestone F — world item loop (cache discovery + Stone Lens use)
+# =======================================================================================
+
+## The cache is a genuine in-world discovery: it appears only after the restored area exists
+## (levels 1–2 solved), grants the Stone Lens + discovery exactly once, then is gone for good.
+func _test_world_cache_item_loop() -> void:
+	print("[world cache item loop]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var app = _mount_app(load("res://scenes/App.tscn"))
+	app._begin_new_game()
+	# Fresh world: no cache exists and the router exposes no cache target.
+	_check("fresh world has no cache", not app.game.world_view.cache_available())
+	_check("fresh world exposes no cache target", not _has_target(app.game.world_view, WorldView.TARGET_CACHE))
+	# Solve level 1: still no cache (needs the seed bed too).
+	app._play_level(0)
+	_check("level 1 solved for cache test", _solve_current(app))
+	_check("cache absent after only level 1", not app.game.world_view.cache_available())
+	# Solve level 2: the restored area exists, so the cache appears and is tappable.
+	app._play_level(1)
+	_check("level 2 solved for cache test", _solve_current(app))
+	_check("cache appears once the restored area exists", app.game.world_view.cache_available())
+	_check("cache is a registered world target", _has_target(app.game.world_view, WorldView.TARGET_CACHE))
+	# Take it through the real world-tap path.
+	app._on_world_tapped(WorldView.TARGET_CACHE)
+	_check("taking the cache grants the Stone Lens", app.game.game_state.owns("equipment.stone_lens"))
+	_check("taking the cache records its discovery", app.game.game_state.discoveries.has("discovery.01.stone_lens"))
+	_check("taking the cache sets the world flag", bool(app.game.game_state.world_flags.get("cache_taken", false)))
+	_check("the cache is gone after taking", not app.game.world_view.cache_available())
+	_check("the taken cache is no longer a target", not _has_target(app.game.world_view, WorldView.TARGET_CACHE))
+	# A repeat tap cannot re-grant or resurrect the cache.
+	app._on_world_tapped(WorldView.TARGET_CACHE)
+	_check("the cache stays gone on a repeat tap", not app.game.world_view.cache_available())
+	_check("repeat tap does not duplicate the item", app.game.game_state.owned_equipment.count("equipment.stone_lens") == 1)
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## The Stone Lens is a real item-use loop: the veiled mark only becomes tappable while the lens
+## is owned, and revealing it makes the hidden glyph meshes visible — exactly once.
+func _test_veiled_mark_item_use() -> void:
+	print("[veiled mark item use]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var app = _mount_app(load("res://scenes/App.tscn"))
+	app._begin_new_game()
+	# Without the lens the mark is scenery, not a target.
+	app.game.world_view.set_lens_owned(false)
+	_check("veiled mark is not tappable without the lens", not app.game.world_view.veiled_mark_available())
+	_check("veiled mark is not a target without the lens", not _has_target(app.game.world_view, WorldView.TARGET_VEILED_MARK))
+	_check("the glyph is not rendered before the reveal", not app.game.world_view.veiled_glyph_visible())
+	# Grant the lens directly (item acquisition is covered by the cache test) and refresh targets.
+	app.game.game_state.grant_equipment("equipment.stone_lens")
+	app.game.world_view.set_lens_owned(true)
+	app._refresh_world_targets()
+	_check("veiled mark becomes tappable once the lens is owned", app.game.world_view.veiled_mark_available())
+	_check("veiled mark is a target once the lens is owned", _has_target(app.game.world_view, WorldView.TARGET_VEILED_MARK))
+	# Use the lens through the real world-tap path.
+	app._on_world_tapped(WorldView.TARGET_VEILED_MARK)
+	_check("using the lens reveals the mark", app.game.world_view.veiled_revealed())
+	_check("the revealed glyph is actually rendered", app.game.world_view.veiled_glyph_visible())
+	_check("the reveal records its discovery", app.game.game_state.discoveries.has("discovery.01.veiled_glyph"))
+	_check("the reveal sets the world flag", bool(app.game.game_state.world_flags.get("veiled_mark_revealed", false)))
+	_check("a revealed mark is no longer a target", not _has_target(app.game.world_view, WorldView.TARGET_VEILED_MARK))
+	# A repeat use cannot re-grant or re-reveal.
+	app._on_world_tapped(WorldView.TARGET_VEILED_MARK)
+	_check("repeat use does not duplicate the discovery", app.game.game_state.discoveries.count("discovery.01.veiled_glyph") == 1)
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## The whole item loop survives save/reload: the cache stays taken, the mark stays revealed (with
+## its glyph rendered), and neither reward nor discovery is re-granted on reload.
+func _test_item_loop_persistence() -> void:
+	print("[item loop persistence]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var app = _mount_app(load("res://scenes/App.tscn"))
+	app._begin_new_game()
+	app._play_level(0)
+	_solve_current(app)
+	app._play_level(1)
+	_solve_current(app)
+	app._on_world_tapped(WorldView.TARGET_CACHE)
+	app._on_world_tapped(WorldView.TARGET_VEILED_MARK)
+	_check("lens owned before reload", app.game.game_state.owns("equipment.stone_lens"))
+	_check("mark revealed before reload", app.game.world_view.veiled_revealed())
+	app.game.save_progress()
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+	# Reload: the world must reconstruct to the saved state without replaying any event.
+	var app2 = _mount_app(load("res://scenes/App.tscn"))
+	app2._continue_game()
+	_check("lens survives reload", app2.game.game_state.owns("equipment.stone_lens"))
+	_check("cache stays taken after reload", not app2.game.world_view.cache_available())
+	_check("cache-taken flag survives reload", bool(app2.game.game_state.world_flags.get("cache_taken", false)))
+	_check("mark stays revealed after reload", app2.game.world_view.veiled_revealed())
+	_check("the revealed glyph is rendered after reload", app2.game.world_view.veiled_glyph_visible())
+	_check("veiled-mark flag survives reload", bool(app2.game.game_state.world_flags.get("veiled_mark_revealed", false)))
+	_check("both discoveries survive reload", app2.game.game_state.discoveries.has("discovery.01.stone_lens") and app2.game.game_state.discoveries.has("discovery.01.veiled_glyph"))
+	_check("the lens is not duplicated on reload", app2.game.game_state.owned_equipment.count("equipment.stone_lens") == 1)
+	# The journal lists both new discoveries by name after reload.
+	app2._open_journal()
+	var jt := _all_ui_text(app2)
+	_check("journal shows the Stone Lens discovery", jt.contains("The Stone Lens"))
+	_check("journal shows the Veiled Glyph discovery", jt.contains("The Veiled Glyph"))
+	if app2.get_parent() != null:
+		app2.get_parent().remove_child(app2)
+	app2.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
 

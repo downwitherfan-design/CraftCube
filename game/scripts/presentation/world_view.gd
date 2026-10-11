@@ -22,8 +22,17 @@ const TARGET_NOX := "world.nox"
 ## by touching the world rather than only through a menu.
 const TARGET_NODE_NEAR := "world.path_node.near"
 const TARGET_NODE_FAR := "world.path_node.far"
+## The world cache (Milestone F): a small container that appears in the restored area once the
+## seed bed (level 2) is solved. Tapping it is the genuine in-world item discovery.
+const TARGET_CACHE := "world.cache"
+## The veiled mark: a stone slab whose hidden glyph is invisible until the Stone Lens is
+## equipped, at which point it becomes a tappable world target. Using the lens on it reveals
+## the mark — a real world change, not a HUD line.
+const TARGET_VEILED_MARK := "world.veiled_mark"
 ## Nox awakens at the chapter's third level (the authored `reward.01.nox_meets` beat).
 const NOX_AWAKEN_LEVELS := 3
+## The cache appears once the restored area exists (levels 1 and 2 solved).
+const CACHE_UNLOCK_LEVELS := 2
 
 var _ground: MeshInstance3D
 var _growth: Array = []
@@ -38,6 +47,15 @@ var _sigil_read := false
 ## Two dormant nodes flanking the broken path (FIRST_TEN_MINUTES Beat 5). One is woken first;
 ## the world remembers which, without gating progression either way.
 var _choice_nodes: Array = []
+## Milestone F world props: the cache (item discovery) and the veiled mark (item use).
+var _cache: Node3D
+var _cache_taken := false
+var _veiled_mark: Node3D
+var _veiled_glyph: MeshInstance3D
+var _veiled_revealed := false
+var _veiled_revealed_lit := false
+## True when the player currently owns the Stone Lens (drives whether the mark is tappable).
+var _lens_owned := false
 ## True once the Beat 5 first-node choice is offered (level 2 solved). Gates whether the path
 ## nodes are tappable; the nodes are always visible so the path reads even before the choice.
 var _choice_available := false
@@ -55,6 +73,13 @@ func build() -> void:
 	_sigil_read = false
 	_choice_nodes.clear()
 	_choice_available = false
+	_cache = null
+	_cache_taken = false
+	_veiled_mark = null
+	_veiled_glyph = null
+	_veiled_revealed = false
+	_veiled_revealed_lit = false
+	_lens_owned = false
 	_lit = 0
 
 	var ground_mesh := CylinderMesh.new()
@@ -88,6 +113,8 @@ func build() -> void:
 	_build_nox()
 	_build_sigil()
 	_build_choice_nodes()
+	_build_cache()
+	_build_veiled_mark()
 
 ## One ward stone per Chapter 01 level, placed at increasing radius and turn so each level's
 ## completion leaves a distinct, spatially separate landmark.
@@ -223,6 +250,86 @@ func _build_choice_nodes() -> void:
 		add_child(node)
 		_choice_nodes.append({"node": node, "material": mat, "cap": cap_mat, "colour": p["colour"], "option": p["option"]})
 
+## The world cache (Milestone F): a small lidded container that appears in the restored area
+## once the seed bed is solved. Built from a base cylinder, a body box and a small lid — a
+## distinct silhouette from the ward pillars and the sigil so the player reads it as "a thing
+## to open", not scenery. Hidden until its prerequisite is met; the router only registers it
+## as a target while it is visible.
+func _build_cache() -> void:
+	_cache = Node3D.new()
+	_cache.position = Vector3(2.5, -1.4, 0.0)
+	_cache.visible = false
+	var body_mat := StandardMaterial3D.new()
+	body_mat.albedo_color = Color(0.34, 0.28, 0.22)
+	body_mat.emission_enabled = true
+	body_mat.emission = Color(0.28, 0.2, 0.1)
+	var lid_mat := StandardMaterial3D.new()
+	lid_mat.albedo_color = Color(0.52, 0.42, 0.3)
+	var base := CylinderMesh.new()
+	base.top_radius = 0.28
+	base.bottom_radius = 0.3
+	base.height = 0.1
+	base.radial_segments = 12
+	var base_mi := MeshInstance3D.new()
+	base_mi.mesh = base
+	base_mi.material_override = body_mat
+	_cache.add_child(base_mi)
+	var body := BoxMesh.new()
+	body.size = Vector3(0.42, 0.3, 0.34)
+	var body_mi := MeshInstance3D.new()
+	body_mi.mesh = body
+	body_mi.material_override = body_mat
+	body_mi.position = Vector3(0, 0.2, 0)
+	_cache.add_child(body_mi)
+	var lid := BoxMesh.new()
+	lid.size = Vector3(0.46, 0.07, 0.38)
+	var lid_mi := MeshInstance3D.new()
+	lid_mi.mesh = lid
+	lid_mi.material_override = lid_mat
+	lid_mi.position = Vector3(0, 0.38, 0)
+	_cache.add_child(lid_mi)
+	add_child(_cache)
+
+## The veiled mark (Milestone F): a stone slab whose hidden glyph is invisible to the naked
+## eye. The slab is always present as scenery; the glyph mesh only becomes visible once the
+## Stone Lens reveals it. It is registered as a router target only while the player owns the
+## lens and the glyph is still veiled, so the "use the item" step is a genuine world tap.
+func _build_veiled_mark() -> void:
+	_veiled_mark = Node3D.new()
+	_veiled_mark.position = Vector3(-2.1, -1.35, -0.7)
+	var slab_mat := StandardMaterial3D.new()
+	slab_mat.albedo_color = Color(0.19, 0.2, 0.2)
+	var slab := BoxMesh.new()
+	slab.size = Vector3(0.7, 0.9, 0.12)
+	var slab_mi := MeshInstance3D.new()
+	slab_mi.mesh = slab
+	slab_mi.material_override = slab_mat
+	_veiled_mark.add_child(slab_mi)
+	# The hidden glyph: a bright inset cross of thin slabs, hidden until revealed.
+	var glyph_mat := StandardMaterial3D.new()
+	glyph_mat.albedo_color = Color(0.75, 0.9, 1.0)
+	glyph_mat.emission_enabled = true
+	glyph_mat.emission = Color(0.35, 0.6, 0.75)
+	_veiled_glyph = MeshInstance3D.new()
+	var glyph := BoxMesh.new()
+	glyph.size = Vector3(0.42, 0.07, 0.04)
+	_veiled_glyph.mesh = glyph
+	_veiled_glyph.material_override = glyph_mat
+	_veiled_glyph.position = Vector3(0, 0.06, 0.075)
+	_veiled_glyph.visible = false
+	_veiled_mark.add_child(_veiled_glyph)
+	var glyph2 := MeshInstance3D.new()
+	var glyph_b := BoxMesh.new()
+	glyph_b.size = Vector3(0.07, 0.42, 0.04)
+	glyph2.mesh = glyph_b
+	glyph2.material_override = glyph_mat
+	glyph2.position = Vector3(0, 0.06, 0.075)
+	glyph2.visible = false
+	_veiled_mark.add_child(glyph2)
+	_veiled_glyph.set_meta("cross", glyph2)
+	add_child(_veiled_mark)
+
+
 ## The three-notch sigil: a small distinct figure (three upright notches on a base) placed
 ## beside the cube. Hidden until the world has answered (>= 1 solved level), then tappable to
 ## reveal the Architect clue. Distinct from the ward stones (which are pillars) so the player
@@ -310,6 +417,10 @@ func sync_lit(count: int) -> void:
 	# so a fresh world exposes no interactive target and cannot be read out of order.
 	if _sigil != null:
 		_sigil.visible = target >= 1
+	# The cache appears once the restored area exists (the seed bed solved), but stays visible
+	# after it is opened only if it has NOT yet been taken — once taken it is gone for good.
+	if _cache != null:
+		_cache.visible = target >= CACHE_UNLOCK_LEVELS and not _cache_taken
 	_lit = target
 
 func lit_count() -> int:
@@ -337,6 +448,13 @@ func interactive_targets() -> Array:
 		out.append({"id": TARGET_SIGIL, "position": _sigil.position, "radius": 0.45})
 	if _nox != null and _nox.visible:
 		out.append({"id": TARGET_NOX, "position": _nox.position, "radius": 0.5})
+	# The cache is tappable only while it exists and has not been taken.
+	if _cache != null and _cache.visible and not _cache_taken:
+		out.append({"id": TARGET_CACHE, "position": _cache.position, "radius": 0.5})
+	# The veiled mark is tappable only once the player owns the Stone Lens and has not yet
+	# revealed it — so the "use the item" step is a genuine world interaction, not a menu press.
+	if _veiled_mark != null and _lens_owned and not _veiled_revealed:
+		out.append({"id": TARGET_VEILED_MARK, "position": _veiled_mark.position, "radius": 0.55})
 	# Path nodes are tappable only once the choice beat is offered; before that they are visible
 	# scenery, so a tap cannot record a decision the story has not reached.
 	if _choice_available:
@@ -412,12 +530,84 @@ func read_sigil() -> bool:
 func apply_world_flags(flags: Dictionary) -> void:
 	if bool(flags.get("sigil_read", false)):
 		_sigil_read = true
+	if bool(flags.get("cache_taken", false)):
+		_cache_taken = true
+	if bool(flags.get("veiled_mark_revealed", false)):
+		_veiled_revealed = true
+		_veiled_revealed_lit = true
+
+# --- Milestone F: world cache (item discovery) -----------------------------------------
+
+## True when the cache exists in the world and has not yet been taken.
+func cache_available() -> bool:
+	return _cache != null and _cache.visible and not _cache_taken
+
+## True once the cache has been opened (persisted as a world flag).
+func cache_taken() -> bool:
+	return _cache_taken
+
+## Take the cache. Returns true only on the first take, so the app can grant the item exactly
+## once; a repeat call changes nothing. Hides the cache for good.
+func take_cache() -> bool:
+	if not cache_available():
+		return false
+	_cache_taken = true
+	if _cache != null:
+		_cache.visible = false
+	return true
+
+# --- Milestone F: veiled mark (item use) -----------------------------------------------
+
+## Tell the world whether the player currently owns the Stone Lens. Owned => the mark becomes
+## a tappable target (the player can try to use it).
+func set_lens_owned(owned: bool) -> void:
+	_lens_owned = owned
+
+## True when the veiled mark is currently tappable (lens owned, not yet revealed).
+func veiled_mark_available() -> bool:
+	return _veiled_mark != null and _lens_owned and not _veiled_revealed
+
+## True once the hidden mark has been revealed.
+func veiled_revealed() -> bool:
+	return _veiled_revealed
+
+## Reveal the hidden mark with the Stone Lens. Returns true only the first time, so the app
+## grants the reveal consequence exactly once. Makes the glyph meshes visible — a real world
+## change, not a HUD line.
+func reveal_veiled_mark() -> bool:
+	if not veiled_mark_available():
+		return false
+	_veiled_revealed = true
+	_veiled_revealed_lit = true
+	if _veiled_glyph != null:
+		_veiled_glyph.visible = true
+		var cross = _veiled_glyph.get_meta("cross", null)
+		if cross is MeshInstance3D:
+			(cross as MeshInstance3D).visible = true
+	return true
+
+## True when the revealed glyph mesh is actually rendered (proves the world changed).
+func veiled_glyph_visible() -> bool:
+	if _veiled_glyph == null:
+		return false
+	var cross = _veiled_glyph.get_meta("cross", null)
+	return _veiled_glyph.visible and cross is MeshInstance3D and (cross as MeshInstance3D).visible
 
 ## Reconstruct the whole world appearance from authoritative progression: the solved
-## count drives the ring, wards and Nox (via sync_lit), and the saved world flags drive
-## the sigil. One call restores a loaded save without replaying any event.
-func sync_from_state(solved_count: int, flags: Dictionary, choices: Dictionary = {}, choice_available: bool = false) -> void:
-	sync_lit(solved_count)
+## count drives the ring, wards, Nox and cache (via sync_lit), and the saved world flags drive
+## the sigil, cache-taken and veiled-mark states. `lens_owned` gates whether the veiled mark is
+## currently tappable. One call restores a loaded save without replaying any event.
+func sync_from_state(solved_count: int, flags: Dictionary, choices: Dictionary = {}, choice_available: bool = false, lens_owned: bool = false) -> void:
+	# Flags first: `_cache_taken` / `_veiled_revealed` must be known before sync_lit decides the
+	# cache's visibility, so a loaded save never re-shows a cache that was already opened.
 	apply_world_flags(flags)
+	_lens_owned = lens_owned
+	sync_lit(solved_count)
 	apply_world_choices(choices)
 	_choice_available = choice_available
+	# Restore the revealed glyph's meshes to match the saved reveal state.
+	if _veiled_revealed and _veiled_glyph != null:
+		_veiled_glyph.visible = true
+		var cross = _veiled_glyph.get_meta("cross", null)
+		if cross is MeshInstance3D:
+			(cross as MeshInstance3D).visible = true

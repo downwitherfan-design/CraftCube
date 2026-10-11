@@ -90,6 +90,19 @@ const DISCOVERIES := {
 		"name": "The First Light",
 		"text": "When the last face settles, the overhead light no longer flickers. It holds — waiting for the chapter you will walk next.",
 	},
+
+        # --- Prototype discoveries (EPIC 0.4 Milestone F): the in-world item loop. Original
+        # prose, routed with the rest of the prototype content for AI-03/AI-09 ratification.
+        "discovery.01.stone_lens": {
+                "id": "discovery.01.stone_lens",
+                "name": "The Stone Lens",
+                "text": "A flat disc of pale stone, ground so fine it holds light at its edge. It was left in the cache for whoever restored the path.",
+        },
+        "discovery.01.veiled_glyph": {
+                "id": "discovery.01.veiled_glyph",
+                "name": "The Veiled Glyph",
+                "text": "Through the lens the blank slab resolves: a small cross of light, cut where no tool should reach. It was hidden, not lost.",
+        },
 }
 
 ## Nox dialogue: the companion's authored lines, shown only once it has genuinely awakened

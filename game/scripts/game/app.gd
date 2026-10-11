@@ -750,8 +750,56 @@ func _on_world_tapped(target_id: String) -> void:
 			_choose_first_node("near")
 		WorldView.TARGET_NODE_FAR:
 			_choose_first_node("far")
+		WorldView.TARGET_CACHE:
+			_take_cache()
+		WorldView.TARGET_VEILED_MARK:
+			_use_stone_lens()
 		_:
 			pass
+
+## Genuine in-world item discovery (Milestone F): the player tapped the cache that appeared in
+## the restored area. Taking it grants the Stone Lens item exactly once and records the
+## discovery + world flag, then re-registers world targets so the veiled mark becomes tappable.
+## A repeat tap cannot re-grant (the cache is gone and `take_cache` reports only the first).
+func _take_cache() -> void:
+	if game == null or game.world_view == null or not game.world_view.cache_available():
+		return
+	var first: bool = game.world_view.take_cache()
+	if first:
+		game.game_state.grant_equipment("equipment.stone_lens")
+		game.game_state.add_discovery("discovery.01.stone_lens")
+		game.game_state.set_world_flag("cache_taken")
+		game.audio.request(AudioDirector.CUE_DISCOVERY)
+		game.save_progress()
+	# Owning the lens makes the veiled mark a real world target.
+	game.world_view.set_lens_owned(game.game_state.owns("equipment.stone_lens"))
+	_refresh_world_targets()
+	_show_info("The Cache", str(StoryContent.discovery_for("discovery.01.stone_lens").get("text", "")))
+
+## Genuine in-world item use (Milestone F): the player tapped the veiled mark while carrying the
+## Stone Lens. The reveal makes the hidden glyph meshes visible (a real world change) and is
+## recorded exactly once; a repeat cannot re-grant.
+func _use_stone_lens() -> void:
+	if game == null or game.world_view == null or not game.world_view.veiled_mark_available():
+		return
+	var first: bool = game.world_view.reveal_veiled_mark()
+	if first:
+		game.game_state.add_discovery("discovery.01.veiled_glyph")
+		game.game_state.set_world_flag("veiled_mark_revealed")
+		game.audio.request(AudioDirector.CUE_DISCOVERY)
+		game.save_progress()
+	_refresh_world_targets()
+	_show_info("The Veiled Glyph", StoryContent.discovery_for("discovery.01.veiled_glyph").get("text", ""))
+
+## Show a short, non-blocking informational dialog (discovery text, world response). Reuses the
+## shared dialog node; never blocks gameplay beyond the player's own dismissal.
+func _show_info(title: String, body: String) -> void:
+	if _nox_dialog == null or body == "":
+		return
+	_nox_dialog.title = title
+	_nox_dialog.dialog_text = body
+	if is_inside_tree():
+		_nox_dialog.popup_centered()
 
 ## The Beat 5 choice is only actionable once it is genuinely available (level 2 solved) and
 ## Nox/the world have begun to answer. A tap on a path node records the decision and re-opens
