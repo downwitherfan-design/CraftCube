@@ -186,3 +186,12 @@ This file is deliberately short. Each AI must update only its own section in the
 - Known limitation: no physical Android device (no device playtest); the APK was built and statically verified in CI, not installed on a device.
 - Checkpoint: `11_INTEGRATION/OPENHANDS_RESUME_STATE.md` (Session 11).
 
+### AI-13 — Session 11b (Epic 0.3 — first GitHub Release published)
+- Branch: `godot-migration` (PR #11 → `integration`); commits `42c4c4a` (workflow hardening), `39e5cd4` (render-step fix), and the version-ledger commit — **pushed**.
+- Owner supplied a write-enabled PAT (stored out-of-band, outside the repo); all GitHub writes now use it. The earlier `403` remote-write block is **RESOLVED**.
+- Bug fixed by running the release workflow for real: the "Render release notes" step referenced `os.environ['APK_NAME']` without an `env:` block → `KeyError`; the run failed and Publish was skipped. Fixed and re-run.
+- **First GitHub Release PUBLISHED: `v0.2.0`** (pre-release) — https://github.com/downwitherfan-design/CraftCube/releases/tag/v0.2.0 — run `38146298682` success. Asset `CraftCube-v0.2.0-android-arm64-v8a-debug.apk` (28,363,821 bytes), sha256 `ee7aef55278a8f20bbc8c8d72160320c95fd0ac7d7c7607eb16fe76152d9dc83`, source commit `39e5cd4`. Downloaded and re-verified with `game/ci/verify_apk.py` → `verify_apk: OK`.
+- Post-release version bump (validator enforces the current version exceed the published ledger): `app_version.json` + `export_presets.cfg` → `0.2.1` / versionCode `3`; `validate_version: OK`. Suite **388 passed / 0 failed**.
+- Status: COMPLETE (release tooling + first published Release). Phase 00 gate remains **NOT PASSED**; PR #11 still must not merge before the gate and PR #12. Human decisions OD-0001, OD-0005 still open.
+- Checkpoint: `11_INTEGRATION/OPENHANDS_RESUME_STATE.md` (Session 11).
+

@@ -492,13 +492,22 @@ with ANIMATED turns; asserts render==truth after every turn + progression/reward
   `verify_apk.py` fails on wrong package/version/arch and on unsigned APKs.
 
 ### BLOCKED / not done (do not claim otherwise)
-- **No GitHub Release has been published yet.** The `gh`/API token is read-only (403), so neither the release workflow can
-  be triggered nor a Release created from this runtime. The first Release (`v0.2.0`, APK attached) must be created by a
-  runtime/owner with write access, or by pushing tag `v0.2.0` once the branch is pushed.
-- **Commit `78dcad1` is unpushed** (local only).
+- **RESOLVED (2026-10-11):** the owner supplied a write-enabled PAT (stored out-of-band at
+  `/home/openhands/.config/craftcube/github_token`, mode 600, outside the repo; used via a
+  `GIT_ASKPASS` helper and a one-off push URL — never printed, committed, or written into
+  `.git/config` or any repo file). With it: commits `78dcad1`/`0eb9f3a`/`42c4c4a`/`39e5cd4` were pushed,
+  the workflow render-step bug was fixed, and tag `v0.2.0` was pushed to trigger the release.
+- **GitHub Release v0.2.0 PUBLISHED** (pre-release): https://github.com/downwitherfan-design/CraftCube/releases/tag/v0.2.0
+  — run `38146298682` success; asset `CraftCube-v0.2.0-android-arm64-v8a-debug.apk` (28,363,821 bytes),
+  sha256 `ee7aef55278a8f20bbc8c8d72160320c95fd0ac7d7c7607eb16fe76152d9dc83`, source commit `39e5cd42cea645a0caa87e7e3c6cb2a3fe56d40a`.
+  The downloaded asset was re-verified with `game/ci/verify_apk.py` (`verify_apk: OK`).
 - **Phase 00 gate remains NOT PASSED.** Human decisions still open: OD-0001 (branch protection), OD-0005 (IP/title clearance).
+  PR #11 must still not merge before the gate and before PR #12 (AI-01 `PD-030`).
+- Note: the published APK sha256 (`ee7aef55…`) differs from the earlier local build (`e54ce9cb…`) — the Godot export is not
+  byte-reproducible across environments; the GitHub Release artifact is the authoritative one.
 
 ### Next safe action
-- Push `78dcad1` from a write-enabled runtime; then trigger `.github/workflows/craftcube-release.yml` (tag `v0.2.0` or a
-  manual run with `publish: true`) and confirm a GitHub Release with the verified APK asset and matching sha256.
-- Keep PR #11 green; the Phase 00 gate and human decisions remain the merge blockers.
+- Keep PR #11 green; the Phase 00 gate and human decisions remain the merge blockers. Bump `app_version.json`
+  (and its `released[]` ledger) before the next published build so version codes stay monotonic.
+- For any future published milestone: edit `game/app_version.json` → commit → push tag `vX.Y.Z` → the release workflow
+  builds, verifies and publishes the versioned APK automatically.
