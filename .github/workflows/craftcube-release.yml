@@ -74,8 +74,18 @@ jobs:
           SETTINGS="$HOME/.config/godot/editor_settings-4.7.tres"
           mkdir -p "$(dirname "$SETTINGS")"
           /opt/godot/godot --headless --editor --quit --path game || true
-          sed -i "s|^export/android/java_sdk_path = .*|export/android/java_sdk_path = \"$JAVA_HOME\"|" "$SETTINGS" || true
-          sed -i "s|^export/android/android_sdk_path = .*|export/android/android_sdk_path = \"$ANDROID_SDK_ROOT\"|" "$SETTINGS" || true
+          # Godot writes a full settings file; set the keys, appending them if absent.
+          set_kv() {
+            key="$1"; val="$2"
+            if grep -q "^${key} = " "$SETTINGS"; then
+              sed -i "s|^${key} = .*|${key} = \"${val}\"|" "$SETTINGS"
+            else
+              echo "${key} = \"${val}\"" >> "$SETTINGS"
+            fi
+          }
+          set_kv export/android/java_sdk_path "$JAVA_HOME"
+          set_kv export/android/android_sdk_path "$ANDROID_SDK_ROOT"
+          grep -E "export/android/(java|android)_sdk_path" "$SETTINGS"
 
       - name: Create debug keystore
         run: |
