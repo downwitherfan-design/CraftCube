@@ -17,6 +17,13 @@ GH_TOKEN="<owner-pat>" gh <command> --repo downwitherfan-design/CraftCube
 Pushing tag `vX.Y.Z` triggers `.github/workflows/craftcube-release.yml`, which builds and publishes
 the versioned APK.
 
+**Scope note (observed 2026-10-11):** the owner PAT carries `contents:write` (branch pushes and
+GitHub Releases succeed) but not `pull-requests`/`issues` write, so editing a PR description or
+posting a PR comment via the API returns `Resource not accessible by integration`. Record
+PR-level status in commit messages and `11_INTEGRATION/OPENHANDS_RESUME_STATE.md` when the API
+is refused. Prefer the one-off URL form `git push "https://<owner-pat>@github.com/.../CraftCube.git" <branch>`
+so the value is never left in `.git/config`.
+
 ## Release rule (non-negotiable)
 
 Every release-ready milestone must publish a **versioned APK as a GitHub Release asset**, not merely
