@@ -1,0 +1,25 @@
+{
+  "app": {
+    "materials": 51,
+    "meshes": 83,
+    "nodes": 216
+  },
+  "app_backdrop_hidden_over_gameplay": true,
+  "app_boots_to_title": true,
+  "app_gameplay_visible": true,
+  "app_screens": [
+    "title",
+    "map",
+    "journal",
+    "settings",
+    "results"
+  ],
+  "gameplay": {
+    "frame_ms_avg": 178.293608333333,
+    "frame_ms_max": 220.19,
+    "frame_ms_min": 171.102,
+    "materials": 51,
+    "meshes": 83,
+    "nodes": 145
+  }
+}
