@@ -2,15 +2,25 @@ class_name WorldView
 extends Node3D
 
 ## Original world-reaction presentation, built procedurally (primitives only) so it needs
-## no external assets and stays IP-safe. The world reacts to puzzle mastery and remembers
-## progress:
-##   * a ground plane that warms as the chapter advances,
-##   * a tally ring of 12 markers (one per solved level, capped) — this is `lit_count()`,
+## no external assets and stays IP-safe. Art direction: "The Living Mineral Garden" - a quiet,
+## ancient garden of dormant stone that the cube's laws restore, revealing warm amber/teal
+## structures and traces of a vanished intelligence. Colours come from the shared
+## `CraftPalette`, so the world, the cube and the application chrome read as one place.
+##
+## The world remembers progress:
+##   * a layered ground (dark plinth, raised garden disc, lit rim) for depth and silhouette,
+##   * a restored stepping-stone path that heals as levels are solved,
+##   * a tally ring of 12 markers (one per solved level, capped) - this is `lit_count()`,
 ##   * six larger "ward" stones, one per Chapter 01 level, each awakening as its level is
 ##     solved, so every level's completion leaves a distinct, spatially separate landmark,
 ##   * Nox, the stone companion from `reward.01.nox_meets`, who awakens once the chapter's
-##     third level is solved and is presented as a small recognisable figure.
-## This is presentation only — the trigger is domain content (world hooks / solved count).
+##     third level is solved and is presented as a small recognisable figure with a restrained
+##     idle motion.
+## This is presentation only - the trigger is domain content (world hooks / solved count).
+##
+## Idempotency: `sync_lit` / `sync_from_state` rebuild the stable appearance from truth and
+## never replay one-time events or create duplicate nodes; a fresh completion may play a short
+## effect, a restored save restores the steady state.
 
 const RING_MARKERS := 12
 const WARD_COUNT := 6
@@ -27,16 +37,21 @@ const TARGET_NODE_FAR := "world.path_node.far"
 const TARGET_CACHE := "world.cache"
 ## The veiled mark: a stone slab whose hidden glyph is invisible until the Stone Lens is
 ## equipped, at which point it becomes a tappable world target. Using the lens on it reveals
-## the mark — a real world change, not a HUD line.
+## the mark - a real world change, not a HUD line.
 const TARGET_VEILED_MARK := "world.veiled_mark"
 ## Nox awakens at the chapter's third level (the authored `reward.01.nox_meets` beat).
 const NOX_AWAKEN_LEVELS := 3
 ## The cache appears once the restored area exists (levels 1 and 2 solved).
 const CACHE_UNLOCK_LEVELS := 2
+## Number of stepping stones on the restored path.
+const PATH_STONES := 7
 
 var _ground: MeshInstance3D
+var _garden: MeshInstance3D
+var _rim: MeshInstance3D
 var _growth: Array = []
 var _wards: Array = []
+var _path: Array = []
 var _nox: Node3D
 var _nox_parts: Array = []
 ## Interactive three-notch sigil near the cube: a tap reveals the Architect clue
@@ -60,14 +75,24 @@ var _lens_owned := false
 ## nodes are tappable; the nodes are always visible so the path reads even before the choice.
 var _choice_available := false
 var _lit := 0
-var _lit_ground := Color(0.12, 0.14, 0.12)
-var _warm_ground := Color(0.2, 0.21, 0.16)
+## Accessibility: when true the ambient motion (companion idle) is held still. The world's
+## *state* (which structures are restored) is unaffected - only the motion stops.
+var reduced_motion := false
+## Companion idle phase + a transient reaction offset, kept separate so a reaction never
+## corrupts the steady-state pose a save restore must reproduce.
+var _nox_t := 0.0
+var _nox_react := 0.0
+var _nox_base_pos := Vector3.ZERO
+var _ground_base := CraftPalette.GROUND_BASE
+var _ground_garden := CraftPalette.GROUND_GARDEN
+var _ground_warm := CraftPalette.GROUND_WARM
 
 func build() -> void:
 	for c in get_children():
 		c.queue_free()
 	_growth.clear()
 	_wards.clear()
+	_path.clear()
 	_nox = null
 	_sigil = null
 	_sigil_read = false
@@ -81,34 +106,11 @@ func build() -> void:
 	_veiled_revealed_lit = false
 	_lens_owned = false
 	_lit = 0
+	_nox_t = 0.0
+	_nox_react = 0.0
 
-	var ground_mesh := CylinderMesh.new()
-	ground_mesh.top_radius = 3.2
-	ground_mesh.bottom_radius = 3.2
-	ground_mesh.height = 0.2
-	ground_mesh.radial_segments = 48
-	_ground = MeshInstance3D.new()
-	_ground.mesh = ground_mesh
-	var gm := StandardMaterial3D.new()
-	gm.albedo_color = _lit_ground
-	_ground.material_override = gm
-	_ground.position = Vector3(0, -1.55, 0)
-	add_child(_ground)
-
-	var ring_mesh := SphereMesh.new()
-	ring_mesh.radius = 0.09
-	ring_mesh.height = 0.18
-	for i in range(RING_MARKERS):
-		var a := TAU * float(i) / float(RING_MARKERS)
-		var m := MeshInstance3D.new()
-		m.mesh = ring_mesh
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = Color(0.18, 0.2, 0.18)
-		m.material_override = mat
-		m.position = Vector3(cos(a) * 2.4, -1.4, sin(a) * 2.4)
-		add_child(m)
-		_growth.append({"node": m, "material": mat})
-
+	_build_ground()
+	_build_ring()
 	_build_wards()
 	_build_nox()
 	_build_sigil()
@@ -116,17 +118,92 @@ func build() -> void:
 	_build_cache()
 	_build_veiled_mark()
 
+## Layered, bounded ground: a wide dark plinth, a raised garden disc and a lit rim. Three
+## meshes total (not dozens of primitives), so the environment gains depth and an intentional
+## silhouette without clutter or mobile cost.
+func _build_ground() -> void:
+	var base_mesh := CylinderMesh.new()
+	base_mesh.top_radius = 4.4
+	base_mesh.bottom_radius = 4.7
+	base_mesh.height = 0.5
+	base_mesh.radial_segments = 40
+	var base := MeshInstance3D.new()
+	base.mesh = base_mesh
+	base.material_override = _mat(_ground_base, 0.95)
+	base.position = Vector3(0, -1.9, 0)
+	add_child(base)
+
+	var garden_mesh := CylinderMesh.new()
+	garden_mesh.top_radius = 3.4
+	garden_mesh.bottom_radius = 3.55
+	garden_mesh.height = 0.34
+	garden_mesh.radial_segments = 44
+	_garden = MeshInstance3D.new()
+	_garden.mesh = garden_mesh
+	_garden.material_override = _mat(_ground_garden, 0.88)
+	_garden.position = Vector3(0, -1.6, 0)
+	add_child(_garden)
+
+	var rim_mesh := TorusMesh.new()
+	rim_mesh.inner_radius = 3.32
+	rim_mesh.outer_radius = 3.5
+	rim_mesh.rings = 40
+	rim_mesh.ring_segments = 8
+	_rim = MeshInstance3D.new()
+	_rim.mesh = rim_mesh
+	_rim.material_override = _mat(CraftPalette.GROUND_RIM, 0.7)
+	_rim.position = Vector3(0, -1.46, 0)
+	add_child(_rim)
+
+	_build_path()
+
+## A readable broken/restored path: stepping stones running from the entrance toward the centre.
+## Dormant stones sit low and dark; restored ones take the path's teal accent, so the walk
+## from the entrance visibly heals as levels are solved.
+func _build_path() -> void:
+	for i in range(PATH_STONES):
+		var t := float(i) / float(PATH_STONES - 1)
+		var stone := CylinderMesh.new()
+		stone.top_radius = 0.2
+		stone.bottom_radius = 0.22
+		stone.height = 0.09
+		stone.radial_segments = 10
+		var mi := MeshInstance3D.new()
+		mi.mesh = stone
+		var mat := _mat(CraftPalette.PATH_DORMANT, 0.85)
+		mi.material_override = mat
+		var z := 2.7 - t * 2.5
+		var x := sin(t * PI) * 0.35
+		mi.position = Vector3(x, -1.44, z)
+		add_child(mi)
+		_path.append({"node": mi, "material": mat})
+
+## The tally ring of small markers around the garden edge.
+func _build_ring() -> void:
+	var ring_mesh := SphereMesh.new()
+	ring_mesh.radius = 0.09
+	ring_mesh.height = 0.18
+	for i in range(RING_MARKERS):
+		var a := TAU * float(i) / float(RING_MARKERS)
+		var m := MeshInstance3D.new()
+		m.mesh = ring_mesh
+		var mat := _mat(CraftPalette.GROWTH_DORMANT, 0.8)
+		m.material_override = mat
+		m.position = Vector3(cos(a) * 2.55, -1.42, sin(a) * 2.55)
+		add_child(m)
+		_growth.append({"node": m, "material": mat})
+
+## A plain rough StandardMaterial3D (no emission) from the shared palette.
+func _mat(colour: Color, roughness: float = 0.85) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = colour
+	m.roughness = roughness
+	return m
+
 ## One ward stone per Chapter 01 level, placed at increasing radius and turn so each level's
-## completion leaves a distinct, spatially separate landmark.
+## completion leaves a distinct, spatially separate landmark. Accents come from the shared
+## palette so the world and the cube read as one place.
 func _build_wards() -> void:
-	var palette := [
-		Color(0.55, 0.85, 0.95),  # level 1 — cool "mechanism awakens" light
-		Color(0.6, 0.95, 0.55),   # level 2 — green "seed grows"
-		Color(0.98, 0.82, 0.45),  # level 3 — amber "stone marks awaken"
-		Color(0.62, 0.78, 0.98),  # level 4 — "resonance deepens"
-		Color(0.78, 0.62, 0.95),  # level 5 — "paths converge"
-		Color(0.98, 0.9, 0.62),   # level 6 — "chapter sealed"
-	]
 	for i in range(WARD_COUNT):
 		var a := -0.7 + float(i) * 0.62
 		var radius := 2.9 + float(i) * 0.16
@@ -134,11 +211,10 @@ func _build_wards() -> void:
 		pillar.top_radius = 0.16
 		pillar.bottom_radius = 0.22
 		pillar.height = 0.9 + float(i) * 0.25
-		pillar.radial_segments = 8
+		pillar.radial_segments = 10
 		var node := MeshInstance3D.new()
 		node.mesh = pillar
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = Color(0.16, 0.17, 0.16)
+		var mat := _mat(CraftPalette.STONE_DORMANT, 0.9)
 		node.material_override = mat
 		node.position = Vector3(cos(a) * radius, -1.15, sin(a) * radius)
 		add_child(node)
@@ -147,62 +223,72 @@ func _build_wards() -> void:
 		cap_mesh.radius = 0.12
 		cap_mesh.height = 0.24
 		cap.mesh = cap_mesh
-		var cap_mat := StandardMaterial3D.new()
-		cap_mat.albedo_color = Color(0.14, 0.15, 0.14)
+		var cap_mat := _mat(CraftPalette.STONE_DORMANT_CAP, 0.9)
 		cap.material_override = cap_mat
 		cap.position = Vector3(0, 0.6 + float(i) * 0.12, 0)
 		node.add_child(cap)
-		_wards.append({"node": node, "material": mat, "cap": cap_mat, "colour": palette[i]})
+		_wards.append({"node": node, "material": mat, "cap": cap_mat, "colour": CraftPalette.accent_for(i)})
 
 ## Nox: a small stone companion near the cube, hidden until it awakens (chapter's third
-## level). Assembled from a few primitives into a recognisable figure — a body, a head with
-## two eyes, two arm nubs and a crest — rather than a single decorative sphere. Still
-## lightweight (six primitive meshes) and entirely procedural.
+## level). Assembled from primitives into a recognisable figure - a body, a head with two
+## eyes, two arm nubs, a crest and two foot nubs - rather than a single decorative sphere.
+## Still lightweight (ten primitive meshes) and entirely procedural. It has a restrained idle
+## motion and a brief reaction gesture; reduced motion holds it still.
 func _build_nox() -> void:
 	_nox = Node3D.new()
-	_nox.position = Vector3(1.7, -1.05, 1.4)
+	_nox_base_pos = Vector3(1.7, -1.0, 1.4)
+	_nox.position = _nox_base_pos
 	_nox.visible = false
 	_nox_parts.clear()
+	_nox_t = 0.0
+	_nox_react = 0.0
 
 	var body_mat := StandardMaterial3D.new()
-	body_mat.albedo_color = Color(0.6, 0.58, 0.66)
+	body_mat.albedo_color = CraftPalette.NOX_BODY
+	body_mat.roughness = 0.7
 	body_mat.emission_enabled = true
-	body_mat.emission = Color(0.2, 0.27, 0.38)
+	body_mat.emission = CraftPalette.NOX_GLOW * 0.12
 
 	var eye_mat := StandardMaterial3D.new()
-	eye_mat.albedo_color = Color(0.85, 0.95, 1.0)
+	eye_mat.albedo_color = Color(0.9, 0.97, 1.0)
 	eye_mat.emission_enabled = true
-	eye_mat.emission = Color(0.5, 0.8, 1.0)
+	eye_mat.emission = CraftPalette.NOX_GLOW * 0.8
 
 	var crest_mat := StandardMaterial3D.new()
 	crest_mat.albedo_color = Color(0.72, 0.9, 0.95)
 	crest_mat.emission_enabled = true
-	crest_mat.emission = Color(0.3, 0.6, 0.7)
+	crest_mat.emission = CraftPalette.NOX_GLOW * 0.45
 
 	var body := SphereMesh.new()
-	body.radius = 0.2
-	body.height = 0.34
+	body.radius = 0.22
+	body.height = 0.38
 	_add_nox_part(body, body_mat, Vector3(0, 0, 0))
 	var head := SphereMesh.new()
-	head.radius = 0.14
-	head.height = 0.26
-	_add_nox_part(head, body_mat, Vector3(0, 0.3, 0))
+	head.radius = 0.15
+	head.height = 0.28
+	_add_nox_part(head, body_mat, Vector3(0, 0.32, 0))
 	var eye := SphereMesh.new()
 	eye.radius = 0.035
 	eye.height = 0.07
-	_add_nox_part(eye, eye_mat, Vector3(-0.05, 0.32, 0.11))
-	_add_nox_part(eye, eye_mat, Vector3(0.05, 0.32, 0.11))
+	_add_nox_part(eye, eye_mat, Vector3(-0.05, 0.34, 0.12))
+	_add_nox_part(eye, eye_mat, Vector3(0.05, 0.34, 0.12))
 	var arm := CylinderMesh.new()
-	arm.top_radius = 0.03
-	arm.bottom_radius = 0.03
-	arm.height = 0.18
-	_add_nox_part(arm, body_mat, Vector3(-0.19, 0.02, 0), Vector3(0, 0, deg_to_rad(28)))
-	_add_nox_part(arm, body_mat, Vector3(0.19, 0.02, 0), Vector3(0, 0, deg_to_rad(-28)))
+	arm.top_radius = 0.032
+	arm.bottom_radius = 0.032
+	arm.height = 0.2
+	_add_nox_part(arm, body_mat, Vector3(-0.2, 0.02, 0), Vector3(0, 0, deg_to_rad(28)))
+	_add_nox_part(arm, body_mat, Vector3(0.2, 0.02, 0), Vector3(0, 0, deg_to_rad(-28)))
 	var crest := CylinderMesh.new()
 	crest.top_radius = 0.0
 	crest.bottom_radius = 0.06
-	crest.height = 0.12
-	_add_nox_part(crest, crest_mat, Vector3(0, 0.46, 0))
+	crest.height = 0.13
+	_add_nox_part(crest, crest_mat, Vector3(0, 0.48, 0))
+	var foot := CylinderMesh.new()
+	foot.top_radius = 0.05
+	foot.bottom_radius = 0.06
+	foot.height = 0.07
+	_add_nox_part(foot, body_mat, Vector3(-0.08, -0.19, 0))
+	_add_nox_part(foot, body_mat, Vector3(0.08, -0.19, 0))
 	add_child(_nox)
 
 func _add_nox_part(mesh: Mesh, mat: Material, pos: Vector3, rot: Vector3 = Vector3.ZERO) -> void:
@@ -214,13 +300,35 @@ func _add_nox_part(mesh: Mesh, mat: Material, pos: Vector3, rot: Vector3 = Vecto
 	_nox.add_child(mi)
 	_nox_parts.append(mi)
 
+## Per-frame idle + reaction. Idle is a low-amplitude bob/turn so the companion feels alive
+## but never distracts; `nox_react_now()` adds a brief, decaying attention gesture on a real
+## event. Reduced motion holds the companion still without changing world state.
+func _process(delta: float) -> void:
+	if _nox == null or not _nox.visible:
+		return
+	if reduced_motion:
+		_nox.position = _nox_base_pos
+		_nox.rotation.y = 0.0
+		_nox_react = 0.0
+		return
+	_nox_t += delta
+	var bob := sin(_nox_t * 1.4) * 0.035
+	_nox_react = maxf(0.0, _nox_react - delta * 1.8)
+	var kick := sin(_nox_react * PI) * 0.12
+	_nox.position = _nox_base_pos + Vector3(0, bob + kick, 0)
+	_nox.rotation.y = sin(_nox_t * 0.5) * 0.18
+
+## A brief attention gesture - called on a genuine world event (restoration, interaction).
+func nox_react_now() -> void:
+	_nox_react = 1.0
+
 ## The two path nodes of the Beat 5 choice. Built as short pillars with a glowing cap, placed
-## inside the tally ring so they read as "the path", not as more ward stones. Both start dormant;
-## whichever the player wakes first is lit brightly and the other wakes in reply (dim but present),
-## so the world shows the decision the player made rather than only that a decision happened.
+## inside the tally ring so they read as "the path", not as more ward stones. Both start
+## dormant; whichever the player wakes first is lit brightly and the other wakes in reply
+## (dim but present), so the world shows the decision the player made.
 func _build_choice_nodes() -> void:
 	var placements := [
-		{"option": "near", "pos": Vector3(-1.0, -1.15, 1.9), "colour": Color(0.7, 0.85, 0.98)},
+		{"option": "near", "pos": Vector3(-1.0, -1.15, 1.9), "colour": CraftPalette.MARK_GLOW},
 		{"option": "far", "pos": Vector3(1.0, -1.15, -1.9), "colour": Color(0.85, 0.75, 0.62)},
 	]
 	for p in placements:
@@ -230,11 +338,10 @@ func _build_choice_nodes() -> void:
 		pillar.top_radius = 0.12
 		pillar.bottom_radius = 0.16
 		pillar.height = 0.7
-		pillar.radial_segments = 8
+		pillar.radial_segments = 10
 		var mi := MeshInstance3D.new()
 		mi.mesh = pillar
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = Color(0.17, 0.18, 0.17)
+		var mat := _mat(CraftPalette.PATH_DORMANT, 0.85)
 		mi.material_override = mat
 		node.add_child(mi)
 		var cap := MeshInstance3D.new()
@@ -242,8 +349,7 @@ func _build_choice_nodes() -> void:
 		cap_mesh.radius = 0.13
 		cap_mesh.height = 0.26
 		cap.mesh = cap_mesh
-		var cap_mat := StandardMaterial3D.new()
-		cap_mat.albedo_color = Color(0.15, 0.16, 0.15)
+		var cap_mat := _mat(CraftPalette.STONE_DORMANT_CAP, 0.85)
 		cap.material_override = cap_mat
 		cap.position = Vector3(0, 0.42, 0)
 		node.add_child(cap)
@@ -251,7 +357,7 @@ func _build_choice_nodes() -> void:
 		_choice_nodes.append({"node": node, "material": mat, "cap": cap_mat, "colour": p["colour"], "option": p["option"]})
 
 ## The world cache (Milestone F): a small lidded container that appears in the restored area
-## once the seed bed is solved. Built from a base cylinder, a body box and a small lid — a
+## once the seed bed is solved. Built from a base cylinder, a body box and a small lid - a
 ## distinct silhouette from the ward pillars and the sigil so the player reads it as "a thing
 ## to open", not scenery. Hidden until its prerequisite is met; the router only registers it
 ## as a target while it is visible.
@@ -260,11 +366,13 @@ func _build_cache() -> void:
 	_cache.position = Vector3(2.5, -1.4, 0.0)
 	_cache.visible = false
 	var body_mat := StandardMaterial3D.new()
-	body_mat.albedo_color = Color(0.34, 0.28, 0.22)
+	body_mat.albedo_color = Color(0.36, 0.3, 0.24)
+	body_mat.roughness = 0.75
 	body_mat.emission_enabled = true
-	body_mat.emission = Color(0.28, 0.2, 0.1)
+	body_mat.emission = Color(0.32, 0.24, 0.12)
 	var lid_mat := StandardMaterial3D.new()
-	lid_mat.albedo_color = Color(0.52, 0.42, 0.3)
+	lid_mat.albedo_color = Color(0.55, 0.45, 0.32)
+	lid_mat.roughness = 0.7
 	var base := CylinderMesh.new()
 	base.top_radius = 0.28
 	base.bottom_radius = 0.3
@@ -297,8 +405,7 @@ func _build_cache() -> void:
 func _build_veiled_mark() -> void:
 	_veiled_mark = Node3D.new()
 	_veiled_mark.position = Vector3(-2.1, -1.35, -0.7)
-	var slab_mat := StandardMaterial3D.new()
-	slab_mat.albedo_color = Color(0.19, 0.2, 0.2)
+	var slab_mat := _mat(CraftPalette.MARK_STONE, 0.85)
 	var slab := BoxMesh.new()
 	slab.size = Vector3(0.7, 0.9, 0.12)
 	var slab_mi := MeshInstance3D.new()
@@ -307,9 +414,9 @@ func _build_veiled_mark() -> void:
 	_veiled_mark.add_child(slab_mi)
 	# The hidden glyph: a bright inset cross of thin slabs, hidden until revealed.
 	var glyph_mat := StandardMaterial3D.new()
-	glyph_mat.albedo_color = Color(0.75, 0.9, 1.0)
+	glyph_mat.albedo_color = Color(0.78, 0.92, 1.0)
 	glyph_mat.emission_enabled = true
-	glyph_mat.emission = Color(0.35, 0.6, 0.75)
+	glyph_mat.emission = CraftPalette.MARK_GLOW * 0.7
 	_veiled_glyph = MeshInstance3D.new()
 	var glyph := BoxMesh.new()
 	glyph.size = Vector3(0.42, 0.07, 0.04)
@@ -329,7 +436,6 @@ func _build_veiled_mark() -> void:
 	_veiled_glyph.set_meta("cross", glyph2)
 	add_child(_veiled_mark)
 
-
 ## The three-notch sigil: a small distinct figure (three upright notches on a base) placed
 ## beside the cube. Hidden until the world has answered (>= 1 solved level), then tappable to
 ## reveal the Architect clue. Distinct from the ward stones (which are pillars) so the player
@@ -338,12 +444,11 @@ func _build_sigil() -> void:
 	_sigil = Node3D.new()
 	_sigil.position = Vector3(-1.8, -1.05, 1.5)
 	_sigil.visible = false
-	var base_mat := StandardMaterial3D.new()
-	base_mat.albedo_color = Color(0.2, 0.21, 0.2)
+	var base_mat := _mat(CraftPalette.MARK_STONE, 0.85)
 	var notch_mat := StandardMaterial3D.new()
-	notch_mat.albedo_color = Color(0.55, 0.6, 0.62)
+	notch_mat.albedo_color = Color(0.6, 0.68, 0.72)
 	notch_mat.emission_enabled = true
-	notch_mat.emission = Color(0.1, 0.13, 0.15)
+	notch_mat.emission = CraftPalette.MARK_GLOW * 0.25
 	var base := CylinderMesh.new()
 	base.top_radius = 0.26
 	base.bottom_radius = 0.3
@@ -375,18 +480,19 @@ func react() -> bool:
 
 ## Set the world's revealed state from authoritative progression (e.g. on resume from a
 ## save), so the world never shows fewer reactions than the levels already completed. The
-## count drives the tally ring, the ward stones and Nox together (one source of truth).
+## count drives the tally ring, the path, the ward stones and Nox together (one source of
+## truth).
 func sync_lit(count: int) -> void:
 	var target := clampi(count, 0, RING_MARKERS)
 	for i in range(_growth.size()):
 		var lit := i < target
 		var mat: StandardMaterial3D = _growth[i]["material"]
 		if lit:
-			mat.albedo_color = Color(0.45, 0.9, 0.5)
+			mat.albedo_color = CraftPalette.GROWTH_LIVING
 			mat.emission_enabled = true
-			mat.emission = Color(0.3, 0.7, 0.35)
+			mat.emission = CraftPalette.GROWTH_LIVING * 0.4
 		else:
-			mat.albedo_color = Color(0.18, 0.2, 0.18)
+			mat.albedo_color = CraftPalette.GROWTH_DORMANT
 			mat.emission_enabled = false
 	for i in range(_wards.size()):
 		var revealed := i < target
@@ -397,19 +503,30 @@ func sync_lit(count: int) -> void:
 		if revealed:
 			wmat.albedo_color = colour
 			wmat.emission_enabled = true
-			wmat.emission = colour * 0.35
+			wmat.emission = colour * 0.42
 			cap.albedo_color = colour
 			cap.emission_enabled = true
-			cap.emission = colour * 0.5
+			cap.emission = colour * 0.6
 		else:
-			wmat.albedo_color = Color(0.16, 0.17, 0.16)
+			wmat.albedo_color = CraftPalette.STONE_DORMANT
 			wmat.emission_enabled = false
-			cap.albedo_color = Color(0.14, 0.15, 0.14)
+			cap.albedo_color = CraftPalette.STONE_DORMANT_CAP
 			cap.emission_enabled = false
-	if _ground != null:
+	# The restored path heals one stone per solved level, up to the path length.
+	for i in range(_path.size()):
+		var restored := i < target
+		var pmat: StandardMaterial3D = _path[i]["material"]
+		if restored:
+			pmat.albedo_color = CraftPalette.PATH_RESTORED
+			pmat.emission_enabled = true
+			pmat.emission = CraftPalette.PATH_RESTORED * 0.3
+		else:
+			pmat.albedo_color = CraftPalette.PATH_DORMANT
+			pmat.emission_enabled = false
+	if _garden != null:
 		var t := clampf(float(target) / float(WARD_COUNT), 0.0, 1.0)
-		(_ground.material_override as StandardMaterial3D).albedo_color = _lit_ground.lerp(_warm_ground, t)
-	# Nox awakens at the chapter's third level, not at full completion — the companion joins
+		(_garden.material_override as StandardMaterial3D).albedo_color = _ground_garden.lerp(_ground_warm, t)
+	# Nox awakens at the chapter's third level, not at full completion - the companion joins
 	# the player for the last three levels (matches the `reward.01.nox_meets` beat).
 	if _nox != null:
 		_nox.visible = target >= NOX_AWAKEN_LEVELS
@@ -418,7 +535,7 @@ func sync_lit(count: int) -> void:
 	if _sigil != null:
 		_sigil.visible = target >= 1
 	# The cache appears once the restored area exists (the seed bed solved), but stays visible
-	# after it is opened only if it has NOT yet been taken — once taken it is gone for good.
+	# after it is opened only if it has NOT yet been taken - once taken it is gone for good.
 	if _cache != null:
 		_cache.visible = target >= CACHE_UNLOCK_LEVELS and not _cache_taken
 	_lit = target
@@ -452,7 +569,7 @@ func interactive_targets() -> Array:
 	if _cache != null and _cache.visible and not _cache_taken:
 		out.append({"id": TARGET_CACHE, "position": _cache.position, "radius": 0.5})
 	# The veiled mark is tappable only once the player owns the Stone Lens and has not yet
-	# revealed it — so the "use the item" step is a genuine world interaction, not a menu press.
+	# revealed it - so the "use the item" step is a genuine world interaction, not a menu press.
 	if _veiled_mark != null and _lens_owned and not _veiled_revealed:
 		out.append({"id": TARGET_VEILED_MARK, "position": _veiled_mark.position, "radius": 0.55})
 	# Path nodes are tappable only once the choice beat is offered; before that they are visible
@@ -486,15 +603,15 @@ func apply_world_choices(choices: Dictionary) -> void:
 		var colour: Color = c["colour"]
 		if chosen == "":
 			c["lit"] = false
-			mat.albedo_color = Color(0.17, 0.18, 0.17)
+			mat.albedo_color = CraftPalette.PATH_DORMANT
 			mat.emission_enabled = false
-			cap.albedo_color = Color(0.15, 0.16, 0.15)
+			cap.albedo_color = CraftPalette.STONE_DORMANT_CAP
 			cap.emission_enabled = false
 		elif opt == chosen:
 			c["lit"] = true
 			mat.albedo_color = colour
 			mat.emission_enabled = true
-			mat.emission = colour * 0.4
+			mat.emission = colour * 0.42
 			cap.albedo_color = colour
 			cap.emission_enabled = true
 			cap.emission = colour * 0.6
@@ -572,7 +689,7 @@ func veiled_revealed() -> bool:
 	return _veiled_revealed
 
 ## Reveal the hidden mark with the Stone Lens. Returns true only the first time, so the app
-## grants the reveal consequence exactly once. Makes the glyph meshes visible — a real world
+## grants the reveal consequence exactly once. Makes the glyph meshes visible - a real world
 ## change, not a HUD line.
 func reveal_veiled_mark() -> bool:
 	if not veiled_mark_available():
@@ -594,9 +711,9 @@ func veiled_glyph_visible() -> bool:
 	return _veiled_glyph.visible and cross is MeshInstance3D and (cross as MeshInstance3D).visible
 
 ## Reconstruct the whole world appearance from authoritative progression: the solved
-## count drives the ring, wards, Nox and cache (via sync_lit), and the saved world flags drive
-## the sigil, cache-taken and veiled-mark states. `lens_owned` gates whether the veiled mark is
-## currently tappable. One call restores a loaded save without replaying any event.
+## count drives the ring, path, wards, Nox and cache (via sync_lit), and the saved world flags
+## drive the sigil, cache-taken and veiled-mark states. `lens_owned` gates whether the veiled
+## mark is currently tappable. One call restores a loaded save without replaying any event.
 func sync_from_state(solved_count: int, flags: Dictionary, choices: Dictionary = {}, choice_available: bool = false, lens_owned: bool = false) -> void:
 	# Flags first: `_cache_taken` / `_veiled_revealed` must be known before sync_lit decides the
 	# cache's visibility, so a loaded save never re-shows a cache that was already opened.

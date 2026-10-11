@@ -13,13 +13,15 @@ extends Control
 
 const GAME_SCENE := "res://scenes/Main.tscn"
 
-const BG := Color(0.07, 0.08, 0.1)
-const CARD := Color(0.13, 0.15, 0.18)
-const CARD_DONE := Color(0.16, 0.22, 0.18)
-const CARD_LOCKED := Color(0.11, 0.12, 0.13)
-const ACCENT := Color(0.55, 0.85, 0.95)
-const MUTED := Color(0.62, 0.66, 0.7)
-const STAR_ON := Color(0.98, 0.82, 0.35)
+## Application chrome colours come from the shared art direction (CraftPalette), so the
+## menu, the world and the cube read as one product rather than three different UIs.
+const BG := CraftPalette.UI_BG
+const CARD := CraftPalette.UI_CARD
+const CARD_DONE := CraftPalette.UI_CARD_DONE
+const CARD_LOCKED := CraftPalette.UI_CARD_LOCKED
+const ACCENT := CraftPalette.UI_ACCENT
+const MUTED := CraftPalette.UI_MUTED
+const STAR_ON := CraftPalette.UI_STAR
 
 ## The single mounted gameplay instance (created once; reused for every level).
 var game: GameController
@@ -29,6 +31,9 @@ var settings_path := SaveManager.SETTINGS_PATH
 
 var _game_layer: Node3D
 var _screen_layer: Control
+## Opaque menu backdrop. Hidden while gameplay is on screen so the 3D world is visible
+## instead of being covered by the menu chrome (this was a real defect).
+var _bg: ColorRect
 ## The five screen roots (added to _screen_layer, toggled for visibility).
 var _screen_roots: Dictionary = {}
 ## Named references to every control the app needs later (roots + sub-nodes).
@@ -58,11 +63,11 @@ func _ready() -> void:
 	_big_text = bool(settings.get("big_text", false))
 	_reduced_motion = bool(settings.get("reduced_motion", false))
 
-	var bg := ColorRect.new()
-	bg.color = BG
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(bg)
+	_bg = ColorRect.new()
+	_bg.color = BG
+	_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_bg)
 
 	_game_layer = Node3D.new()
 	_game_layer.name = "GameLayer"
@@ -618,6 +623,9 @@ func _show(name: String, keep_game_visible: bool = false) -> void:
 		var c: Control = _screen_roots[key]
 		c.visible = false
 	var show_game := name == "game"
+	if _bg != null:
+		# Menu screens need the opaque backdrop; gameplay must show the world through it.
+		_bg.visible = not show_game
 	if game:
 		game.visible = show_game and keep_game_visible
 		if game.router:

@@ -2836,7 +2836,7 @@ func _test_item_loop_persistence() -> void:
 	app.free()
 	# Reload: the world must reconstruct to the saved state without replaying any event.
 	var app2 = _mount_app(load("res://scenes/App.tscn"))
-	app2._continue_game()
+	app2._on_continue_pressed()
 	_check("lens survives reload", app2.game.game_state.owns("equipment.stone_lens"))
 	_check("cache stays taken after reload", not app2.game.world_view.cache_available())
 	_check("cache-taken flag survives reload", bool(app2.game.game_state.world_flags.get("cache_taken", false)))
