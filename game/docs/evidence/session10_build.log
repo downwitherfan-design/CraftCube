@@ -1,11 +1,16 @@
 
+=== clean stale build outputs ===
+
+=== version validation (single source of truth) ===
+validate_version: OK  app_version=0.2.0  version_code=2
+target artifact: CraftCube-v0.2.0-android-arm64-v8a-debug.apk  (versionCode 2, package com.downwitherfandesign.craftcube)
+
 === engine version ===
 4.7.2.stable.official.ed1daf0bf
 
 === import (populate .godot cache) ===
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
-Could not find version of build tools that matches Target SDK, using 35.0.0
 [   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
 [   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
 [  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
@@ -14,12 +19,6 @@ Could not find version of build tools that matches Target SDK, using 35.0.0
 [  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
 [  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
 [92m[ DONE ][39m [1mfirst_scan_filesystem[22m
-[0m
-[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (3 steps)[39m[0m
-[   0% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
-[  25% ] [90m[1mupdate_scripts_classes[22m | CubeView[39m[0m
-[  50% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
-[92m[ DONE ][39m [1mupdate_scripts_classes[22m
 [0m
 [   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
 [   0% ] [90m[1mloading_editor_layout[22m | Loading editor layout...[39m[0m
@@ -150,7 +149,6 @@ Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 === android export (debug) ===
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
-Could not find version of build tools that matches Target SDK, using 35.0.0
 [   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
 [   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
 [  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
@@ -160,7 +158,6 @@ Could not find version of build tools that matches Target SDK, using 35.0.0
 [  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
 [92m[ DONE ][39m [1mfirst_scan_filesystem[22m
 [0m
-Could not find version of build tools that matches Target SDK, using 35.0.0
 [   0% ] [90m[1mexport[22m | Started Exporting for Android (105 steps)[39m[0m
 0 param: --xr_mode_regular
 1 param: --xr-mode
@@ -271,9 +268,8 @@ ADDING: kotlin/reflect/reflect.kotlin_builtins
 [   0% ] [90m[1mexport[22m | Adding files...[39m[0m
 [  97% ] [90m[1mexport[22m | Aligning APK...[39m[0m
 [  98% ] [90m[1mexport[22m | Signing debug APK...[39m[0m
-Could not find version of build tools that matches Target SDK, using 35.0.0
 Signing binary using: 
-/opt/android-sdk/build-tools/35.0.0/apksigner sign --verbose --ks <REDACTED> --ks-pass pass:<REDACTED> --ks-key-alias <REDACTED> /workspace/project/CraftCube/dist/CraftCube.apk
+/tmp/android-sdk/build-tools/36.0.0/apksigner sign --verbose --ks <REDACTED> --ks-pass pass:<REDACTED> --ks-key-alias <REDACTED> /workspace/project/CraftCube/dist/CraftCube.apk
 Signed
 
 [  99% ] [90m[1mexport[22m | Verifying APK...[39m[0m
@@ -281,7 +277,41 @@ Signed
 [0m
 cannot connect to daemon at tcp:5037: Cannot assign requested address
 APK produced:
--rw------- 1 openhands openhands 28363593 Oct 10 21:25 /workspace/project/CraftCube/dist/CraftCube.apk
-018458babf53d53c3777adaad547acce04d571ff39114913c126c5cab1ce3e23  /workspace/project/CraftCube/dist/CraftCube.apk
+-rw-r--r-- 1 openhands openhands 28363821 Oct 11 13:58 /workspace/project/CraftCube/dist/CraftCube.apk
+
+=== verify APK metadata against the source of truth ===
+{
+  "file": "CraftCube.apk",
+  "size_bytes": 28363821,
+  "sha256": "e54ce9cbfde977bae8ba1bc246c84f78399df66d97464b7649d519f24a3f5e67",
+  "package": "com.downwitherfandesign.craftcube",
+  "version_name": "0.2.0",
+  "version_code": 2,
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "architectures": [
+    "arm64-v8a"
+  ],
+  "signing": {
+    "schemes": [
+      "v1",
+      "v2+"
+    ],
+    "v1_certs": [
+      "META-INF/ANDROIDD.RSA"
+    ],
+    "debug_certificate": true,
+    "subject_hints": [
+      "Godot Engine",
+      "Stichting Godot"
+    ],
+    "type": "debug"
+  }
+}
+verify_apk: OK
+
+=== stage versioned release artifact ===
+staged: /workspace/project/CraftCube/dist/release/CraftCube-v0.2.0-android-arm64-v8a-debug.apk
+e54ce9cbfde977bae8ba1bc246c84f78399df66d97464b7649d519f24a3f5e67  CraftCube-v0.2.0-android-arm64-v8a-debug.apk
 
 CI: PASS

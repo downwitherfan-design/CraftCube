@@ -58,6 +58,8 @@ func _initialize() -> void:
 	_test_hud_big_text_persistence()
 	_test_progress_flush_on_exit()
 	_test_reduced_motion_persistence()
+	_test_version_single_source_of_truth()
+	_test_hud_version_label()
 	_test_animated_chapter_end_to_end()
 	_test_guided_solver_domain()
 	_test_guided_solver_controller()
@@ -1250,6 +1252,63 @@ func _test_reduced_motion_persistence() -> void:
 		m2.get_parent().remove_child(m2)
 	m2.free()
 	SaveManager.delete_settings(p)
+
+## Versioned-APK release policy: the application version has ONE source of truth
+## (res://app_version.json). These tests fail loudly if the export preset, the version
+## reader, or the HUD drift away from it.
+func _test_version_single_source_of_truth() -> void:
+	print("[version single source of truth]")
+	var meta := Version._read()
+	_check("app_version.json is readable", not meta.is_empty())
+	var ver := Version.app_version()
+	var code := Version.version_code()
+	_check("app_version is MAJOR.MINOR.PATCH", ver.split(".").size() == 3)
+	_check("version_code is a positive integer", code > 0)
+	_check("Version.tag prefixes with v", Version.tag() == "v" + ver)
+
+	# The export preset (the value Godot stamps into the APK) must equal the source of truth.
+	var f := FileAccess.open("res://export_presets.cfg", FileAccess.READ)
+	_check("export_presets.cfg is readable", f != null)
+	var preset_name := ""
+	var preset_code := ""
+	var preset_pkg := ""
+	if f != null:
+		for line in f.get_as_text().split("\n"):
+			var s := line.strip_edges()
+			if s.begins_with("version/name="):
+				preset_name = s.split("=", true, 1)[1].strip_edges().trim_prefix('"').trim_suffix('"')
+			elif s.begins_with("version/code="):
+				preset_code = s.split("=", true, 1)[1].strip_edges()
+			elif s.begins_with("package/unique_name="):
+				preset_pkg = s.split("=", true, 1)[1].strip_edges().trim_prefix('"').trim_suffix('"')
+	_eq("export version/name equals app_version", preset_name, ver)
+	_eq("export version/code equals version_code", preset_code, str(code))
+	_eq("export package equals android.package", preset_pkg, str(meta.get("android", {}).get("package", "")))
+
+	# The released ledger must keep version_code strictly increasing and never reuse a version.
+	var released: Array = meta.get("released", [])
+	var monotonic := true
+	var reused := false
+	for rec in released:
+		if int(rec.get("version_code", 0)) >= code:
+			monotonic = false
+		if str(rec.get("version", "")) == ver:
+			reused = true
+	_check("version_code is greater than every released version_code", monotonic)
+	_check("app_version is not already in the released ledger", not reused)
+
+## The HUD shows the version read from the single source of truth.
+func _test_hud_version_label() -> void:
+	print("[hud version label]")
+	var m = load("res://scenes/Main.tscn").instantiate()
+	m._ready()
+	var hud = m.get_node("HUD")
+	_check("hud has a version label", hud._version != null)
+	_check("hud version label names the app and version", str(hud._version.text).contains(Version.app_version()))
+	_check("hud version label matches the shared display string", str(hud._version.text) == "CraftCube " + Version.display())
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
 
 ## Play the whole chapter through the real scene using ANIMATED turns (each turn started via
 ## the controller and settled through the tween path), asserting the rendered cube matches

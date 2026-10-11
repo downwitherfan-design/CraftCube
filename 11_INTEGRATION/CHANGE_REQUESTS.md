@@ -21,6 +21,10 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 | CR-0010 | AI-13 (gate procedure) + all accounts (shared-file convention) | 00 (before merging the second account PR) | Low (process) | **RESOLVED** (2026-10-10) |
 | CR-0011 | AI-09 (PR #5) | 00 (before merge) | High (gate blocker) | **RESOLVED** (2026-10-10) |
 | CR-0012 | AI-10 (QA) | 00 (before Phase 00 gate can pass) | High (gate blocker) | OPEN |
+| CR-0013 | AI-01 (product register/validator) | 00 | Medium | **RESOLVED** (PR #12, pending gate) |
+| CR-0014 | AI-03 (content fixture confirmation) | 00 | Low–Medium | OPEN |
+| CR-0015 | AI-12 (`.github/`, `12_RELEASE/ci/`) + Human for release-signing | 00 | Low (release enablement) | OPEN |
+| CR-0016 | AI-12 (`12_RELEASE/`) | 00 | Low (doc/governance) | OPEN |
 
 ---
 
@@ -159,3 +163,22 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 - **Gate impact:** LOW–MEDIUM. The running slice is playable and correct either way; this is a content-binding confirmation that keeps the AI-03 fixture and the implementation aligned. Recorded because the *draft* disagrees with the *implementation*.
 - **Note:** AI-13 does not edit `tracks/ai-03-puzzle-content/**` (AI-03-owned). This CR is returned to AI-03 for confirmation or amendment.
 
+
+### CR-0015 — Activate the versioned-APK release workflow (`.github/workflows/`)
+- **Target owner:** AI-12 (`ai-12-build`) for `.github/workflows/` and `12_RELEASE/ci/`; Human Project Owner for any store/release-signing decision.
+- **Trigger / evidence:** permanent Human Project Owner requirement (2026-10-10): every release-ready milestone must produce a versioned APK downloadable from **GitHub Releases**, not merely a CI pass or an Actions artifact. Delivered technically by AI-13 on `godot-migration`: `game/app_version.json` (single source of truth), `game/ci/validate_version.py`, `game/ci/verify_apk.py`, extended `game/ci/build_android.sh` (staging + metadata verification), and the new `.github/workflows/craftcube-release.yml`. Policy: `12_RELEASE/ANDROID_RELEASE_POLICY.md`. VERIFIED: local `bash game/ci/build_android.sh` → `CI: PASS`, suite 388/0, `dist/release/CraftCube-v0.2.0-android-arm64-v8a-debug.apk` verified (package/version/versionCode/minSdk/arch/signing).
+- **Failing artifact:** no release workflow or versioning existed; the app version lived only in `export_presets.cfg` (no single validated source of truth), and `craftcube-android.yml` uploaded only a CI artifact named `CraftCube-debug-apk`.
+- **Expected behavior:** AI-12 ratifies/activates `craftcube-release.yml` (tag `v*` or manual dispatch → build, verify, upload versioned artifact, create/update the GitHub Release with the APK and rendered notes) and replaces `12_RELEASE/ci/release_gate.template.yml` with the active pipeline. The versioned APK filename, checksum and provenance must be recorded.
+- **Acceptance test:** pushing tag `vX.Y.Z` (or a manual run with `publish`) produces a GitHub Release whose single APK asset's SHA-256 equals `dist/release/<name>.sha256`; `python3 game/ci/validate_version.py` and `python3 game/ci/verify_apk.py` exit 0 for that artifact.
+- **Why AI-13 edits `.github/` here:** the owner directive authorises the release pipeline; `.github/workflows/` is AI-12-owned, so this CR routes ratification to AI-12 rather than assuming the overwrite is silently accepted.
+- **Rollback:** revert the workflow commit; `craftcube-android.yml` (test/build CI) is unaffected.
+- **Gate impact:** LOW (release enablement). Does not by itself pass the Phase 00 gate.
+
+### CR-0016 — Ratify the versioned-APK release policy under `12_RELEASE/`
+- **Target owner:** AI-12 (`ai-12-build`), `12_RELEASE/` owner.
+- **Trigger / evidence:** the permanent release requirement adds `12_RELEASE/ANDROID_RELEASE_POLICY.md` and `12_RELEASE/release_notes/RELEASE_NOTES_TEMPLATE.md` inside AI-12's owned folder. AI-13 authored them as integration/release enablement under the owner directive.
+- **Failing artifact:** `12_RELEASE/` had a Phase 00 direction lock and gate policy but no permanent, active versioned-APK release policy.
+- **Expected behavior:** AI-12 adopts `ANDROID_RELEASE_POLICY.md` as the folder's active release rule (or merges it into the direction lock), and consumes `RELEASE_NOTES_TEMPLATE.md` from the release workflow.
+- **Acceptance test:** `12_RELEASE/README.md` lists `ANDROID_RELEASE_POLICY.md` and `release_notes/`; the active release workflow references the template path.
+- **Rollback:** revert the two added files; no build behaviour depends on them at runtime.
+- **Gate impact:** LOW (documentation/governance).

@@ -24,6 +24,7 @@ var _hint_btn: Button
 var _step_btn: Button
 var _readiness: Label
 var _resonance: Label
+var _version: Label
 
 ## Accessibility state: large text and reduced motion, both persisted in the settings file.
 var _reduced_motion := false
@@ -106,6 +107,11 @@ func _build() -> void:
 	_readiness = _label("", 18)
 	_resonance = _label("", 18)
 	outer.add_child(_title)
+	# Single source of truth: the app version shown here comes from res://app_version.json.
+	_version = _label("", 14)
+	var ver := Version.display()
+	_version.text = ("CraftCube " + ver) if ver != "" else ""
+	outer.add_child(_version)
 	outer.add_child(_status)
 
 	var spacer := Control.new()
@@ -395,8 +401,8 @@ func _apply_reduced_motion(on: bool) -> void:
 func _apply_big_text(on: bool) -> void:
 	_big_text = on
 	var mult := 1.5 if _big_text else 1.0
-	for l in [_title, _status, _onboard, _hint, _story, _guide, _readiness, _resonance]:
-		var base := 34 if l == _title else (22 if (l == _status or l == _story) else (18 if (l == _readiness or l == _resonance) else 20))
+	for l in [_title, _status, _onboard, _hint, _story, _guide, _readiness, _resonance, _version]:
+		var base := 34 if l == _title else (22 if (l == _status or l == _story) else (18 if (l == _readiness or l == _resonance) else (14 if l == _version else 20)))
 		l.add_theme_font_size_override("font_size", int(base * mult))
 	for entry in _face_buttons:
 		entry["button"].add_theme_font_size_override("font_size", int(24 * mult))
