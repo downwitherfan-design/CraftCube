@@ -415,6 +415,11 @@ func _on_move_applied() -> void:
 	_refresh_guide()
 	_refresh_status()
 
+## Re-read the live gameplay readouts from current state. The app calls this after a loadout
+## change made outside gameplay (equip/unequip) so a capability's effect appears at once.
+func refresh_readouts() -> void:
+	_refresh_status()
+
 func _on_solve() -> void:
 	if not controller.confirm_solve():
 		_status.text = "Not yet — the required faces are not aligned."

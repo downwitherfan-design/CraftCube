@@ -91,6 +91,10 @@ func _initialize() -> void:
 	# EPIC 0.4 additions
 	_test_interaction_arbiter()
 	_test_hud_compact_and_completion()
+	# EPIC 0.4 Milestone D additions
+	_test_world_choices()
+	_test_save_v2_to_v3_migration()
+	_test_equipment_use_loop()
 	_restore_ambient_save()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -1711,10 +1715,10 @@ func _test_save_v1_migration() -> void:
 	_check("v1 world flags preserved", g.world_flags.has("mechanism_awakens") and g.world_flags.has("seed_grows"))
 	_eq("v1 campaign position preserved", g.current_level_index, 2)
 	_check("v1 save has no mastery records (empty table)", g.level_records.is_empty())
-	# The next write must be schema version 2 and still carry the v1 data.
+	# The next write must upgrade the schema to the current version and still carry the v1 data.
 	SaveManager.save_to_path(g, path)
 	var reread := SaveManager.load_from_path(path)
-	_check("upgraded save is version 2", int(reread.to_dict().get("save_version", 0)) == 2)
+	_check("upgraded save is the current schema version", int(reread.to_dict().get("save_version", 0)) == GameState.SAVE_VERSION)
 	_check("upgrade keeps solved levels", reread.is_solved("level.01.seed_bed"))
 	_check("upgrade keeps discoveries", reread.discoveries.has("discovery.01.first_pulse"))
 	# A malformed level_records table is coerced to empty, never trusted.
@@ -2372,3 +2376,213 @@ func _histogram_str(h: Dictionary) -> String:
 	for k in keys:
 		parts.append("%s:%d" % [str(k), h[k]])
 	return ",".join(parts)
+
+## EPIC 0.4 Milestone D: the scoped Beat 5 world choice. Proves the choice is unavailable
+## before its beat, records exactly once, drives the world from truth (not an event), persists
+## across reload, and that the tappable path nodes are gated on the same availability.
+func _test_world_choices() -> void:
+	print("[world choices]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var app = _mount_app(load("res://scenes/App.tscn"))
+	app._begin_new_game()
+	var w = app.game.world_view
+	# Two path nodes are built as world scenery from the start.
+	_eq("two path-choice nodes are built", w.choice_node_count(), 2)
+	# The choice beat is unavailable on a fresh game (level 2 not yet solved)...
+	_check("first-node choice unavailable on a fresh game", not app.game.first_node_choice_available())
+	_check("no path node is tappable before the beat", not _has_target(w, WorldView.TARGET_NODE_NEAR) and not _has_target(w, WorldView.TARGET_NODE_FAR))
+	# ...so a tap through the arbiter records nothing.
+	app.game.router.world_tapped.emit(WorldView.TARGET_NODE_NEAR)
+	_check("tapping a node before the beat records no choice", not app.game.game_state.has_choice(GameController.FIRST_NODE_CHOICE))
+	# Solve level 2 (the seed bed) to reach the Beat 5 moment.
+	app._play_level(0)
+	_check("level 1 solved for the choice test", _solve_current(app))
+	app._play_level(1)
+	_check("level 2 solved for the choice test", _solve_current(app))
+	_check("first-node choice becomes available after level 2", app.game.first_node_choice_available())
+	_check("path nodes become tappable after the beat", _has_target(w, WorldView.TARGET_NODE_NEAR) and _has_target(w, WorldView.TARGET_NODE_FAR))
+	# A real tap on the near node records the choice and lights it; the far node wakes in reply.
+	app.game.router.world_tapped.emit(WorldView.TARGET_NODE_NEAR)
+	_eq("tap records the near choice", app.game.first_node_choice(), "near")
+	_check("chosen node is lit", w.choice_node_lit("near"))
+	_check("the other node wakes in reply (not lit as chosen)", not w.choice_node_lit("far"))
+	_check("choice world flag set", app.game.game_state.world_flags.has("ch01_node_near"))
+	# Re-selecting the same option reports no change (idempotent), so no reward can duplicate.
+	var changed: bool = app.game.record_choice(GameController.FIRST_NODE_CHOICE, "near")
+	_check("re-selecting the same option is not a change", not changed)
+	# Changing the decision is allowed and updates the world from the recorded choice.
+	app.game.record_choice(GameController.FIRST_NODE_CHOICE, "far")
+	_eq("decision can be changed", app.game.first_node_choice(), "far")
+	_check("changing the choice re-lights the far node", w.choice_node_lit("far"))
+	_check("the previously chosen node is no longer the chosen one", not w.choice_node_lit("near"))
+	# Persist and reload: the choice survives and the world is rebuilt from the recorded value.
+	app.game.save_progress()
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+	var app2 = _mount_app(load("res://scenes/App.tscn"))
+	var w2 = app2.game.world_view
+	_eq("choice survives reload", app2.game.first_node_choice(), "far")
+	_check("world rebuilt from the recorded choice after reload", w2.choice_node_lit("far") and not w2.choice_node_lit("near"))
+	if app2.get_parent() != null:
+		app2.get_parent().remove_child(app2)
+	app2.free()
+	if had:
+		var wr := FileAccess.open(saved, FileAccess.WRITE)
+		wr.store_string(backup)
+		wr.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## EPIC 0.4 Milestone D: schema migration from the EPIC 0.3 version-2 save to version 3. A v2
+## save has mastery records but no `world_choices`; every field must survive and the upgraded
+## file must be written as version 3. Also proves a v1 save skips straight to v3 unchanged.
+func _test_save_v2_to_v3_migration() -> void:
+	print("[save v2 -> v3 migration]")
+	var path := "user://t_migrate_v3.json"
+	SaveManager.delete_at_path(path)
+	var v2 := {
+		"save_version": 2,
+		"solved_levels": ["level.01.awaken", "level.01.seed_bed", "level.01.hollow_stone"],
+		"discoveries": ["discovery.01.first_pulse", "discovery.01.stone_mark"],
+		"owned_equipment": ["equipment.rootweave_gauntlet"],
+		"loadout": ["equipment.rootweave_gauntlet"],
+		"world_flags": {"mechanism_awakens": true, "seed_grows": true, "stone_marks_awaken": true},
+		"current_level_index": 3,
+		"level_records": {"level.01.awaken": {"best_moves": 3, "best_stars": 3, "attempts": 2, "hints": 1}},
+	}
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify(v2))
+	f.close()
+	var g := SaveManager.load_from_path(path)
+	_check("v2 solved levels preserved", g.is_solved("level.01.hollow_stone"))
+	_check("v2 mastery record preserved", g.best_stars("level.01.awaken") == 3 and g.best_moves("level.01.awaken") == 3)
+	_check("v2 equipment preserved", g.owns("equipment.rootweave_gauntlet"))
+	_check("v2 world flags preserved", g.world_flags.has("stone_marks_awaken"))
+	_eq("v2 campaign position preserved", g.current_level_index, 3)
+	_check("v2 save has no world choices (empty table)", g.world_choices.is_empty())
+	# The next write must be schema version 3 and still carry every v2 field.
+	SaveManager.save_to_path(g, path)
+	var reread := SaveManager.load_from_path(path)
+	_eq("upgraded save is version 3", int(reread.to_dict().get("save_version", 0)), 3)
+	_check("upgrade keeps solved levels", reread.is_solved("level.01.seed_bed"))
+	_check("upgrade keeps mastery", reread.best_stars("level.01.awaken") == 3)
+	_check("upgrade keeps discoveries", reread.discoveries.has("discovery.01.stone_mark"))
+	# A recorded choice round-trips through v3.
+	reread.set_choice(GameController.FIRST_NODE_CHOICE, "far")
+	SaveManager.save_to_path(reread, path)
+	var reread2 := SaveManager.load_from_path(path)
+	_eq("v3 choice round-trips", reread2.choice(GameController.FIRST_NODE_CHOICE, ""), "far")
+	# Malformed world_choices are coerced away, never trusted.
+	var v3bad := {"save_version": 3, "solved_levels": [], "world_choices": {"ok": "near", "bad_num": 5, "": "x"}}
+	f = FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify(v3bad))
+	f.close()
+	var gb := SaveManager.load_from_path(path)
+	_eq("valid choice kept", gb.choice("ok", ""), "near")
+	_check("non-string choice dropped", not gb.has_choice("bad_num"))
+	_check("empty-key choice dropped", not gb.has_choice(""))
+	# A version-1 save (no records, no choices) upgrades straight to v3 unchanged.
+	var v1 := {
+		"save_version": 1,
+		"solved_levels": ["level.01.awaken"],
+		"discoveries": [],
+		"owned_equipment": [],
+		"loadout": [],
+		"world_flags": {},
+		"current_level_index": 1,
+	}
+	f = FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify(v1))
+	f.close()
+	var g1 := SaveManager.load_from_path(path)
+	_check("v1 solved level survives to v3", g1.is_solved("level.01.awaken"))
+	_check("v1 -> v3 leaves choices empty", g1.world_choices.is_empty())
+	SaveManager.save_to_path(g1, path)
+	var g1b := SaveManager.load_from_path(path)
+	_eq("v1 upgraded save is version 3", int(g1b.to_dict().get("save_version", 0)), 3)
+	SaveManager.delete_at_path(path)
+
+func _has_target(w, target_id: String) -> bool:
+	for t in w.interactive_targets():
+		if str(t["id"]) == target_id:
+			return true
+	return false
+
+## Collect the text of every Label AND Button in a subtree. Button captions (e.g. "Unequip")
+## are not Labels, so a label-only scan would miss them and a naive `contains("Equip")` would
+## match the "Equipment" heading — this helper lets a test assert the real control caption.
+func _all_ui_text(node: Node) -> String:
+	var out := ""
+	if node is Label or node is Button:
+		out += str(node.text) + "\n"
+	for c in node.get_children():
+		out += _all_ui_text(c)
+	return out
+
+## EPIC 0.4 Milestone D: the item discovery/use loop. Proves equipment is granted through the
+## real reward path, appears in the journal's equipment panel, equipping/unequipping goes
+## through real GameState, changes the live capability readout, persists across reload, and
+## cannot equip an unowned item.
+func _test_equipment_use_loop() -> void:
+	print("[equipment use loop]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var app = _mount_app(load("res://scenes/App.tscn"))
+	app._begin_new_game()
+	# A fresh game owns nothing; the panel shows the empty state, not a phantom item.
+	app._open_journal()
+	_check("fresh journal owns no equipment", app.game.game_state.owned_equipment.is_empty())
+	_check("empty equipment panel explains how to earn items", _all_label_text(app).contains("No equipment yet"))
+	_check("no resonance capability before the gauntlet", not app.game.game_state.has_capability("resonance"))
+	# Earn the Rootweave Gauntlet by completing level 3 (its authored reward).
+	app._play_level(0)
+	_check("level 1 solved for equipment test", _solve_current(app))
+	app._play_level(1)
+	_check("level 2 solved for equipment test", _solve_current(app))
+	app._play_level(2)
+	_check("level 3 solved for equipment test", _solve_current(app))
+	_check("gauntlet granted by level 3 reward", app.game.game_state.owns("equipment.rootweave_gauntlet"))
+	_check("granted gauntlet is auto-equipped", app.game.game_state.is_equipped("equipment.rootweave_gauntlet"))
+	_check("resonance capability active while equipped", app.game.game_state.has_capability("resonance"))
+	# The journal shows the item with its real name and an Unequip control (it is equipped).
+	app._open_journal()
+	var jt := _all_ui_text(app)
+	_check("journal shows the gauntlet by name", jt.contains("Rootweave Gauntlet"))
+	_check("journal offers Unequip while equipped", jt.contains("Unequip"))
+	# Unequip through the real path: capability turns off, panel offers Equip again.
+	app._toggle_equip("equipment.rootweave_gauntlet")
+	_check("unequip removes the capability", not app.game.game_state.has_capability("resonance"))
+	app._open_journal()
+	_check("journal offers Equip once unequipped", _all_ui_text(app).contains("Equip"))
+	# Re-equip and confirm the live HUD readout reflects the capability again.
+	app._toggle_equip("equipment.rootweave_gauntlet")
+	_check("re-equip restores the capability", app.game.game_state.has_capability("resonance"))
+	var hud = app.game.get_node_or_null("HUD")
+	_check("live HUD resonance line is populated while equipped", hud != null and hud._resonance.text.contains("Resonance"))
+	# An unowned item cannot be equipped (no phantom loadout entries).
+	app._toggle_equip("equipment.stone_lens")
+	_check("unowned item cannot be equipped", not app.game.game_state.is_equipped("equipment.stone_lens"))
+	# Persist and reload: ownership and equipped state survive.
+	app.game.save_progress()
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+	var app2 = _mount_app(load("res://scenes/App.tscn"))
+	_check("equipment survives reload", app2.game.game_state.owns("equipment.rootweave_gauntlet"))
+	_check("equipped state survives reload", app2.game.game_state.is_equipped("equipment.rootweave_gauntlet"))
+	_check("capability survives reload", app2.game.game_state.has_capability("resonance"))
+	if app2.get_parent() != null:
+		app2.get_parent().remove_child(app2)
+	app2.free()
+	if had:
+		var wr := FileAccess.open(saved, FileAccess.WRITE)
+		wr.store_string(backup)
+		wr.close()
+	else:
+		SaveManager.delete_at_path(saved)

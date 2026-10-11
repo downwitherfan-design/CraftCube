@@ -86,6 +86,16 @@ func _initialize() -> void:
         await _capture("session12_sigil_clue.png")
         app._open_nox()
         await _capture("session12_nox_dialogue.png")
+        # Milestone D: the Beat 5 path choice. Record a real decision and capture the world
+        # showing the chosen node lit and the other woken in reply.
+        app.game.record_choice(GameController.FIRST_NODE_CHOICE, "far")
+        app.game.world_view.apply_world_choices(app.game.game_state.world_choices)
+        app._refresh_world_targets()
+        await _capture("session13_world_choice.png")
+        # Milestone D: the journal's equipment panel (item use loop).
+        app.game.game_state.grant_equipment("equipment.rootweave_gauntlet")
+        app._open_journal()
+        await _capture("session13_equipment.png")
         if app.get_parent() != null:
                 app.get_parent().remove_child(app)
         app.free()

@@ -36,6 +36,10 @@ var _screens: Dictionary = {}
 var _active := ""
 var _confirm: ConfirmationDialog
 var _nox_dialog: AcceptDialog
+## The Beat 5 first-node choice dialog + its two option buttons (custom actions "near"/"far").
+var _choice_dialog: AcceptDialog
+var _choice_near_btn: Button
+var _choice_far_btn: Button
 var _big_text := false
 var _reduced_motion := false
 var _initialized := false
@@ -129,6 +133,16 @@ func _build_screens() -> void:
 	_nox_dialog.title = "Nox"
 	_nox_dialog.ok_button_text = "Close"
 	add_child(_nox_dialog)
+
+	# The Beat 5 first-node choice. One dialog with both options so the player can decide from
+	# the map, plus tapping a path node in the world routes through the same record path.
+	_choice_dialog = AcceptDialog.new()
+	_choice_dialog.title = "The Broken Path"
+	_choice_dialog.ok_button_text = "Decide later"
+	add_child(_choice_dialog)
+	_choice_near_btn = _choice_dialog.add_button("Wake the near node", true, "near")
+	_choice_far_btn = _choice_dialog.add_button("Wake the far node", true, "far")
+	_choice_dialog.custom_action.connect(_on_choice_dialog_action)
 
 	_apply_big_text(_big_text)
 
@@ -263,6 +277,11 @@ func _build_map() -> Control:
 	_screens.set("map_nox", nox_btn)
 	col.add_child(nox_btn)
 
+	var choice_btn := _button("The Broken Path")
+	choice_btn.pressed.connect(_open_choice)
+	_screens.set("map_choice", choice_btn)
+	col.add_child(choice_btn)
+
 	var back := _button("Back")
 	back.pressed.connect(_open_title)
 	col.add_child(back)
@@ -313,6 +332,15 @@ func _refresh_map() -> void:
 	var awakened: bool = game.game_state.world_flags.has("stone_marks_awaken")
 	nox_btn.visible = awakened
 	nox_btn.disabled = not awakened
+	# The first-node choice appears once its beat is reachable; label shows the decision made.
+	var choice_btn: Button = _screens["map_choice"]
+	var choice_available: bool = game.first_node_choice_available()
+	choice_btn.visible = choice_available
+	var chosen := game.first_node_choice()
+	if choice_available and chosen != "":
+		choice_btn.text = "The Broken Path — chose the %s node" % chosen
+	else:
+		choice_btn.text = "The Broken Path"
 
 # --- journal ---------------------------------------------------------------------------
 
@@ -328,6 +356,12 @@ func _build_journal() -> Control:
 	list.add_theme_constant_override("separation", 10)
 	col.add_child(list)
 	_screens.set("journal_list", list)
+	var equip_title := _label("Equipment", 30, ACCENT)
+	col.add_child(equip_title)
+	var equip_list := VBoxContainer.new()
+	equip_list.add_theme_constant_override("separation", 10)
+	col.add_child(equip_list)
+	_screens.set("journal_equipment", equip_list)
 	var back := _button("Back")
 	back.pressed.connect(_open_map)
 	col.add_child(back)
@@ -351,6 +385,52 @@ func _refresh_journal() -> void:
 		list.add_child(card["panel"])
 	var sub: Label = _screens["journal_sub"]
 	sub.text = "%d of %d entries discovered." % [found, all.size()]
+	_refresh_equipment()
+
+## The equipment panel: every owned item with an Equip/Unequip control that performs the real
+## loadout change. Equipping is the "use item" loop — it changes what the HUD can perceive
+## (PD-002), never puzzle truth. Owned items only, so nothing unobtained can be equipped.
+func _refresh_equipment() -> void:
+	var list: VBoxContainer = _screens["journal_equipment"]
+	for c in list.get_children():
+		list.remove_child(c)
+		c.queue_free()
+	var owned: Array = game.game_state.owned_equipment
+	if owned.is_empty():
+		var empty := _card("No equipment yet", "Complete Chapter One levels to earn equipment.", CARD_LOCKED)
+		list.add_child(empty["panel"])
+		return
+	for id in owned:
+		var item := StoryContent.equipment_by_id(str(id))
+		var equipped: bool = game.game_state.is_equipped(str(id))
+		var card := _card(str(item.get("name", str(id))), str(item.get("purpose", "")), CARD_DONE if equipped else CARD_LOCKED)
+		var btn := _button("Unequip" if equipped else "Equip", 20)
+		var item_id := str(id)
+		btn.pressed.connect(func() -> void: _toggle_equip(item_id))
+		card["box"].add_child(btn)
+		list.add_child(card["panel"])
+
+## Toggle one owned item's equipped state through the real GameState, persist, and refresh the
+## live gameplay readouts so the change is visible immediately during play.
+func _toggle_equip(id: String) -> void:
+	if not game.game_state.owns(id):
+		return
+	if game.game_state.is_equipped(id):
+		game.game_state.unequip(id)
+	else:
+		game.game_state.equip(id)
+	game.save_progress()
+	_refresh_equipment()
+	_refresh_live_gameplay()
+
+## Push a loadout change made in the journal into the running gameplay HUD, so equipping an
+## item has a visible effect immediately rather than only after re-entering the level.
+func _refresh_live_gameplay() -> void:
+	if game == null:
+		return
+	var hud := game.get_node_or_null("HUD")
+	if hud and hud.has_method("refresh_readouts"):
+		hud.refresh_readouts()
 
 # --- settings --------------------------------------------------------------------------
 
@@ -653,8 +733,44 @@ func _on_world_tapped(target_id: String) -> void:
 			_read_sigil()
 		WorldView.TARGET_NOX:
 			_open_nox()
+		WorldView.TARGET_NODE_NEAR:
+			_choose_first_node("near")
+		WorldView.TARGET_NODE_FAR:
+			_choose_first_node("far")
 		_:
 			pass
+
+## The Beat 5 choice is only actionable once it is genuinely available (level 2 solved) and
+## Nox/the world have begun to answer. A tap on a path node records the decision and re-opens
+## the dialogue showing the world's reply.
+func _choose_first_node(option: String) -> void:
+	if game == null or not game.first_node_choice_available():
+		return
+	game.record_choice(GameController.FIRST_NODE_CHOICE, option)
+	_open_choice()
+
+## Open the first-node choice. Unavailable before the beat, so the interaction cannot be
+## reached out of order; re-opening after a decision shows the recorded option and its reply.
+func _open_choice() -> void:
+	if game == null or not game.first_node_choice_available():
+		return
+	var chosen := game.first_node_choice()
+	var text := "Two dormant nodes flank the broken path. Only one will wake first."
+	if chosen != "":
+		text += "\n\n" + StoryContent.choice_option_reaction(GameController.FIRST_NODE_CHOICE, chosen)
+	_choice_dialog.dialog_text = text
+	# Reflect the recorded decision on the option buttons so re-deciding is legible.
+	_choice_near_btn.disabled = chosen == "near"
+	_choice_far_btn.disabled = chosen == "far"
+	if is_inside_tree():
+		_choice_dialog.popup_centered()
+
+func _on_choice_dialog_action(action: StringName) -> void:
+	var option := str(action)
+	if option == "near" or option == "far":
+		if game != null and game.first_node_choice_available():
+			game.record_choice(GameController.FIRST_NODE_CHOICE, option)
+			_open_choice()
 
 ## Reveal the sigil clue. The discovery is granted only on the first read (idempotent), and
 ## the "sigil_read" world flag is persisted so the clue stays discovered across restarts.

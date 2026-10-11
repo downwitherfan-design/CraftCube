@@ -102,6 +102,56 @@ const NOX_DIALOGUE := {
 	"closing": "Nox: \"The chapter closes, but the road keeps going. I will walk it with you.\"",
 }
 
+## Scoped world choices (FIRST_TEN_MINUTES Beat 5). Each is a low-stakes decision the player
+## records once; the world reflects which option was taken. `nar.flag.ch01_first_node_choice`
+## is the near/far first-node pick. Both options are valid; neither gates progression.
+const WORLD_CHOICES := {
+	"nar.flag.ch01_first_node_choice": {
+		"id": "nar.flag.ch01_first_node_choice",
+		"prompt": "Two dormant nodes flank the broken path. Which do you wake first?",
+		"default": "near",
+		"options": {
+			"near": {
+				"label": "Wake the near node",
+				"flag": "ch01_node_near",
+				"reaction": "The near node answers at once, and its glow runs along the walkway toward you.",
+			},
+			"far": {
+				"label": "Wake the far node",
+				"flag": "ch01_node_far",
+				"reaction": "The far node answers. Light crosses the broken span first, and the near node wakes in reply.",
+			},
+		},
+	},
+}
+
+## The choice record by id ({} when unknown).
+static func choice_definition(choice_id: String) -> Dictionary:
+	return WORLD_CHOICES.get(choice_id, {})
+
+## All choice definitions as an ordered array (journal/map iteration without hard-coded ids).
+static func all_choices() -> Array:
+	var out := []
+	for id in WORLD_CHOICES.keys():
+		out.append(WORLD_CHOICES[id])
+	return out
+
+## The player-facing label for one option of a choice ("" when unknown).
+static func choice_option_label(choice_id: String, option: String) -> String:
+	var opts: Dictionary = WORLD_CHOICES.get(choice_id, {}).get("options", {})
+	return str(opts.get(option, {}).get("label", ""))
+
+## The world flag a choice option fires ("" when unknown), so the world can be rebuilt from
+## the recorded choice without replaying the decision.
+static func choice_option_flag(choice_id: String, option: String) -> String:
+	var opts: Dictionary = WORLD_CHOICES.get(choice_id, {}).get("options", {})
+	return str(opts.get(option, {}).get("flag", ""))
+
+## The short world-reaction line for a chosen option ("" when unknown).
+static func choice_option_reaction(choice_id: String, option: String) -> String:
+	var opts: Dictionary = WORLD_CHOICES.get(choice_id, {}).get("options", {})
+	return str(opts.get(option, {}).get("reaction", ""))
+
 ## The clue read by tapping the three-notch sigil in the world. Short, non-blocking and
 ## original (FIRST_TEN_MINUTES Beat 2 plants the Architect mystery via the mark).
 const SIGIL_CLUE := "Three notches, each shallower than the last. Not a tally of what you have solved — a tally of what once answered here. Someone expected the light to come back."

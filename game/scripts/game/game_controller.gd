@@ -11,6 +11,9 @@ signal level_advanced(index: int)
 signal discovery_found(discovery: Dictionary)
 signal reward_granted(reward_id: String, equipment: Dictionary)
 signal world_reacted(hook: String, text: String)
+## A scoped world choice was recorded (or changed). `changed` is false when the same option was
+## re-selected, so a listener can grant a first-time consequence exactly once.
+signal choice_recorded(choice_id: String, option: String, changed: bool)
 signal move_applied()
 ## Fires on every successful completion (first time AND replays) with the derived result, so
 ## the results screen is driven by real state rather than cosmetic variables.
@@ -107,13 +110,52 @@ func load_level(index: int, force: bool = false) -> bool:
 	if world_view:
 		# Reconstruct the whole world appearance from truth: solved count + saved flags, so
 		# a loaded save restores the world without replaying any awakening/reward event.
-		world_view.sync_from_state(game_state.solved_levels.size(), game_state.world_flags)
+		world_view.sync_from_state(game_state.solved_levels.size(), game_state.world_flags, game_state.world_choices, first_node_choice_available())
 	level_loaded.emit(lvl)
 	return true
 
 ## True when `index` may be entered right now (first level, or predecessor solved).
 func is_level_unlocked(index: int) -> bool:
 	return game_state.is_level_unlocked(levels, index)
+
+# --- scoped world choice (Milestone D) -------------------------------------------------
+
+## The Beat 5 first-node choice becomes available once its story beat is reachable: after the
+## seed bed (level 2) is solved. It is never required for progression, so it only adds colour.
+const FIRST_NODE_CHOICE := "nar.flag.ch01_first_node_choice"
+
+func first_node_choice_available() -> bool:
+	return game_state.is_solved("level.01.seed_bed")
+
+## The current option for the first-node choice ("" before the player has decided).
+func first_node_choice() -> String:
+	return game_state.choice(FIRST_NODE_CHOICE, "")
+
+## Record the player's first-node choice. The world is rebuilt from the recorded choice (not
+## from an event), so re-selecting shows the same world and cannot double-apply anything.
+## Returns true only when the choice is genuinely new/changed.
+func record_choice(choice_id: String, option: String) -> bool:
+	if StoryContent.choice_definition(choice_id).is_empty():
+		return false
+	var changed := game_state.set_choice(choice_id, option)
+	# Mirror the decision into world flags (one flag per option) so any world code that keys off
+	# flags stays consistent; the sibling option's flag is cleared so the state is unambiguous.
+	var def := StoryContent.choice_definition(choice_id)
+	var opts: Dictionary = def.get("options", {})
+	for opt_key in opts.keys():
+		var flag := StoryContent.choice_option_flag(choice_id, str(opt_key))
+		if flag == "":
+			continue
+		if str(opt_key) == option:
+			game_state.world_flags[flag] = true
+		else:
+			game_state.world_flags.erase(flag)
+	if world_view:
+		world_view.apply_world_choices(game_state.world_choices)
+	if changed:
+		save_progress()
+	choice_recorded.emit(choice_id, option, changed)
+	return changed
 
 # --- interaction routing (Milestone A) -------------------------------------------------
 
@@ -407,7 +449,7 @@ func confirm_solve() -> bool:
 		if world_view:
 			# World reaction is derived from the authoritative solved set (idempotent), so a
 			# replay can never double-light and a resume can never under-light.
-			world_view.sync_from_state(game_state.solved_levels.size(), game_state.world_flags)
+			world_view.sync_from_state(game_state.solved_levels.size(), game_state.world_flags, game_state.world_choices, first_node_choice_available())
 		if cube_view:
 			cube_view.flash_solved(engine.state)
 		world_reacted.emit(hook, StoryContent.reaction_for(hook))

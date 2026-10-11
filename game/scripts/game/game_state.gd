@@ -10,8 +10,12 @@ extends RefCounted
 ##   2 — adds `level_records`: per-level best mastery (best_moves / best_stars) plus minimal
 ##       attempt and hint statistics. A version-1 save loads unchanged (no records) and is
 ##       upgraded in place; nothing from version 1 is dropped.
+##   3 — adds `world_choices`: the player's recorded scoped world decisions
+##       (choice_id -> option id, e.g. the first-node choice {near, far}). A version-1 or
+##       version-2 save loads unchanged (no choices recorded yet) and is upgraded in place;
+##       nothing from version 1 or 2 is dropped.
 
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 const MAX_SLOTS := 4
 
 var solved_levels: Array = []          # ordered level_ids
@@ -19,6 +23,7 @@ var discoveries: Array = []            # discovery_ids found
 var owned_equipment: Array = []        # equipment ids
 var loadout: Array = []                # equipped equipment ids (<= MAX_SLOTS)
 var world_flags: Dictionary = {}       # world_hook -> true
+var world_choices: Dictionary = {}
 var current_level_index: int = 0
 # level_id -> {"best_moves": int, "best_stars": int, "attempts": int, "hints": int}
 var level_records: Dictionary = {}
@@ -112,6 +117,24 @@ func add_discovery(id: String) -> bool:
 func set_world_flag(flag: String) -> void:
 	world_flags[flag] = true
 
+## Record a scoped world choice. Returns true when the choice is new or changed, so a
+## caller can grant a first-time consequence exactly once. Re-deciding is allowed, but
+## only a genuine change reports true.
+func set_choice(choice_id: String, option: String) -> bool:
+	if choice_id == "" or option == "":
+		return false
+	if str(world_choices.get(choice_id, "")) == option:
+		return false
+	world_choices[choice_id] = option
+	return true
+
+func has_choice(choice_id: String) -> bool:
+	return world_choices.has(choice_id)
+
+## The recorded option for a choice, or `fallback` when the player has not decided yet.
+func choice(choice_id: String, fallback: String = "") -> String:
+	return str(world_choices.get(choice_id, fallback))
+
 func grant_equipment(id: String) -> bool:
 	if id == "" or owned_equipment.has(id):
 		return false
@@ -166,6 +189,7 @@ func to_dict() -> Dictionary:
 		"owned_equipment": owned_equipment.duplicate(),
 		"loadout": loadout.duplicate(),
 		"world_flags": world_flags.duplicate(),
+		"world_choices": world_choices.duplicate(),
 		"current_level_index": current_level_index,
 		"level_records": level_records.duplicate(true),
 	}
@@ -190,6 +214,11 @@ static func from_dict(d: Dictionary) -> GameState:
 		for k in flags.keys():
 			if typeof(k) == TYPE_STRING:
 				g.world_flags[k] = true
+	var choices = d.get("world_choices", {})
+	if typeof(choices) == TYPE_DICTIONARY:
+		for k in choices.keys():
+			if typeof(k) == TYPE_STRING and str(k) != "" and typeof(choices[k]) == TYPE_STRING and str(choices[k]) != "":
+				g.world_choices[k] = str(choices[k])
 	g.current_level_index = maxi(0, int(d.get("current_level_index", 0)))
 	g.level_records = _records_dict(d.get("level_records", {}))
 	return g

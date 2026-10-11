@@ -18,6 +18,10 @@ const WARD_COUNT := 6
 ## and the tests agree on the identifier without duplicating a magic string.
 const TARGET_SIGIL := "world.three_notch_sigil"
 const TARGET_NOX := "world.nox"
+## The two Beat 5 path nodes are tappable once the choice is available, so the decision is made
+## by touching the world rather than only through a menu.
+const TARGET_NODE_NEAR := "world.path_node.near"
+const TARGET_NODE_FAR := "world.path_node.far"
 ## Nox awakens at the chapter's third level (the authored `reward.01.nox_meets` beat).
 const NOX_AWAKEN_LEVELS := 3
 
@@ -31,6 +35,12 @@ var _nox_parts: Array = []
 ## world has begun to answer, so a fresh world has nothing to tap.
 var _sigil: Node3D
 var _sigil_read := false
+## Two dormant nodes flanking the broken path (FIRST_TEN_MINUTES Beat 5). One is woken first;
+## the world remembers which, without gating progression either way.
+var _choice_nodes: Array = []
+## True once the Beat 5 first-node choice is offered (level 2 solved). Gates whether the path
+## nodes are tappable; the nodes are always visible so the path reads even before the choice.
+var _choice_available := false
 var _lit := 0
 var _lit_ground := Color(0.12, 0.14, 0.12)
 var _warm_ground := Color(0.2, 0.21, 0.16)
@@ -43,6 +53,8 @@ func build() -> void:
 	_nox = null
 	_sigil = null
 	_sigil_read = false
+	_choice_nodes.clear()
+	_choice_available = false
 	_lit = 0
 
 	var ground_mesh := CylinderMesh.new()
@@ -75,6 +87,7 @@ func build() -> void:
 	_build_wards()
 	_build_nox()
 	_build_sigil()
+	_build_choice_nodes()
 
 ## One ward stone per Chapter 01 level, placed at increasing radius and turn so each level's
 ## completion leaves a distinct, spatially separate landmark.
@@ -173,6 +186,42 @@ func _add_nox_part(mesh: Mesh, mat: Material, pos: Vector3, rot: Vector3 = Vecto
 	mi.rotation = rot
 	_nox.add_child(mi)
 	_nox_parts.append(mi)
+
+## The two path nodes of the Beat 5 choice. Built as short pillars with a glowing cap, placed
+## inside the tally ring so they read as "the path", not as more ward stones. Both start dormant;
+## whichever the player wakes first is lit brightly and the other wakes in reply (dim but present),
+## so the world shows the decision the player made rather than only that a decision happened.
+func _build_choice_nodes() -> void:
+	var placements := [
+		{"option": "near", "pos": Vector3(-1.0, -1.15, 1.9), "colour": Color(0.7, 0.85, 0.98)},
+		{"option": "far", "pos": Vector3(1.0, -1.15, -1.9), "colour": Color(0.85, 0.75, 0.62)},
+	]
+	for p in placements:
+		var node := Node3D.new()
+		node.position = p["pos"]
+		var pillar := CylinderMesh.new()
+		pillar.top_radius = 0.12
+		pillar.bottom_radius = 0.16
+		pillar.height = 0.7
+		pillar.radial_segments = 8
+		var mi := MeshInstance3D.new()
+		mi.mesh = pillar
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = Color(0.17, 0.18, 0.17)
+		mi.material_override = mat
+		node.add_child(mi)
+		var cap := MeshInstance3D.new()
+		var cap_mesh := SphereMesh.new()
+		cap_mesh.radius = 0.13
+		cap_mesh.height = 0.26
+		cap.mesh = cap_mesh
+		var cap_mat := StandardMaterial3D.new()
+		cap_mat.albedo_color = Color(0.15, 0.16, 0.15)
+		cap.material_override = cap_mat
+		cap.position = Vector3(0, 0.42, 0)
+		node.add_child(cap)
+		add_child(node)
+		_choice_nodes.append({"node": node, "material": mat, "cap": cap_mat, "colour": p["colour"], "option": p["option"]})
 
 ## The three-notch sigil: a small distinct figure (three upright notches on a base) placed
 ## beside the cube. Hidden until the world has answered (>= 1 solved level), then tappable to
@@ -288,7 +337,57 @@ func interactive_targets() -> Array:
 		out.append({"id": TARGET_SIGIL, "position": _sigil.position, "radius": 0.45})
 	if _nox != null and _nox.visible:
 		out.append({"id": TARGET_NOX, "position": _nox.position, "radius": 0.5})
+	# Path nodes are tappable only once the choice beat is offered; before that they are visible
+	# scenery, so a tap cannot record a decision the story has not reached.
+	if _choice_available:
+		for c in _choice_nodes:
+			var target := TARGET_NODE_NEAR if str(c["option"]) == "near" else TARGET_NODE_FAR
+			out.append({"id": target, "position": (c["node"] as Node3D).position, "radius": 0.45})
 	return out
+
+## Number of path-choice nodes built (0 before the world is built).
+func choice_node_count() -> int:
+	return _choice_nodes.size()
+
+## True when the given option's node is currently the woken (bright) one.
+func choice_node_lit(option: String) -> bool:
+	for c in _choice_nodes:
+		if str(c["option"]) == option:
+			return bool(c.get("lit", false))
+	return false
+
+## Light the chosen path node brightly and let the other wake in reply (dim, but present).
+## Rebuilt from the recorded choice, so a loaded save shows the same world without replaying
+## the decision.
+func apply_world_choices(choices: Dictionary) -> void:
+	var chosen := str(choices.get("nar.flag.ch01_first_node_choice", ""))
+	for c in _choice_nodes:
+		var opt := str(c["option"])
+		var mat: StandardMaterial3D = c["material"]
+		var cap: StandardMaterial3D = c["cap"]
+		var colour: Color = c["colour"]
+		if chosen == "":
+			c["lit"] = false
+			mat.albedo_color = Color(0.17, 0.18, 0.17)
+			mat.emission_enabled = false
+			cap.albedo_color = Color(0.15, 0.16, 0.15)
+			cap.emission_enabled = false
+		elif opt == chosen:
+			c["lit"] = true
+			mat.albedo_color = colour
+			mat.emission_enabled = true
+			mat.emission = colour * 0.4
+			cap.albedo_color = colour
+			cap.emission_enabled = true
+			cap.emission = colour * 0.6
+		else:
+			c["lit"] = false
+			mat.albedo_color = colour * 0.35
+			mat.emission_enabled = true
+			mat.emission = colour * 0.12
+			cap.albedo_color = colour * 0.4
+			cap.emission_enabled = true
+			cap.emission = colour * 0.15
 
 ## True once the three-notch clue has been read (persisted as a world flag).
 func sigil_read() -> bool:
@@ -317,6 +416,8 @@ func apply_world_flags(flags: Dictionary) -> void:
 ## Reconstruct the whole world appearance from authoritative progression: the solved
 ## count drives the ring, wards and Nox (via sync_lit), and the saved world flags drive
 ## the sigil. One call restores a loaded save without replaying any event.
-func sync_from_state(solved_count: int, flags: Dictionary) -> void:
+func sync_from_state(solved_count: int, flags: Dictionary, choices: Dictionary = {}, choice_available: bool = false) -> void:
 	sync_lit(solved_count)
 	apply_world_flags(flags)
+	apply_world_choices(choices)
+	_choice_available = choice_available
