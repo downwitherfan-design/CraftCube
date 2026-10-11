@@ -561,3 +561,61 @@ with ANIMATED turns; asserts render==truth after every turn + progression/reward
 - Phase 00 gate remains **NOT PASSED**; PR #11 must not merge before PR #12 (AI-01 `PD-030`) and the gate/human
   decisions (OD-0001 branch protection, OD-0005 IP/title clearance).
 
+
+## Session 14 — EPIC 0.5 (CC-PROD-050): Chapter One Gold Slice (2026-10-11)
+
+- **Branch:** `godot-migration` (PR #11 -> `integration`). Commits `5612709`, `0e14348`, `33e0f2a`,
+  `c37347c` pushed; tag `v0.5.0` on candidate `c37347c`.
+
+### Delivered (real features, verified)
+- **Milestone A — shared art direction.** New `game/scripts/presentation/palette.gd`
+  (`class_name CraftPalette`): `FACE_COLOURS`, `NOX_BODY/GLOW`, per-ward `ACCENTS`, ground/sky
+  tones, menu gradient and app chrome colours. `world_view.gd`, `cube_view.gd` and `app.gd` all
+  read from it.
+- **Milestone A/C — living world.** `world_view.gd` rewritten as a layered mineral garden: dark
+  plinth + raised garden disc + lit rim, a stepping-stone path that heals (teal) one stone per
+  solved level, palette-driven ward stones, and an improved Nox (foot nubs, idle bob/turn,
+  `nox_react_now()`), all reduced-motion aware and asset-free.
+- **Milestone B — cube presentation.** `cube_view.gd`: palette face colours, inter-tile gap, dark
+  inner core, edge frame. The 3x3 topology (levels 4-6) renders correctly (verified: 38 distinct
+  saturated face colours; `_test_3x3_rendered_sync` still passes).
+- **Milestone D — shell identity.** `app.gd`: procedural `GradientTexture2D` backdrop
+  (`MENU_TOP/MID/BOTTOM`) + face-colour emblem under the title.
+- **Milestone E — runtime quality.** New `game/tests/runtime_quality.gd` + evidence JSON:
+  gameplay 145 nodes / 83 meshes / 51 materials, app 216 nodes / 83 meshes; app boots to title,
+  world mounted, backdrop hidden over gameplay.
+
+### Real defect fixed (highest impact)
+- The application shell drew an opaque full-screen backdrop at all times, so every gameplay frame
+  was ~97% pure black (the rendered cube/world were hidden). The backdrop is now hidden while
+  gameplay is on screen and restored on menus. Measured: world-sigil frame 3.1% -> 41.4% non-black
+  pixels; cube zone 25-38 distinct saturated colours. Guarded by
+  `_test_app_backdrop_and_world_visibility`.
+
+### Verified results
+- Godot suite: **876 passed / 0 failed** (`godot --headless --path game --script res://tests/run_tests.gd`).
+- `bash game/ci/build_android.sh` -> **CI: PASS** (local toolchain installed this session:
+  Godot 4.7.2 export templates, Temurin JDK 21 under `/workspace/jdk`, debug keystore).
+- **v0.5.0 published (VERIFIED):** tag `v0.5.0` on `c37347c`; release workflow run `38178313244`
+  success. https://github.com/downwitherfan-design/CraftCube/releases/tag/v0.5.0 carries
+  `CraftCube-v0.5.0-android-arm64-v8a-debug.apk` (28,438,429 bytes, sha256
+  `6f282788abc1a418f5634ce1b365d78865c8d686aa84e29fd0a2e46656ac882e`, package
+  `com.downwitherfandesign.craftcube`, versionName 0.5.0, versionCode 8, minSdk 24, arm64-v8a,
+  debug-signed). Downloaded asset re-verified with `verify_apk.py` -> OK.
+- Post-release dev bump to **0.5.1 / version_code 9** with the v0.5.0 ledger entry preserved;
+  `validate_version` OK.
+
+### Credential note
+- The owner PAT (per AGENTS.md) was applied out-of-band at
+  `/home/openhands/.config/craftcube/github_token` (mode 600, outside the repo) and used only via
+  one-off push URLs. It carries full `repo` scope, so PR descriptions are editable this session.
+
+### Known limitations
+- No physical Android device; the APK is built and statically verified. Frame-time figures are a
+  Mesa llvmpipe software-GL path under Xvfb, not a device-GPU benchmark.
+- Phase 00 gate remains **NOT PASSED**; PR #11 must not merge before PR #12 (AI-01 `PD-030`) and
+  the human decisions OD-0001 / OD-0005.
+
+### Next safe action
+- Continue EPIC 0.5 polish if desired; otherwise this epic's deliverables (palette/world/cube/
+  shell/runtime quality + v0.5.0 release) are complete and pushed.

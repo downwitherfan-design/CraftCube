@@ -37,8 +37,23 @@ Phase 00 gate passing and the required human approvals. See `11_INTEGRATION/OPEN
 
 ## Latest release
 
-`v0.3.0` (version_code 4) is published as a GitHub pre-release with
-`CraftCube-v0.3.0-android-arm64-v8a-debug.apk` (sha256
-`7abcd64872cecc9bc1596e501a4df9df5aa81380eb07dac981c0851b90b90f78`). Development version is
-`0.3.1` / version_code 5. Build locally with `bash game/ci/build_android.sh` (needs JDK 21 + the
-Android SDK; the runtime here installs them under `/workspace/android-sdk`).
+`v0.5.0` (version_code 8) is published as a GitHub pre-release with
+`CraftCube-v0.5.0-android-arm64-v8a-debug.apk` (sha256
+`6f282788abc1a418f5634ce1b365d78865c8d686aa84e29fd0a2e46656ac882e`). Development version is
+`0.5.1` / version_code 9. Earlier published releases: `v0.4.0` (code 6), `v0.3.0` (code 4),
+`v0.2.0` (code 2).
+
+Build locally with `bash game/ci/build_android.sh`. The runtime needs Godot 4.7.2-stable export
+templates (`~/.local/share/godot/export_templates/4.7.2.stable/`), a JDK (this runtime installs
+Temurin 21 under `/workspace/jdk/`), the Android SDK (`/workspace/android-sdk`) and a debug
+keystore at `~/.local/share/godot/keystores/debug.keystore` (alias `androiddebugkey`, store/key
+password `android`); point Godot at them via `~/.config/godot/editor_settings-4.7.tres`
+(`export/android/java_sdk_path`, `export/android/android_sdk_path`).
+
+## Visual identity (EPIC 0.5)
+
+`game/scripts/presentation/palette.gd` (`class_name CraftPalette`) is the single source of the
+art direction ("The Living Mineral Garden"): `FACE_COLOURS`, `NOX_BODY/GLOW`, per-ward
+`ACCENTS`, ground/sky tones and the application chrome colours. The world (`world_view.gd`), the
+cube (`cube_view.gd`) and the app shell (`app.gd`) all read from it. Do not hard-code colours in
+those files; add them to the palette instead.
