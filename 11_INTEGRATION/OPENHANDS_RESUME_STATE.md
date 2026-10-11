@@ -512,3 +512,51 @@ with ANIMATED turns; asserts render==truth after every turn + progression/reward
   (and its `released[]` ledger) before the next published build so version codes stay monotonic.
 - For any future published milestone: edit `game/app_version.json` → commit → push tag `vX.Y.Z` → the release workflow
   builds, verifies and publishes the versioned APK automatically.
+
+## Session 13 — EPIC 0.4 Milestone D: item use loop + scoped world choice (2026-10-11)
+
+- **Branch:** `godot-migration`; head `3e6b3f3` (pushed, VERIFIED via `git ls-remote`).
+  Prior head `ddf9024` (Milestone C).
+- **Working tree:** clean at commit.
+
+### Delivered (real features, verified)
+- **Scoped world choice (Beat 5 first-node choice).** `StoryContent.WORLD_CHOICES`
+  (`nar.flag.ch01_first_node_choice`, options `near`/`far`) with per-option world flags and reactions.
+  `WorldView` renders two path nodes as world scenery; the recorded choice lights the chosen node and
+  wakes its sibling in reply. Nodes are tappable only once the beat is available (`_choice_available`),
+  and `interactive_targets()` gates on that, so no pre-awakening tap can record a choice.
+  `GameController.record_choice()` / `first_node_choice*` mirror the decision into world flags and
+  rebuild the world from truth (never from a transient event).
+- **Item discovery/use loop.** The journal gains an Equipment panel listing every *owned* item with a
+  real Equip/Unequip control that mutates `GameState.loadout`, persists, and refreshes the live HUD
+  readout. Equipping the Rootweave Gauntlet turns on the `perceive.resonance` HUD line; unequipping
+  turns it off; an unowned item cannot be equipped (no phantom loadout). PD-002 preserved: capability
+  changes perception, never puzzle truth.
+- **Save schema v2 → v3.** `GameState.SAVE_VERSION = 3` adds a `world_choices` table; the defensive read
+  drops non-string keys, empty keys, and non-string/empty values. v1 and v2 saves migrate to v3 with all
+  legitimate data preserved (solved levels, discoveries, equipment, loadout, world flags, campaign position,
+  mastery records).
+
+### Verified results
+- Godot domain suite: **793 passed / 0 failed** (`godot --headless --path game --script res://tests/run_tests.gd`).
+- Rendered evidence (Xvfb/GL, 720x1280) via `game/tests/capture_frames.gd`:
+  `session13_world_choice.png` (chosen path node lit), `session13_equipment.png` (journal equipment panel).
+  Target projections printed by the capture run confirm the two path nodes are real rendered geometry at
+  distinct screen positions.
+
+### Real defects fixed this session
+1. `_test_interaction_arbiter` repeatedly logged `Condition "!is_inside_tree()"` — the test drove the
+   arbiter before the app node had entered the tree. Fixed by mounting through the tree-aware helper.
+2. Stale `_test_save_v1_migration` asserted the post-write schema was version 2; the bump to v3 made the
+   assertion wrong. Corrected to compare against `GameState.SAVE_VERSION` (the real current schema).
+3. `GameState.from_dict` accepted an empty-string `world_choices` key; a malformed save could inject a
+   phantom entry. Added an explicit `str(k) != ""` guard.
+
+### New regressions (game/tests/run_tests.gd)
+`_test_world_choices`, `_test_save_v2_to_v3_migration`, `_test_equipment_use_loop`.
+
+### Next safe action
+- Milestone D is the last milestone recorded for EPIC 0.4 (AI-04); it is now DONE and pushed.
+- Phase 00 gate remains **NOT PASSED**; PR #11 must not merge before PR #12 (AI-01 `PD-030`) and the gate/human
+  decisions (OD-0001 branch protection, OD-0005 IP/title clearance).
+
