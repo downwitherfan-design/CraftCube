@@ -7,7 +7,7 @@ meaningful milestone.
 
 ## 1. Last verified repository state
 
-- **Inspection time:** 2026-10-10 (Epic 0.3 session 10; last milestone H, head `5af28e1`). Earlier recovery inspection also recorded below.
+- **Inspection time:** 2026-10-10 (Epic 0.3 session 11; versioned-APK release tooling). Session 10 (Milestone H, head `5af28e1`) and earlier recovery inspections also recorded below.
 - **Epic 0.3 session 10 (VERIFIED):** working branch `godot-migration`; branch head `5af28e1` after Milestones E/F/G/H, all pushed
   (`bab56ee..5af28e1`). `integration` = `3df70ae7518a9d6055b46d7dd690bbb13c8eeb51` (does NOT yet contain `game/` — PR #11 unmerged).
   Remote write worked this session via the injected `GITHUB_TOKEN` (pushes succeeded); the earlier "remote write BLOCKED" note in
@@ -446,3 +446,59 @@ with ANIMATED turns; asserts render==truth after every turn + progression/reward
 - No physical Android device / emulator in this runtime → the pipeline is VERIFIED; this is **not** a device playtest.
 - Rendering under Mesa llvmpipe is a software GL path; it validates layout/geometry, not device GPU performance.
 
+
+
+## Session 11 — Epic 0.3: versioned-APK release tooling (2026-10-10)
+
+- **Branch:** `godot-migration` (PR #11 -> `integration`). Local head advanced `94ebe93 -> 78dcad1` (new commit).
+- **Remote write: BLOCKED (regressed again).** The out-of-band PAT (`/tmp/.ghtok`) is absent and the injected
+  `GITHUB_TOKEN` still has **empty OAuth scopes**; `git push` returns `403 ... denied`. `origin/godot-migration`
+  therefore remains at `94ebe9388d12be7c83573733e6f0565bc7f23063`. Commit `78dcad1` is committed locally only and
+  must be pushed by a runtime that has write access (see section 1). No destructive action was taken.
+- **PR #11 (VERIFIED):** OPEN, base `integration`, head `godot-migration`, head OID `94ebe93`, `mergeStateStatus: CLEAN`.
+  Do NOT merge before the Phase 00 gate passes. PR #11 does not yet show `78dcad1`.
+
+### Delivered (new permanent requirement: versioned APK via GitHub Releases)
+- **`game/app_version.json`** - single source of truth: `app_version` `0.2.0`, `version_code` `2`, android block
+  (package `com.downwitherfandesign.craftcube`, minSdk 24, targetSdk 36, arm64-v8a, debug signing), `released[]` ledger.
+- **`game/scripts/game/version.gd`** (`class_name Version`) - runtime reader; HUD shows `CraftCube v0.2.0 (2)` from the same file.
+- **`game/ci/validate_version.py`** - fails if `export_presets.cfg` (`version/name`, `version/code`, `package/unique_name`,
+  architectures, min_sdk), `version.gd`, or the `released[]` ledger drift from the source of truth (monotonic version_code,
+  no version reuse).
+- **`game/ci/verify_apk.py`** - dependency-free AXML/APK metadata verifier (no aapt/apksigner): parses the ZIP central
+  directory, binary `AndroidManifest.xml` (AXML string pool + element/attribute chunks), `lib/<abi>/`, v1 certs and the
+  APK Signing Block. Reports package, versionName, versionCode, minSdk/targetSdk, architectures, signing schemes, cert hints, sha256.
+- **`game/ci/build_android.sh`** - now deletes stale `dist/*.apk`, validates the version, imports/tests/boots, exports the
+  debug APK, verifies its real metadata, and only on success stages a versioned
+  `dist/release/CraftCube-vMAJOR.MINOR.PATCH-android-<arch>-<signing>.apk` plus `.sha256` and `.json` provenance; fails visibly otherwise.
+- **`.github/workflows/craftcube-release.yml`** - on tag `v*` or manual dispatch: build+verify, upload the versioned APK
+  artifact, render notes, and create/update a **GitHub Release** with the APK attached (`contents: write`).
+- **`12_RELEASE/ANDROID_RELEASE_POLICY.md`** + **`12_RELEASE/release_notes/RELEASE_NOTES_TEMPLATE.md`** - permanent policy
+  and notes template.
+- **`game/tests/run_tests.gd`** - new `_test_version_single_source_of_truth`, `_test_hud_version_label`.
+- **`11_INTEGRATION/CHANGE_REQUESTS.md`** - CR-0015/CR-0016 route AI-12-owned `.github/` and `12_RELEASE/` ratification;
+  CR-0013/CR-0014 table rows corrected to match their bodies.
+
+### Verified results
+- Godot domain suite: **388 passed / 0 failed** (was 375; +13 checks from the two version tests).
+- `bash game/ci/build_android.sh` -> **CI: PASS** on this tree (toolchain reinstalled in this runtime: Godot 4.7.2-stable,
+  Temurin JDK 17, Android SDK 36, export templates). APK verified: package `com.downwitherfandesign.craftcube`,
+  versionName `0.2.0`, versionCode `2`, minSdk 24, arm64-v8a, v1+v2 signed (Godot debug keystore). Log:
+  `game/docs/evidence/session10_build.log`.
+- Staged artifact: `dist/release/CraftCube-v0.2.0-android-arm64-v8a-debug.apk`, size 28,363,821 bytes,
+  sha256 `e54ce9cbfde977bae8ba1bc246c84f78399df66d97464b7649d519f24a3f5e67` (the `.json` records `commit`
+  `94ebe9388d12be7c83573733e6f0565bc7f23063` because the build ran before the tooling commit was created).
+- Negative tests run manually: `validate_version.py` fails on version-name mismatch, code mismatch and non-monotonic code;
+  `verify_apk.py` fails on wrong package/version/arch and on unsigned APKs.
+
+### BLOCKED / not done (do not claim otherwise)
+- **No GitHub Release has been published yet.** The `gh`/API token is read-only (403), so neither the release workflow can
+  be triggered nor a Release created from this runtime. The first Release (`v0.2.0`, APK attached) must be created by a
+  runtime/owner with write access, or by pushing tag `v0.2.0` once the branch is pushed.
+- **Commit `78dcad1` is unpushed** (local only).
+- **Phase 00 gate remains NOT PASSED.** Human decisions still open: OD-0001 (branch protection), OD-0005 (IP/title clearance).
+
+### Next safe action
+- Push `78dcad1` from a write-enabled runtime; then trigger `.github/workflows/craftcube-release.yml` (tag `v0.2.0` or a
+  manual run with `publish: true`) and confirm a GitHub Release with the verified APK asset and matching sha256.
+- Keep PR #11 green; the Phase 00 gate and human decisions remain the merge blockers.
