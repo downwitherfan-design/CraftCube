@@ -8,6 +8,13 @@ var _passed := 0
 var _failed := 0
 var _failures: Array = []
 
+## The default player save. The suite is isolated from it: the file is set aside before any
+## test runs and restored afterwards, so a developer's (or a previous run's) progress can
+## never make the results depend on ambient state.
+const DEFAULT_SAVE := "user://craftcube_save.json"
+var _ambient_had := false
+var _ambient_backup := ""
+
 func _check(name: String, cond: bool) -> void:
 	if cond:
 		_passed += 1
@@ -21,6 +28,10 @@ func _eq(name: String, a, b) -> void:
 
 func _initialize() -> void:
 	print("== CraftCube domain tests ==")
+	_ambient_had = FileAccess.file_exists(DEFAULT_SAVE)
+	if _ambient_had:
+		_ambient_backup = FileAccess.get_file_as_string(DEFAULT_SAVE)
+	SaveManager.delete_at_path(DEFAULT_SAVE)
 	_test_geometry()
 	_test_moves()
 	_test_scramble()
@@ -78,10 +89,21 @@ func _initialize() -> void:
 	_test_nox_interaction()
 	# EPIC 0.4 additions
 	_test_interaction_arbiter()
+	_test_hud_compact_and_completion()
+	_restore_ambient_save()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
 		print("  - ", f)
 	quit(0 if _failed == 0 else 1)
+
+## Put the player's save back exactly as it was before the run.
+func _restore_ambient_save() -> void:
+	if _ambient_had:
+		var w := FileAccess.open(DEFAULT_SAVE, FileAccess.WRITE)
+		w.store_string(_ambient_backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(DEFAULT_SAVE)
 
 func _solved_fp(n: int) -> String:
 	return CubeState.new(n).fingerprint()
@@ -520,6 +542,9 @@ func _test_scene_integration() -> void:
 	var saved := "user://craftcube_save.json"
 	var had := FileAccess.file_exists(saved)
 	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	# Deterministic: this test asserts a freshly-built world starts unlit, so it must not
+	# depend on whatever save happens to be on disk. Remove it and restore afterwards.
+	SaveManager.delete_at_path(saved)
 	var packed: PackedScene = load("res://scenes/Main.tscn")
 	_check("Main.tscn loads as PackedScene", packed != null)
 	if packed == null:
@@ -2156,6 +2181,75 @@ func _test_interaction_arbiter() -> void:
 	if m.get_parent() != null:
 		m.get_parent().remove_child(m)
 	m.free()
+
+
+## EPIC 0.4 Milestone B: the gameplay HUD must stay readable on a narrow portrait screen
+## (objective + move count pinned in a non-scrolling top banner) and a first solve must not
+## yank the puzzle away — the completion panel offers the next step instead.
+func _test_hud_compact_and_completion() -> void:
+	print("[hud compact + non-interrupting completion]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var m = load("res://scenes/Main.tscn").instantiate()
+	root.add_child(m)
+	m._ready()
+	var hud = m.get_node("HUD")
+	# The status (objective + moves) and title must NOT be inside the ScrollContainer, so they
+	# stay pinned even when the control column overflows on a short screen.
+	var scroll: ScrollContainer = null
+	var node: Node = hud._status.get_parent()
+	while node != null and scroll == null:
+		if node is ScrollContainer:
+			scroll = node
+		node = node.get_parent()
+	_check("the move/objective banner is pinned (not scrolled)", scroll == null)
+	# A scroll container still exists for the control column, so nothing clips.
+	var has_scroll := false
+	for c in _all_descendants(hud):
+		if c is ScrollContainer:
+			has_scroll = true
+	_check("a scroll container still holds the control column", has_scroll)
+	_check("completion panel starts hidden", not hud._solved_panel.visible)
+
+	# Solve level 1 through the real path; the panel must appear without leaving gameplay.
+	m.load_level(0)
+	var guard := 0
+	while not m.engine.is_solved() and guard < 80:
+		if not m.guided_move():
+			break
+		while m.is_animating():
+			m.cube_view.skip_animation()
+		guard += 1
+	_check("level 1 solved for the completion panel", m.engine.is_solved())
+	_check("confirm_solve succeeds", m.confirm_solve())
+	_check("the completion panel appears on solve", hud._solved_panel.visible)
+	_check("the completion panel names the level and result", hud._solved_label.text.contains("Solved") and hud._solved_label.text.contains("Moves"))
+	_check("the player is still on the same level after the panel", m.current_index == 0)
+	# The HUD node stays visible (the harness does not attach nodes to a live tree, so
+	# `is_visible_in_tree()` is not meaningful here; the node's own flag is).
+	_check("the gameplay HUD stays visible after the panel", hud.visible)
+	# Continue advances to the next level via the real load path.
+	hud._on_continue_pressed()
+	_check("continue advances to level 2", m.current_index == 1)
+	_check("the completion panel hides after continuing", not hud._solved_panel.visible)
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+func _all_descendants(node: Node) -> Array:
+	var out: Array = []
+	for c in node.get_children():
+		out.append(c)
+		out.append_array(_all_descendants(c))
+	return out
 
 
 func _mount_app(packed: PackedScene) -> Node:

@@ -25,6 +25,11 @@ var _step_btn: Button
 var _readiness: Label
 var _resonance: Label
 var _version: Label
+## Non-interrupting completion panel: after the win predicate passes, the puzzle stays on
+## screen and the player chooses when to move on (so the win is not yanked away instantly).
+var _solved_panel: PanelContainer
+var _solved_label: Label
+var _continue_btn: Button
 
 ## Accessibility state: large text and reduced motion, both persisted in the settings file.
 var _reduced_motion := false
@@ -99,45 +104,54 @@ func _build() -> void:
 	margin.add_theme_constant_override("margin_bottom", 24)
 	add_child(margin)
 
-	var scroll := ScrollContainer.new()
-	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	margin.add_child(scroll)
-
 	var outer := VBoxContainer.new()
 	outer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	outer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.add_child(outer)
+	outer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.add_child(outer)
 
-	_title = _label("", 34)
-	_status = _label("", 22)
+	# Top banner: title + objective/moves stay pinned (never scrolled off) so the player can
+	# always read the goal and move count, even on a short narrow portrait phone.
+	_title = _label("", 30)
+	_status = _label("", 20)
+	outer.add_child(_title)
+	# Single source of truth: the app version shown here comes from res://app_version.json.
+	_version = _label("", 13)
+	var ver := Version.display()
+	_version.text = ("CraftCube " + ver) if ver != "" else ""
+	outer.add_child(_version)
+	outer.add_child(_status)
+
+	# Middle: the cube is visible here. Everything below scrolls, so a crowded control column
+	# on a small screen can never push the essential readout off the top.
+	outer.add_child(_spacer())
+
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	outer.add_child(scroll)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_theme_constant_override("separation", 10)
+	scroll.add_child(col)
+
 	_onboard = _label("", 20)
 	_hint = _label("", 20)
 	_story = _label("", 22)
 	_guide = _label("", 20)
 	_readiness = _label("", 18)
 	_resonance = _label("", 18)
-	outer.add_child(_title)
-	# Single source of truth: the app version shown here comes from res://app_version.json.
-	_version = _label("", 14)
-	var ver := Version.display()
-	_version.text = ("CraftCube " + ver) if ver != "" else ""
-	outer.add_child(_version)
-	outer.add_child(_status)
-
-	var spacer := Control.new()
-	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	outer.add_child(spacer)
-	outer.add_child(_readiness)
-	outer.add_child(_resonance)
-	outer.add_child(_onboard)
-	outer.add_child(_hint)
-	outer.add_child(_guide)
-	outer.add_child(_story)
+	col.add_child(_readiness)
+	col.add_child(_resonance)
+	col.add_child(_onboard)
+	col.add_child(_hint)
+	col.add_child(_guide)
+	col.add_child(_story)
 
 	_root = VBoxContainer.new()
 	_root.add_theme_constant_override("separation", 10)
-	outer.add_child(_root)
+	col.add_child(_root)
 
 	# Face-turn row (legal faces). Tap = recommended direction; toggle flips it.
 	var face_row := GridContainer.new()
@@ -170,19 +184,27 @@ func _build() -> void:
 	action_row.add_child(restart)
 	_restart_btn = restart
 
+	# Solving: request guidance, and confirm the win. Advancing to the next level is offered
+	# only on the completion panel, so progress is never skipped by accident.
 	var solve_row := HBoxContainer.new()
 	solve_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	solve_row.add_theme_constant_override("separation", 8)
 	_root.add_child(solve_row)
+	var hint := _button("Hint")
+	hint.pressed.connect(_on_hint)
+	solve_row.add_child(hint)
+	_hint_btn = hint
+	var step := _button("Guide: next step")
+	step.pressed.connect(_on_guided_step)
+	solve_row.add_child(step)
+	_step_btn = step
 	var solve := _button("I solved it")
 	solve.pressed.connect(_on_solve)
 	solve_row.add_child(solve)
-	var nxt := _button("Next level")
-	nxt.pressed.connect(func(): if not controller.next_level(): _status.text = "Chapter 01 slice complete.")
-	solve_row.add_child(nxt)
 
 	var a11y_row := HBoxContainer.new()
 	a11y_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	a11y_row.add_theme_constant_override("separation", 8)
 	_root.add_child(a11y_row)
 	var big := _button("Large text")
 	big.pressed.connect(_on_big_text)
@@ -195,20 +217,53 @@ func _build() -> void:
 	menu.pressed.connect(func(): controller.request_menu())
 	a11y_row.add_child(menu)
 
-	# Guided solving: request a reliable route (not optimal) and step through it using the
-	# same engine/animation path as a manual turn.
-	var guide_row := HBoxContainer.new()
-	guide_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	guide_row.add_theme_constant_override("separation", 8)
-	_root.add_child(guide_row)
-	var hint := _button("Hint")
-	hint.pressed.connect(_on_hint)
-	guide_row.add_child(hint)
-	_hint_btn = hint
-	var step := _button("Guide: next step")
-	step.pressed.connect(_on_guided_step)
-	guide_row.add_child(step)
-	_step_btn = step
+	_build_solved_panel()
+
+func _spacer() -> Control:
+	var s := Control.new()
+	s.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	s.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return s
+
+## Completion panel: appears only when the win predicate has passed, sits above the controls,
+## and never replaces the puzzle. The player presses Continue when they are ready.
+func _build_solved_panel() -> void:
+	# Bottom-anchored layer so the panel hugs its content instead of stretching into a large
+	# empty box; it overlays the controls but never covers the cube above.
+	var layer := MarginContainer.new()
+	layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_theme_constant_override("margin_left", 24)
+	layer.add_theme_constant_override("margin_right", 24)
+	layer.add_theme_constant_override("margin_bottom", 32)
+	add_child(layer)
+	var vbox := VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_END
+	vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(vbox)
+
+	_solved_panel = PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.14, 0.24, 0.2, 0.97)
+	sb.corner_radius_top_left = 14
+	sb.corner_radius_top_right = 14
+	sb.corner_radius_bottom_left = 14
+	sb.corner_radius_bottom_right = 14
+	sb.content_margin_left = 16
+	sb.content_margin_right = 16
+	sb.content_margin_top = 12
+	sb.content_margin_bottom = 12
+	_solved_panel.add_theme_stylebox_override("panel", sb)
+	_solved_panel.visible = false
+	vbox.add_child(_solved_panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	_solved_panel.add_child(box)
+	_solved_label = _label("", 22)
+	box.add_child(_solved_label)
+	_continue_btn = _button("Continue")
+	_continue_btn.pressed.connect(_on_continue_pressed)
+	box.add_child(_continue_btn)
 
 func _on_level_loaded(level: Dictionary) -> void:
 	_title.text = "%d. %s" % [int(level.get("ordinal", 0)), str(level.get("title", ""))]
@@ -220,9 +275,11 @@ func _on_level_loaded(level: Dictionary) -> void:
 	# Onboarding guidance is shown only on the first level; the story panel below is
 	# cleared so completion feedback from a previous level never lingers.
 	_onboard.visible = int(level.get("ordinal", 1)) == 1
-	_onboard.text = "Tap a face to twist the cube. Make every required face one colour, then press \"I solved it\"."
+	_onboard.text = "Drag across a face to twist it, or drag empty space to orbit the cube. Make every required face one colour, then press \"I solved it\"."
 	_story.text = ""
 	_guide.text = ""
+	if _solved_panel:
+		_solved_panel.visible = false
 	_refresh_legal()
 	_refresh_readiness()
 	_refresh_resonance()
@@ -394,6 +451,26 @@ func _on_discovery(discovery: Dictionary) -> void:
 
 func _on_solved(_level: Dictionary, _reward: Dictionary) -> void:
 	_status.text = "Solved! The world answered. Saved."
+	# Non-interrupting completion: keep the puzzle on screen and offer the next step rather
+	# than yanking the player away the instant the predicate passes.
+	var r: Dictionary = controller.last_result_data()
+	var stars := int(r.get("stars", 0))
+	var star_text := ""
+	for k in range(3):
+		star_text += "★" if k < stars else "☆"
+	_solved_label.text = "Solved!  %s\nMoves %d · par %d" % [star_text, int(r.get("moves", 0)), int(r.get("par", 0))]
+	var has_next: bool = int(r.get("next_index", -1)) >= 0
+	_continue_btn.text = "Continue to next level" if has_next else "Chapter map"
+	_solved_panel.visible = true
+
+## Continue from the completion panel: enter the next level when one remains, otherwise ask
+## the app to return to the chapter map. Reachable only by a deliberate press.
+func _on_continue_pressed() -> void:
+	_solved_panel.visible = false
+	var r: Dictionary = controller.last_result_data()
+	if int(r.get("next_index", -1)) >= 0 and controller.load_level(int(r["next_index"]), true):
+		return
+	controller.request_menu()
 
 func _on_big_text() -> void:
 	_apply_big_text(not _big_text)
@@ -416,7 +493,7 @@ func _apply_reduced_motion(on: bool) -> void:
 func _apply_big_text(on: bool) -> void:
 	_big_text = on
 	var mult := 1.5 if _big_text else 1.0
-	for l in [_title, _status, _onboard, _hint, _story, _guide, _readiness, _resonance, _version]:
+	for l in [_title, _status, _onboard, _hint, _story, _guide, _readiness, _resonance, _version, _solved_label]:
 		var base := 34 if l == _title else (22 if (l == _status or l == _story) else (18 if (l == _readiness or l == _resonance) else (14 if l == _version else 20)))
 		l.add_theme_font_size_override("font_size", int(base * mult))
 	for entry in _face_buttons:

@@ -31,6 +31,18 @@ func _initialize() -> void:
         hud._on_hint()
         cam.reset_view()
         await _capture("session10_hint.png")
+        # EPIC 0.4 Milestone B: the non-interrupting completion panel. Solve level 1 for real
+        # and capture the panel while the puzzle is still on screen.
+        _m.load_level(0)
+        var g1 := 0
+        while not _m.engine.is_solved() and g1 < 40:
+                if not _m.guided_move():
+                        break
+                while _m.is_animating():
+                        _m.cube_view.skip_animation()
+                g1 += 1
+        _m.confirm_solve()
+        await _capture("session11_completion.png")
         # Milestone C: play the chapter via the guide so the world's ward stones and the
         # companion (Nox) are revealed, then frame the world from a higher angle.
         for i in range(_m.levels.size()):
