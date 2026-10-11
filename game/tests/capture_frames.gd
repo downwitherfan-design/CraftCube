@@ -96,6 +96,21 @@ func _initialize() -> void:
         app.game.game_state.grant_equipment("equipment.rootweave_gauntlet")
         app._open_journal()
         await _capture("session13_equipment.png")
+        # EPIC 0.5 Milestone D: the application shell screens, to check readability and that
+        # the opaque menu backdrop is correct (and hidden over gameplay).
+        app._open_title()
+        await _capture("session15_title.png")
+        app._open_map()
+        await _capture("session15_map.png")
+        app._open_settings()
+        await _capture("session15_settings.png")
+        # EPIC 0.5 Milestone B: the newly exposed 3x3 topology (Chapter 01 levels 4-6).
+        app._play_level(3)
+        await _capture("session15_cube3x3.png")
+        app.game.camera.orbit(0.6, -0.15)
+        for _i in range(30):
+                app.game.camera._process(0.05)
+        await _capture("session15_cube3x3_orbit.png")
         if app.get_parent() != null:
                 app.get_parent().remove_child(app)
         app.free()

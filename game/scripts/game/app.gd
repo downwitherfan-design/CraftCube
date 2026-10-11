@@ -31,9 +31,9 @@ var settings_path := SaveManager.SETTINGS_PATH
 
 var _game_layer: Node3D
 var _screen_layer: Control
-## Opaque menu backdrop. Hidden while gameplay is on screen so the 3D world is visible
-## instead of being covered by the menu chrome (this was a real defect).
-var _bg: ColorRect
+## Opaque menu backdrop (a procedural gradient). Hidden while gameplay is on screen so the
+## 3D world is visible instead of being covered by the menu chrome (this was a real defect).
+var _bg: TextureRect
 ## The five screen roots (added to _screen_layer, toggled for visibility).
 var _screen_roots: Dictionary = {}
 ## Named references to every control the app needs later (roots + sub-nodes).
@@ -63,8 +63,21 @@ func _ready() -> void:
 	_big_text = bool(settings.get("big_text", false))
 	_reduced_motion = bool(settings.get("reduced_motion", false))
 
-	_bg = ColorRect.new()
-	_bg.color = BG
+	_bg = TextureRect.new()
+	# A procedural vertical gradient (sky -> ground) instead of a flat black slab, so the
+	# menu shares the world's art direction. GradientTexture2D is built-in: no asset file.
+	var grad := Gradient.new()
+	grad.set_color(0, CraftPalette.MENU_TOP)
+	grad.set_color(1, CraftPalette.MENU_BOTTOM)
+	grad.add_point(0.55, CraftPalette.MENU_MID)
+	var gtex := GradientTexture2D.new()
+	gtex.gradient = grad
+	gtex.fill_from = Vector2(0.0, 0.0)
+	gtex.fill_to = Vector2(0.0, 1.0)
+	gtex.width = 8
+	gtex.height = 256
+	_bg.texture = gtex
+	_bg.stretch_mode = TextureRect.STRETCH_SCALE
 	_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_bg)
@@ -192,6 +205,21 @@ func _button(text: String, base: int = 24) -> Button:
 	b.set_meta("base_font", base)
 	return b
 
+## A small procedural title emblem: the six cube face colours as a centred band, so the
+## home screen reads as a cube game. Built from plain ColorRects (no asset, no shader).
+func _face_emblem() -> Control:
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 6)
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for i in range(CraftPalette.FACE_COLOURS.size()):
+		var sw := ColorRect.new()
+		sw.color = CraftPalette.FACE_COLOURS[i]
+		sw.custom_minimum_size = Vector2(34, 10)
+		sw.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(sw)
+	return row
+
 func _card(title: String, subtitle: String, colour: Color) -> Dictionary:
 	var panel := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
@@ -225,6 +253,7 @@ func _build_title() -> Control:
 	var sub := _label("Chapter One — First Light", 22, MUTED)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(sub)
+	col.add_child(_face_emblem())
 
 	var spacer := Control.new()
 	spacer.custom_minimum_size = Vector2(0, 20)

@@ -75,6 +75,11 @@ const CUBE_EDGE := Color(0.06, 0.07, 0.08)
 
 # --- application chrome (app.gd / HUD) ---------------------------------------------------
 const UI_BG := Color(0.07, 0.08, 0.1)
+## Menu backdrop gradient (lighter than the in-game sky so the shell reads as a lit place
+## rather than a void, while staying in the same cool family).
+const MENU_TOP := Color(0.09, 0.11, 0.15)
+const MENU_MID := Color(0.16, 0.19, 0.25)
+const MENU_BOTTOM := Color(0.07, 0.08, 0.1)
 const UI_CARD := Color(0.13, 0.15, 0.18)
 const UI_CARD_DONE := Color(0.15, 0.21, 0.17)
 const UI_CARD_LOCKED := Color(0.11, 0.12, 0.13)

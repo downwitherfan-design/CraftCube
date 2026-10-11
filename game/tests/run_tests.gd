@@ -103,6 +103,10 @@ func _initialize() -> void:
 	_test_world_cache_item_loop()
 	_test_veiled_mark_item_use()
 	_test_item_loop_persistence()
+	# EPIC 0.5 additions (visual identity / world presentation)
+	_test_app_backdrop_and_world_visibility()
+	_test_world_presentation_layers()
+	_test_palette_contract()
 	_restore_ambient_save()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -2328,6 +2332,63 @@ func _all_descendants(node: Node) -> Array:
 		out.append_array(_all_descendants(c))
 	return out
 
+
+## EPIC 0.5 regression: the application shell must NOT cover the 3D world during gameplay.
+## The opaque menu backdrop (a real defect this epic fixed) previously hid the rendered cube
+## and world at all times, so every gameplay frame was near-black. The backdrop must be
+## visible on menu screens and hidden on the gameplay pseudo-screen.
+func _test_app_backdrop_and_world_visibility() -> void:
+	print("[app backdrop / world visibility]")
+	var app := _mount_app(load("res://scenes/App.tscn") as PackedScene)
+	_check("app built a menu backdrop", app._bg != null)
+	app._open_title()
+	_check("backdrop shown on the title screen", app._bg.visible)
+	_check("title screen does not show gameplay", not app.game.visible)
+	app._play_level(0)
+	_check("gameplay entered", app.current_screen() == "game")
+	_check("gameplay instance visible", app.game.visible)
+	_check("backdrop HIDDEN over gameplay so the world shows", not app._bg.visible)
+	app._open_map()
+	_check("backdrop restored on the chapter map", app._bg.visible)
+	_check("gameplay hidden behind the map", not app.game.visible)
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+
+## EPIC 0.5 Milestone A/C: the world presentation must be layered and must heal with
+## progress. Proves the ground is more than one slab and that the restored path grows with
+## the solved count (not only the tally ring).
+func _test_world_presentation_layers() -> void:
+	print("[world presentation layers]")
+	var w := WorldView.new()
+	w.build()
+	_check("world has a raised garden disc", w._garden != null)
+	_check("world has a lit rim", w._rim != null)
+	_check("world built a restored path", w.path_restored_count() == 0)
+	w.sync_lit(3)
+	_check("path heals with progress", w.path_restored_count() == 3)
+	_check("path is capped at the stone count", w.path_restored_count() <= WorldView.PATH_STONES)
+	w.sync_lit(0)
+	_check("path returns to dormant on a reset", w.path_restored_count() == 0)
+	w.sync_lit(2)
+	var first := w.path_restored_count()
+	w.sync_lit(2)
+	_eq("path rebuild is idempotent", w.path_restored_count(), first)
+	w.free()
+
+## EPIC 0.5 Milestone A/D: the shared palette is the single art direction for the whole
+## product. Guards the contract the world, cube and chrome depend on.
+func _test_palette_contract() -> void:
+	print("[palette contract]")
+	_eq("six face colours", CraftPalette.FACE_COLOURS.size(), 6)
+	_eq("six ward accents", CraftPalette.ACCENTS.size(), 6)
+	_check("accent_for clamps above range", CraftPalette.accent_for(99) == CraftPalette.ACCENTS[5])
+	_check("accent_for clamps below range", CraftPalette.accent_for(-4) == CraftPalette.ACCENTS[0])
+	var m := CraftPalette.restored_material(CraftPalette.ACCENTS[0])
+	_check("restored material is emissive", m.emission_enabled)
+	_check("restored material keeps the accent albedo", m.albedo_color.is_equal_approx(CraftPalette.ACCENTS[0]))
+	var d := CraftPalette.dormant_material()
+	_check("dormant material is not emissive", not d.emission_enabled)
 
 func _mount_app(packed: PackedScene) -> Node:
 	var app := packed.instantiate()

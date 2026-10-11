@@ -547,6 +547,16 @@ func lit_count() -> int:
 func wards_lit() -> int:
 	return clampi(_lit, 0, _wards.size())
 
+## Number of path stones currently restored (teal). Lets a test prove the walk heals with
+## progress rather than only the tally ring changing.
+func path_restored_count() -> int:
+	var n := 0
+	for p in _path:
+		var m: StandardMaterial3D = p["material"]
+		if m.emission_enabled:
+			n += 1
+	return n
+
 func nox_visible() -> bool:
 	return _nox != null and _nox.visible
 
