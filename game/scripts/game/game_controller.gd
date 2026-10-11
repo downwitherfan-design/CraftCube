@@ -47,6 +47,9 @@ var camera: OrbitCamera
 ## The single owner of raw touch/mouse input (AI-04 arbitration). All gameplay input arrives
 ## as typed commands from here; no other node consumes raw touches.
 var router: InteractionRouter
+## The single gameplay audio director (Milestone E). All cues are requested through here so
+## there is exactly one audio source; it is optional so headless scenes without it still work.
+var audio: AudioDirector
 
 ## Save file used by save_progress(); tests override it so they never touch the real save.
 var save_path := SaveManager.DEFAULT_PATH
@@ -66,6 +69,7 @@ func _ready() -> void:
 	world_view = get_node_or_null("WorldView")
 	camera = get_node_or_null("Camera3D")
 	router = get_node_or_null("InteractionRouter")
+	audio = get_node_or_null("AudioDirector")
 	if camera:
 		camera.reset_view()
 	if world_view:
@@ -118,6 +122,12 @@ func load_level(index: int, force: bool = false) -> bool:
 func is_level_unlocked(index: int) -> bool:
 	return game_state.is_level_unlocked(levels, index)
 
+## Request a gameplay cue through the single audio director. No-op when audio is absent
+## (headless scenes) or muted, so callers never need to guard.
+func _cue(cue: String) -> void:
+	if audio != null:
+		audio.request(cue)
+
 # --- scoped world choice (Milestone D) -------------------------------------------------
 
 ## The Beat 5 first-node choice becomes available once its story beat is reachable: after the
@@ -154,6 +164,7 @@ func record_choice(choice_id: String, option: String) -> bool:
 		world_view.apply_world_choices(game_state.world_choices)
 	if changed:
 		save_progress()
+	_cue(AudioDirector.CUE_CHOICE)
 	choice_recorded.emit(choice_id, option, changed)
 	return changed
 
@@ -215,17 +226,22 @@ func try_move(face: String, cw: bool, animated: bool = true) -> bool:
 		if cube_view.is_animating():
 			return false
 		if not engine.is_legal(move):
+			_cue(AudioDirector.CUE_REFUSED)
 			return false
 		if not cube_view.animate_move(move, engine.state, _on_move_animated.bind(move)):
 			return false
 		_pending_move = move
+		_cue(AudioDirector.CUE_TURN)
 		return true
 	var applied := engine.apply_move(move)
 	if applied:
 		_on_player_action()
 		if cube_view:
 			cube_view.refresh(engine.state)
+		_cue(AudioDirector.CUE_TURN)
 		move_applied.emit()
+	else:
+		_cue(AudioDirector.CUE_REFUSED)
 	return applied
 
 func _on_move_animated(move: Dictionary) -> void:
@@ -446,6 +462,10 @@ func confirm_solve() -> bool:
 		game_state.mark_solved(level_id)
 		var hook := str(lvl.get("world_hook", ""))
 		game_state.set_world_flag(hook)
+		# A genuine first solve: the solve cue and the world-restoration cue are distinct, so the
+		# player can tell "you solved it" from "the world answered".
+		_cue(AudioDirector.CUE_SOLVE)
+		_cue(AudioDirector.CUE_WORLD)
 		if world_view:
 			# World reaction is derived from the authoritative solved set (idempotent), so a
 			# replay can never double-light and a resume can never under-light.
@@ -460,6 +480,10 @@ func confirm_solve() -> bool:
 			var equipment_id := StoryContent.equipment_id_for(reward_id)
 			if equipment_id != "":
 				game_state.grant_equipment(equipment_id)
+				# Nox's authored awakening beat gets its own cue, distinct from the generic
+				# world-restoration swell, so the companion's arrival reads as a new event.
+				if reward_id == "reward.01.nox_meets":
+					_cue(AudioDirector.CUE_NOX)
 			reward_granted.emit(reward_id, StoryContent.equipment_for(reward_id))
 			last_result["reward_id"] = reward_id
 			last_result["reward_narrative"] = str(reward.get("narrative", ""))
@@ -474,6 +498,7 @@ func confirm_solve() -> bool:
 			if not disc.is_empty() and game_state.add_discovery(disc_id):
 				last_result["discovery_id"] = disc_id
 				last_result["discovery_name"] = str(disc.get("name", ""))
+				_cue(AudioDirector.CUE_DISCOVERY)
 				discovery_found.emit(disc)
 
 	# The next actionable level (first unsolved later level), or -1 when the chapter is done.

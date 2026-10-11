@@ -449,6 +449,11 @@ func _build_settings() -> Control:
 	_screens.set("set_rm", rm)
 	col.add_child(rm)
 
+	var audio := _button("Game audio: On")
+	audio.pressed.connect(_toggle_audio_muted)
+	_screens.set("set_audio", audio)
+	col.add_child(audio)
+
 	var cam_label := _label("Camera distance", 20, MUTED)
 	col.add_child(cam_label)
 	var slider := HSlider.new()
@@ -464,9 +469,6 @@ func _build_settings() -> Control:
 	reset_cam.pressed.connect(_on_reset_camera)
 	col.add_child(reset_cam)
 
-	var note := _label("Audio settings are not shown because no game audio is implemented yet.", 16, MUTED)
-	col.add_child(note)
-
 	var back := _button("Back")
 	back.pressed.connect(_open_title)
 	col.add_child(back)
@@ -477,6 +479,9 @@ func _refresh_settings() -> void:
 	big.text = "Large text: %s" % ("On" if _big_text else "Off")
 	var rm: Button = _screens["set_rm"]
 	rm.text = "Reduced motion: %s" % ("On" if _reduced_motion else "Off")
+	var audio: Button = _screens["set_audio"]
+	var muted: bool = game != null and game.audio != null and bool(game.audio.muted)
+	audio.text = "Game audio: %s" % ("Off (muted)" if muted else "On")
 
 func _toggle_big_text() -> void:
 	_big_text = not _big_text
@@ -492,6 +497,14 @@ func _toggle_reduced_motion() -> void:
 	SaveManager.update_settings({"reduced_motion": _reduced_motion}, settings_path)
 	_refresh_settings()
 	_sync_game_accessibility()
+
+## Mute/unmute the real gameplay audio through the single audio director. The change takes
+## effect on the very next cue and is persisted in the settings file (truthful current state).
+func _toggle_audio_muted() -> void:
+	if game == null or game.audio == null:
+		return
+	game.audio.set_muted(not game.audio.muted)
+	_refresh_settings()
 
 func _on_camera_distance(value: float) -> void:
 	if game and game.camera:

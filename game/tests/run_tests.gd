@@ -95,6 +95,10 @@ func _initialize() -> void:
 	_test_world_choices()
 	_test_save_v2_to_v3_migration()
 	_test_equipment_use_loop()
+	# EPIC 0.4 Milestone E additions (gameplay audio)
+	_test_audio_director_cues()
+	_test_audio_event_wiring()
+	_test_audio_settings_persistence()
 	_restore_ambient_save()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -2586,3 +2590,134 @@ func _test_equipment_use_loop() -> void:
 		wr.close()
 	else:
 		SaveManager.delete_at_path(saved)
+
+# =======================================================================================
+# EPIC 0.4 Milestone E — gameplay audio
+# =======================================================================================
+
+## The audio director synthesises a distinct cue for every vocabulary entry, keeps a bounded
+## player pool, and honours mute without losing the request record (so the real event path
+## stays testable even when no audio device exists).
+func _test_audio_director_cues() -> void:
+	print("[audio director cues]")
+	var p := "user://t_audio_settings.json"
+	SaveManager.delete_settings(p)
+	var d := AudioDirector.new()
+	d.settings_path = p
+	root.add_child(d)
+	d._ready()
+	_eq("audio director generates one cue per vocabulary entry", d.cue_count(), 7)
+	var stream: AudioStreamWAV = d._streams[AudioDirector.CUE_TURN]
+	_check("a cue is a real 16-bit PCM stream", stream != null and stream.format == AudioStreamWAV.FORMAT_16_BITS and stream.data.size() > 0)
+	_check("turn and solve cues are different samples", d._streams[AudioDirector.CUE_TURN].data != d._streams[AudioDirector.CUE_SOLVE].data)
+	_check("world and solve cues are different samples", d._streams[AudioDirector.CUE_WORLD].data != d._streams[AudioDirector.CUE_SOLVE].data)
+	_check("discovery and world cues are different samples", d._streams[AudioDirector.CUE_DISCOVERY].data != d._streams[AudioDirector.CUE_WORLD].data)
+	_check("player pool is bounded", d.pool_size() <= AudioDirector.POOL_SIZE)
+	d.request(AudioDirector.CUE_TURN)
+	_eq("turn cue request count is 1", d.request_count(AudioDirector.CUE_TURN), 1)
+	d.set_muted(true)
+	var played: bool = d.request(AudioDirector.CUE_SOLVE)
+	_check("muted request does not play", not played)
+	_eq("muted request is still recorded", d.request_count(AudioDirector.CUE_SOLVE), 1)
+	_check("mute is persisted to the settings file", bool(SaveManager.load_settings(p).get("audio_muted", false)))
+	d.set_muted(false)
+	_check("unmute is persisted", not bool(SaveManager.load_settings(p).get("audio_muted", false)))
+	if d.get_parent() != null:
+		d.get_parent().remove_child(d)
+	d.free()
+	SaveManager.delete_settings(p)
+
+## Real gameplay events must request the correct cues through the single audio director.
+func _test_audio_event_wiring() -> void:
+	print("[audio event wiring]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var app = _mount_app(load("res://scenes/App.tscn"))
+	app._begin_new_game()
+	var a = app.game.audio
+	_check("the gameplay scene has an audio director", a != null)
+	var before_turn: int = a.request_count(AudioDirector.CUE_TURN)
+	app.game.load_level(0)
+	app.game.try_move("U", true, false)
+	_check("a legal turn requests the turn cue", a.request_count(AudioDirector.CUE_TURN) == before_turn + 1)
+	app.game.game_state.mark_solved("level.01.awaken")
+	app.game.game_state.mark_solved("level.01.seed_bed")
+	app.game.load_level(2)
+	var before_ref: int = a.request_count(AudioDirector.CUE_REFUSED)
+	app.game.try_move("U", true, false)
+	_check("an illegal/locked move requests the refused cue", a.request_count(AudioDirector.CUE_REFUSED) > before_ref)
+	SaveManager.delete_at_path(saved)
+	app._begin_new_game()
+	app._play_level(0)
+	var s_before: int = a.request_count(AudioDirector.CUE_SOLVE)
+	var w_before: int = a.request_count(AudioDirector.CUE_WORLD)
+	_check("level 1 solved for audio wiring", _solve_current(app))
+	_eq("a first solve requests the solve cue once", a.request_count(AudioDirector.CUE_SOLVE), s_before + 1)
+	_eq("a first solve requests the world cue once", a.request_count(AudioDirector.CUE_WORLD), w_before + 1)
+	app._play_level(0)
+	_solve_current(app)
+	_eq("a replay does not repeat the solve cue", a.request_count(AudioDirector.CUE_SOLVE), s_before + 1)
+	app._play_level(1)
+	_solve_current(app)
+	var nox_before: int = a.request_count(AudioDirector.CUE_NOX)
+	app._play_level(2)
+	_solve_current(app)
+	_eq("the Nox awakening requests the nox cue once", a.request_count(AudioDirector.CUE_NOX), nox_before + 1)
+	var c_before: int = a.request_count(AudioDirector.CUE_CHOICE)
+	app.game.record_choice(GameController.FIRST_NODE_CHOICE, "far")
+	_check("recording a world choice requests the choice cue", a.request_count(AudioDirector.CUE_CHOICE) > c_before)
+	SaveManager.delete_at_path(saved)
+	app._begin_new_game()
+	app._play_level(0)
+	_solve_current(app)
+	var d_before: int = a.request_count(AudioDirector.CUE_DISCOVERY)
+	app._play_level(1)
+	_solve_current(app)
+	_check("a new discovery requests the discovery cue", a.request_count(AudioDirector.CUE_DISCOVERY) > d_before)
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+	if had:
+		var w := FileAccess.open(saved, FileAccess.WRITE)
+		w.store_string(backup)
+		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## The mute setting persists across a restart; malformed settings fall back to the default.
+func _test_audio_settings_persistence() -> void:
+	print("[audio settings persistence]")
+	var p := "user://t_audio_persist.json"
+	SaveManager.delete_settings(p)
+	var d := AudioDirector.new()
+	d.settings_path = p
+	root.add_child(d)
+	d._ready()
+	_check("audio is unmuted by default on a clean install", not d.muted)
+	d.set_muted(true)
+	if d.get_parent() != null:
+		d.get_parent().remove_child(d)
+	d.free()
+	var d2 := AudioDirector.new()
+	d2.settings_path = p
+	root.add_child(d2)
+	d2._ready()
+	_check("a fresh audio director restores the persisted mute", d2.muted)
+	if d2.get_parent() != null:
+		d2.get_parent().remove_child(d2)
+	d2.free()
+	var f := FileAccess.open(p, FileAccess.WRITE)
+	f.store_string("{broken")
+	f.close()
+	var d3 := AudioDirector.new()
+	d3.settings_path = p
+	root.add_child(d3)
+	d3._ready()
+	_check("malformed audio settings fall back to unmuted default", not d3.muted)
+	if d3.get_parent() != null:
+		d3.get_parent().remove_child(d3)
+	d3.free()
+	SaveManager.delete_settings(p)
+

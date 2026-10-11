@@ -25,6 +25,8 @@ var _step_btn: Button
 var _readiness: Label
 var _resonance: Label
 var _version: Label
+## Audio mute toggle (drives the single AudioDirector; state read from it, never duplicated).
+var _audio_btn: Button
 ## Non-interrupting completion panel: after the win predicate passes, the puzzle stays on
 ## screen and the player chooses when to move on (so the win is not yanked away instantly).
 var _solved_panel: PanelContainer
@@ -212,6 +214,11 @@ func _build() -> void:
 	var rm := _button("Reduced motion")
 	rm.pressed.connect(_on_reduced_motion)
 	a11y_row.add_child(rm)
+	# Mute the real gameplay audio (same single audio director the settings screen drives).
+	var snd := _button("Audio")
+	snd.pressed.connect(_on_audio_toggle)
+	_audio_btn = snd
+	a11y_row.add_child(snd)
 	# Return to the application menu. The app shell owns navigation; this only asks for it.
 	var menu := _button("Menu")
 	menu.pressed.connect(func(): controller.request_menu())
@@ -283,6 +290,7 @@ func _on_level_loaded(level: Dictionary) -> void:
 	_refresh_legal()
 	_refresh_readiness()
 	_refresh_resonance()
+	_refresh_audio_button()
 
 func _refresh_legal() -> void:
 	var legal: Array = controller.legal_faces()
@@ -419,6 +427,7 @@ func _on_move_applied() -> void:
 ## change made outside gameplay (equip/unequip) so a capability's effect appears at once.
 func refresh_readouts() -> void:
 	_refresh_status()
+	_refresh_audio_button()
 
 func _on_solve() -> void:
 	if not controller.confirm_solve():
@@ -486,6 +495,20 @@ func _on_big_text() -> void:
 func _on_reduced_motion() -> void:
 	_apply_reduced_motion(not _reduced_motion)
 	SaveManager.update_settings({"big_text": _big_text, "reduced_motion": _reduced_motion}, settings_path)
+
+## Toggle the real gameplay audio mute through the single AudioDirector and reflect the new
+## state on the button. Reads the director's state (single source of truth), never a copy.
+func _on_audio_toggle() -> void:
+	if controller == null or controller.audio == null:
+		return
+	controller.audio.set_muted(not controller.audio.muted)
+	_refresh_audio_button()
+
+func _refresh_audio_button() -> void:
+	if _audio_btn == null:
+		return
+	var muted: bool = controller != null and controller.audio != null and bool(controller.audio.muted)
+	_audio_btn.text = "Audio: muted" if muted else "Audio: on"
 
 ## Apply reduced motion to the cube view. Shared by the toggle and the settings restore path.
 func _apply_reduced_motion(on: bool) -> void:
