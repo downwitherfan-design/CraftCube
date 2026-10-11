@@ -14,6 +14,10 @@ extends Node3D
 
 const RING_MARKERS := 12
 const WARD_COUNT := 6
+## Interactive world-target ids the arbiter can route. Consts so the router, the app
+## and the tests agree on the identifier without duplicating a magic string.
+const TARGET_SIGIL := "world.three_notch_sigil"
+const TARGET_NOX := "world.nox"
 ## Nox awakens at the chapter's third level (the authored `reward.01.nox_meets` beat).
 const NOX_AWAKEN_LEVELS := 3
 
@@ -22,6 +26,11 @@ var _growth: Array = []
 var _wards: Array = []
 var _nox: Node3D
 var _nox_parts: Array = []
+## Interactive three-notch sigil near the cube: a tap reveals the Architect clue
+## (FIRST_TEN_MINUTES Beat 2). Built as a small distinct figure, hidden until the
+## world has begun to answer, so a fresh world has nothing to tap.
+var _sigil: Node3D
+var _sigil_read := false
 var _lit := 0
 var _lit_ground := Color(0.12, 0.14, 0.12)
 var _warm_ground := Color(0.2, 0.21, 0.16)
@@ -32,6 +41,8 @@ func build() -> void:
 	_growth.clear()
 	_wards.clear()
 	_nox = null
+	_sigil = null
+	_sigil_read = false
 	_lit = 0
 
 	var ground_mesh := CylinderMesh.new()
@@ -63,6 +74,7 @@ func build() -> void:
 
 	_build_wards()
 	_build_nox()
+	_build_sigil()
 
 ## One ward stone per Chapter 01 level, placed at increasing radius and turn so each level's
 ## completion leaves a distinct, spatially separate landmark.
@@ -162,6 +174,41 @@ func _add_nox_part(mesh: Mesh, mat: Material, pos: Vector3, rot: Vector3 = Vecto
 	_nox.add_child(mi)
 	_nox_parts.append(mi)
 
+## The three-notch sigil: a small distinct figure (three upright notches on a base) placed
+## beside the cube. Hidden until the world has answered (>= 1 solved level), then tappable to
+## reveal the Architect clue. Distinct from the ward stones (which are pillars) so the player
+## reads it as a *mark*, not another progress bar.
+func _build_sigil() -> void:
+	_sigil = Node3D.new()
+	_sigil.position = Vector3(-1.8, -1.05, 1.5)
+	_sigil.visible = false
+	var base_mat := StandardMaterial3D.new()
+	base_mat.albedo_color = Color(0.2, 0.21, 0.2)
+	var notch_mat := StandardMaterial3D.new()
+	notch_mat.albedo_color = Color(0.55, 0.6, 0.62)
+	notch_mat.emission_enabled = true
+	notch_mat.emission = Color(0.1, 0.13, 0.15)
+	var base := CylinderMesh.new()
+	base.top_radius = 0.26
+	base.bottom_radius = 0.3
+	base.height = 0.16
+	base.radial_segments = 12
+	var base_mi := MeshInstance3D.new()
+	base_mi.mesh = base
+	base_mi.material_override = base_mat
+	_sigil.add_child(base_mi)
+	# Three notches: each a thin upright slab, evenly spaced and leaning slightly outward.
+	for k in range(3):
+		var notch := BoxMesh.new()
+		notch.size = Vector3(0.05, 0.3 + float(k) * 0.04, 0.05)
+		var mi := MeshInstance3D.new()
+		mi.mesh = notch
+		mi.material_override = notch_mat
+		mi.position = Vector3((float(k) - 1.0) * 0.13, 0.23, 0.0)
+		mi.rotation = Vector3(0, 0, (float(k) - 1.0) * 0.16)
+		_sigil.add_child(mi)
+	add_child(_sigil)
+
 ## Light up the next growth marker; represents a world hook firing. Idempotent in effect:
 ## lighting is capped at the marker count so a repeated/extra call cannot exceed the ring.
 func react() -> bool:
@@ -210,6 +257,10 @@ func sync_lit(count: int) -> void:
 	# the player for the last three levels (matches the `reward.01.nox_meets` beat).
 	if _nox != null:
 		_nox.visible = target >= NOX_AWAKEN_LEVELS
+	# The sigil becomes tappable as soon as the world has begun to answer (>= 1 level),
+	# so a fresh world exposes no interactive target and cannot be read out of order.
+	if _sigil != null:
+		_sigil.visible = target >= 1
 	_lit = target
 
 func lit_count() -> int:
@@ -229,6 +280,43 @@ func nox_part_count() -> int:
 
 ## Interactive world targets currently registered with the input arbiter. Each entry is
 ## {id, position, radius}; only targets that are actually visible/available are returned, so
-## a tap can never interact with a veiled target. Base implementation: none yet.
+## a tap can never interact with a veiled target (the sigil before the world answers, or Nox
+## before it awakens).
 func interactive_targets() -> Array:
-	return []
+	var out: Array = []
+	if _sigil != null and _sigil.visible:
+		out.append({"id": TARGET_SIGIL, "position": _sigil.position, "radius": 0.45})
+	if _nox != null and _nox.visible:
+		out.append({"id": TARGET_NOX, "position": _nox.position, "radius": 0.5})
+	return out
+
+## True once the three-notch clue has been read (persisted as a world flag).
+func sigil_read() -> bool:
+	return _sigil_read
+
+## True when the sigil is currently tappable.
+func sigil_available() -> bool:
+	return _sigil != null and _sigil.visible
+
+## Reveal the sigil's clue. Returns true the first time only, so the app can grant the
+## discovery exactly once; a repeat tap re-opens the text without re-granting anything.
+func read_sigil() -> bool:
+	if not sigil_available():
+		return false
+	var first := not _sigil_read
+	_sigil_read = true
+	return first
+
+## Apply persisted world flags onto the presentation. `sigil_read` is a flag, not a
+## progression count, so it is restored explicitly (the tally ring is rebuilt from the
+## solved-level count by sync_lit).
+func apply_world_flags(flags: Dictionary) -> void:
+	if bool(flags.get("sigil_read", false)):
+		_sigil_read = true
+
+## Reconstruct the whole world appearance from authoritative progression: the solved
+## count drives the ring, wards and Nox (via sync_lit), and the saved world flags drive
+## the sigil. One call restores a loaded save without replaying any event.
+func sync_from_state(solved_count: int, flags: Dictionary) -> void:
+	sync_lit(solved_count)
+	apply_world_flags(flags)

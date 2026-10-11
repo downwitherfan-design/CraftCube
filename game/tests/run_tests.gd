@@ -87,6 +87,7 @@ func _initialize() -> void:
 	_test_app_campaign_flow()
 	_test_journal_visibility()
 	_test_nox_interaction()
+	_test_world_sigil()
 	# EPIC 0.4 additions
 	_test_interaction_arbiter()
 	_test_hud_compact_and_completion()
@@ -1992,6 +1993,70 @@ func _test_nox_interaction() -> void:
 		var w := FileAccess.open(saved, FileAccess.WRITE)
 		w.store_string(backup)
 		w.close()
+	else:
+		SaveManager.delete_at_path(saved)
+
+## EPIC 0.4 Milestone C: the interactive three-notch sigil. Unavailable on a fresh world,
+## tappable once the world answers, grants its discovery exactly once, and restores from a
+## save. Also proves the world appearance is rebuilt from truth (no event replay on load).
+func _test_world_sigil() -> void:
+	print("[world sigil]")
+	var saved := "user://craftcube_save.json"
+	var had := FileAccess.file_exists(saved)
+	var backup := FileAccess.get_file_as_string(saved) if had else ""
+	SaveManager.delete_at_path(saved)
+	var app = _mount_app(load("res://scenes/App.tscn"))
+	app._begin_new_game()
+	var w = app.game.world_view
+	# Fresh world: nothing interactive, and the sigil cannot be read yet.
+	_check("fresh world exposes no interactive targets", w.interactive_targets().is_empty())
+	_check("fresh world hides the sigil", not w.sigil_available())
+	_check("reading the sigil before it exists does nothing", not w.read_sigil())
+	# Answer the world once.
+	app._play_level(0)
+	_check("level 1 solved for the sigil test", _solve_current(app))
+	_check("sigil becomes available after the first solve", w.sigil_available())
+	var ids := []
+	for t in w.interactive_targets():
+		ids.append(str(t["id"]))
+	_check("sigil is registered as a world target", ids.has(WorldView.TARGET_SIGIL))
+	# A real tap through the arbiter grants the discovery exactly once.
+	var before: int = app.game.game_state.discoveries.size()
+	app.game.router.world_tapped.emit(WorldView.TARGET_SIGIL)
+	_check("tap grants the three-notch discovery", app.game.game_state.discoveries.has("discovery.01.three_notch_mark"))
+	_eq("tap granted exactly one discovery", app.game.game_state.discoveries.size(), before + 1)
+	app.game.router.world_tapped.emit(WorldView.TARGET_SIGIL)
+	_eq("second tap does not duplicate the discovery", app.game.game_state.discoveries.size(), before + 1)
+	_check("sigil_read world flag persisted", app.game.game_state.world_flags.has("sigil_read"))
+	app.game.router.world_tapped.emit("world.does_not_exist")
+	_eq("unknown target id is a safe no-op", app.game.game_state.discoveries.size(), before + 1)
+	# Solve a second level so the reload proves the world is rebuilt from the real tally.
+	app._play_level(1)
+	_check("level 2 solved for the sigil test", _solve_current(app))
+	# The journal reveals the newly discovered entry.
+	app._open_journal()
+	_check("journal reveals the sigil discovery", _all_label_text(app).contains("The Three-Notch Mark"))
+	# Rebuilding the world from truth is idempotent (no double-lighting on re-entry).
+	w.sync_from_state(2, {})
+	w.sync_from_state(2, {})
+	_eq("world rebuild is idempotent", w.lit_count(), 2)
+	# Reload: the sigil stays read, the discovery survives, the world is rebuilt from truth.
+	app.game.save_progress()
+	if app.get_parent() != null:
+		app.get_parent().remove_child(app)
+	app.free()
+	var app2 = _mount_app(load("res://scenes/App.tscn"))
+	var w2 = app2.game.world_view
+	_check("sigil stays read after reload", w2.sigil_read())
+	_check("sigil discovery survives reload", app2.game.game_state.discoveries.has("discovery.01.three_notch_mark"))
+	_eq("world rebuilt to the saved tally after reload", w2.lit_count(), 2)
+	if app2.get_parent() != null:
+		app2.get_parent().remove_child(app2)
+	app2.free()
+	if had:
+		var wr := FileAccess.open(saved, FileAccess.WRITE)
+		wr.store_string(backup)
+		wr.close()
 	else:
 		SaveManager.delete_at_path(saved)
 

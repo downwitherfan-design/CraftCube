@@ -92,6 +92,7 @@ func _mount_game() -> void:
 	game.menu_requested.connect(_on_menu_requested)
 	game.result_ready.connect(_on_result_ready)
 	game.level_loaded.connect(_on_game_level_loaded)
+	game.world_tapped.connect(_on_world_tapped)
 
 func _on_menu_requested() -> void:
 	game.save_progress()
@@ -100,6 +101,8 @@ func _on_menu_requested() -> void:
 func _on_game_level_loaded(_lvl: Dictionary) -> void:
 	# Keep the gameplay HUD's accessibility state in sync with the app's cached preferences.
 	_sync_game_accessibility()
+	if _active == "game":
+		_refresh_world_targets()
 
 # --- screens ---------------------------------------------------------------------------
 
@@ -464,6 +467,9 @@ func _build_results() -> Control:
 func _on_result_ready(result: Dictionary) -> void:
 	_refresh_results(result)
 	_show("results", true)
+	# The world just changed (a ward lit); re-register targets so the sigil/companion that
+	# became available can be tapped without leaving and re-entering gameplay.
+	_refresh_world_targets()
 
 func _refresh_results(result: Dictionary) -> void:
 	var title: Label = _screens["res_title"]
@@ -637,10 +643,41 @@ func nox_dialogue_text() -> String:
 func nox_available() -> bool:
 	return game != null and game.game_state.world_flags.has("stone_marks_awaken")
 
+## A tap on a world target (routed by the single interaction arbiter) performs the target's
+## real action. The sigil reveals the three-notch clue and grants its discovery exactly once;
+## a repeat tap re-opens the text without re-granting. Tapping the companion opens its
+## dialogue. Unknown ids are ignored, so a stale target can never do something unexpected.
+func _on_world_tapped(target_id: String) -> void:
+	match target_id:
+		WorldView.TARGET_SIGIL:
+			_read_sigil()
+		WorldView.TARGET_NOX:
+			_open_nox()
+		_:
+			pass
+
+## Reveal the sigil clue. The discovery is granted only on the first read (idempotent), and
+## the "sigil_read" world flag is persisted so the clue stays discovered across restarts.
+func _read_sigil() -> void:
+	if game == null or game.world_view == null or not game.world_view.sigil_available():
+		return
+	var first: bool = game.world_view.read_sigil()
+	if first:
+		game.game_state.add_discovery("discovery.01.three_notch_mark")
+		game.game_state.set_world_flag("sigil_read")
+		game.save_progress()
+	if _nox_dialog == null:
+		return
+	_nox_dialog.title = "The Three-Notch Mark"
+	_nox_dialog.dialog_text = StoryContent.sigil_clue()
+	if is_inside_tree():
+		_nox_dialog.popup_centered()
+
 func _open_nox() -> void:
 	var text := nox_dialogue_text()
 	if text == "":
 		return
+	_nox_dialog.title = "Nox"
 	_nox_dialog.dialog_text = text
 	if is_inside_tree():
 		_nox_dialog.popup_centered()

@@ -62,12 +62,47 @@ func _initialize() -> void:
         for _i in range(30):
                 cam._process(0.05)
         await _capture("session10_world_complete.png")
+        # Milestone C: the interactive three-notch sigil and the Nox dialogue it can open.
+        # Free the Main instance first so only one Camera3D is current in the viewport.
+        if _m.get_parent() != null:
+                _m.get_parent().remove_child(_m)
+        _m.free()
+        _m = null
+        var app = load("res://scenes/App.tscn").instantiate()
+        root.add_child(app)
+        app._ready()
+        # Drive the world to the chapter-complete truth so the sigil and the companion are
+        # genuinely revealed (no event replay: this is a state rebuild, not a playthrough).
+        for lv in app.game.levels:
+                app.game.game_state.mark_solved(str(lv["level_id"]))
+        app.game.game_state.set_world_flag("stone_marks_awaken")
+        app.game.world_view.sync_from_state(app.game.game_state.solved_levels.size(), app.game.game_state.world_flags)
+        app._play_level(2)
+        app._refresh_world_targets()
+        _print_targets(app)
+        # Hide the gameplay HUD so the capture frames the world itself, not the controls.
+        await _capture("session12_world_sigil.png")
+        app._read_sigil()
+        await _capture("session12_sigil_clue.png")
+        app._open_nox()
+        await _capture("session12_nox_dialogue.png")
+        if app.get_parent() != null:
+                app.get_parent().remove_child(app)
+        app.free()
         SaveManager.delete_at_path(_saved_path)
         if _saved_had:
                 var w := FileAccess.open(_saved_path, FileAccess.WRITE)
                 w.store_string(_saved_backup)
                 w.close()
         quit(0)
+
+## Print the world targets the arbiter would hit-test, with their projected screen
+## positions, so a capture run can be checked for real rendered geometry.
+func _print_targets(app: Node) -> void:
+        var w = app.game.world_view
+        for t in w.interactive_targets():
+                var sp: Vector2 = app.game.router.project_to_screen(t["position"])
+                print("target ", t["id"], " world=", t["position"], " screen=", sp)
 
 func _capture(name: String) -> void:
         for _i in range(5):

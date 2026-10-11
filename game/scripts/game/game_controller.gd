@@ -105,7 +105,9 @@ func load_level(index: int, force: bool = false) -> bool:
 	if cube_view:
 		cube_view.build(engine.state)
 	if world_view:
-		world_view.sync_lit(game_state.solved_levels.size())
+		# Reconstruct the whole world appearance from truth: solved count + saved flags, so
+		# a loaded save restores the world without replaying any awakening/reward event.
+		world_view.sync_from_state(game_state.solved_levels.size(), game_state.world_flags)
 	level_loaded.emit(lvl)
 	return true
 
@@ -403,7 +405,9 @@ func confirm_solve() -> bool:
 		var hook := str(lvl.get("world_hook", ""))
 		game_state.set_world_flag(hook)
 		if world_view:
-			world_view.react()
+			# World reaction is derived from the authoritative solved set (idempotent), so a
+			# replay can never double-light and a resume can never under-light.
+			world_view.sync_from_state(game_state.solved_levels.size(), game_state.world_flags)
 		if cube_view:
 			cube_view.flash_solved(engine.state)
 		world_reacted.emit(hook, StoryContent.reaction_for(hook))

@@ -67,6 +67,13 @@ const DISCOVERIES := {
 		"name": "The First Pulse",
 		"text": "You notice the cube answers near-solutions with a soft pulse — a rhythm you can learn to read.",
 	},
+	# Prototype discovery revealed by tapping the three-notch sigil in the world (EPIC 0.4
+	# Milestone C). Original prose, routed with the rest of the prototype content.
+	"discovery.01.three_notch_mark": {
+		"id": "discovery.01.three_notch_mark",
+		"name": "The Three-Notch Mark",
+		"text": "Three grooves are cut into the stone, each shallower than the last. Whoever cut them expected the light to return — and left a place for it to land.",
+	},
 	"discovery.01.stone_mark": {
 		"id": "discovery.01.stone_mark",
 		"name": "The Stone Mark",
@@ -94,6 +101,13 @@ const NOX_DIALOGUE := {
 	"resonance": "Nox: \"The Loom answers near-solutions with a pulse. The gauntlet you carry can read it — the rest is patience.\"",
 	"closing": "Nox: \"The chapter closes, but the road keeps going. I will walk it with you.\"",
 }
+
+## The clue read by tapping the three-notch sigil in the world. Short, non-blocking and
+## original (FIRST_TEN_MINUTES Beat 2 plants the Architect mystery via the mark).
+const SIGIL_CLUE := "Three notches, each shallower than the last. Not a tally of what you have solved — a tally of what once answered here. Someone expected the light to come back."
+
+static func sigil_clue() -> String:
+	return SIGIL_CLUE
 
 static func reaction_for(hook: String) -> String:
 	return str(WORLD_REACTIONS.get(hook, ""))
