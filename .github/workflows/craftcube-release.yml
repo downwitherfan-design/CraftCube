@@ -123,6 +123,10 @@ jobs:
 
       - name: Render release notes
         id: notes
+        env:
+          APK_NAME: ${{ steps.meta.outputs.name }}
+          SHA256: ${{ steps.meta.outputs.sha256 }}
+          SIZE: ${{ steps.meta.outputs.size }}
         run: |
           python3 - <<'PY'
           import json, os, pathlib, re
