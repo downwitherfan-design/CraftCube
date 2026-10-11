@@ -1,6 +1,6 @@
 {
-  "app_version": "0.2.1",
-  "version_code": 3,
+  "app_version": "0.3.0",
+  "version_code": 4,
   "android": {
     "package": "com.downwitherfandesign.craftcube",
     "min_sdk": 24,
@@ -26,6 +26,14 @@
       "date": "2026-10-11",
       "type": "development",
       "notes": "First published GitHub Release (pre-release, debug-signed). Chapter 01 slice + accessibility + versioned release pipeline."
+    },
+    {
+      "version": "0.2.1",
+      "version_code": 3,
+      "tag": null,
+      "date": null,
+      "type": "development",
+      "notes": "Intermediate development version; never published as a GitHub Release. Recorded for monotonic version-code ordering."
     }
   ]
 }

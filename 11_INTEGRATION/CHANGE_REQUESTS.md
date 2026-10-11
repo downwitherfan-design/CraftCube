@@ -25,6 +25,17 @@ rollback note, per `05_PROMPTS/INTEGRATION_GATE_PROMPT_AI13.md`.
 | CR-0014 | AI-03 (content fixture confirmation) | 00 | Low–Medium | OPEN |
 | CR-0015 | AI-12 (`.github/`, `12_RELEASE/ci/`) + Human for release-signing | 00 | Low (release enablement) | OPEN |
 | CR-0016 | AI-12 (`12_RELEASE/`) | 00 | Low (doc/governance) | OPEN |
+| CR-0017 | AI-03 (canonical Chapter 01 content) | 01 | Low–Medium (content ratification) | OPEN |
+
+---
+
+### CR-0017 — Ratify the EPIC 0.3 prototype levels 4–6 as canonical Chapter 01 content
+- **Target owner:** AI-03 (canonical authored Chapter 01 source: `03_PHASES/…` fixtures + `chapters.draft.json`).
+- **Failing artifact (gap, not a defect):** Chapter 01 previously shipped three authored levels (`level.01.awaken`, `level.01.seed_bed`, `level.01.hollow_stone`). EPIC 0.3 (task `CC-PROD-030`, AI-13) adds three **implementation-level prototype** levels to reach a six-level campaign: `level.01.deeper_resonance` (ordinal 4, `topology.cube.3`, objective `align{U,F,R}`), `level.01.constrained_paths` (ordinal 5, `topology.cube.3`, `rule.axis_lock{X}` + `align{U}`), `level.01.closing_trial` (ordinal 6, `topology.cube.3`, `rule.axis_lock{Z}` + `align{U,F}`). Bound in `game/scripts/domain/level_catalog.gd`; validated against the real Godot 4.7.2 engine by `game/tests/run_tests.gd::_test_chapter_campaign_levels`.
+- **Evidence:** Deterministic scrambles (seeds 104/105/106), all verified solvable via inverse replay and via the guided route under each level's own legal move set; objectives not auto-satisfied; par matches scramble depth; the 3×3 topology renders and animates with no logical/rendered divergence (`_test_3x3_rendered_sync`).
+- **Expected behavior:** AI-03 either (a) ratifies the three prototype levels into the canonical Chapter 01 set (adjusting its draft fixtures/signature as needed), or (b) returns a corrected authored set; AI-13 then rebinds `level_catalog.gd`. Until ratification, these levels are prototype content and are labelled as such in the catalog header. Existing canonical levels 1–3 and CR-0014's status are untouched.
+- **Acceptance test:** AI-03's content validator passes with the six-level Chapter 01 set and no ID/signature conflict; the chapter signature (topology + `objective.align` + deterministic scramble) is preserved.
+- **Rollback:** Remove levels 4–6 from `level_catalog.gd` (campaign reverts to the three authored levels); no save-schema impact (progression is ID-keyed).
 
 ---
 
