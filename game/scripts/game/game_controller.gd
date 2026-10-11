@@ -18,6 +18,8 @@ signal result_ready(result: Dictionary)
 ## Player asked to return to the application menu (HUD "Menu" button). The app shell owns
 ## navigation, so the controller only announces the request.
 signal menu_requested()
+## A recognised world target was tapped through the interaction router (id as registered).
+signal world_tapped(target_id: String)
 
 ## When true, a platform back/close request quits the tree (standalone gameplay). When the
 ## app shell is present it sets this false so back navigation stays with the app.
@@ -39,6 +41,9 @@ var _hint_uses := 0
 var cube_view: CubeView
 var world_view: WorldView
 var camera: OrbitCamera
+## The single owner of raw touch/mouse input (AI-04 arbitration). All gameplay input arrives
+## as typed commands from here; no other node consumes raw touches.
+var router: InteractionRouter
 
 ## Save file used by save_progress(); tests override it so they never touch the real save.
 var save_path := SaveManager.DEFAULT_PATH
@@ -57,10 +62,12 @@ func _ready() -> void:
 	cube_view = get_node_or_null("CubeView")
 	world_view = get_node_or_null("WorldView")
 	camera = get_node_or_null("Camera3D")
+	router = get_node_or_null("InteractionRouter")
 	if camera:
 		camera.reset_view()
 	if world_view:
 		world_view.build()
+	_wire_router()
 	var hud := get_node_or_null("HUD")
 	if hud and hud.has_method("bind"):
 		hud.bind(self)
@@ -105,6 +112,45 @@ func load_level(index: int, force: bool = false) -> bool:
 ## True when `index` may be entered right now (first level, or predecessor solved).
 func is_level_unlocked(index: int) -> bool:
 	return game_state.is_level_unlocked(levels, index)
+
+# --- interaction routing (Milestone A) -------------------------------------------------
+
+## Connect the single input arbiter to the camera and the puzzle, so raw touches are
+## classified once and dispatched as typed commands. The router owns *all* raw input; the
+## camera and HUD no longer read touches directly.
+func _wire_router() -> void:
+	if router == null:
+		return
+	router.camera = camera
+	router.cube_half = 1.0
+	# Idempotent: `_ready` can be invoked again by the headless test harness, and a second
+	# connect would make every gesture fire twice.
+	if not router.twist_requested.is_connected(_on_twist_requested):
+		router.twist_requested.connect(_on_twist_requested)
+	if not router.orbit_requested.is_connected(_on_orbit_requested):
+		router.orbit_requested.connect(_on_orbit_requested)
+	if not router.zoom_requested.is_connected(_on_zoom_requested):
+		router.zoom_requested.connect(_on_zoom_requested)
+	if not router.world_tapped.is_connected(_on_world_tapped):
+		router.world_tapped.connect(_on_world_tapped)
+
+func _on_twist_requested(face: String, cw: bool) -> void:
+	# A gesture twist goes through the same validated path as a button twist; the controller
+	# refuses it while a turn is animating or when the axis is locked.
+	try_move(face, cw)
+
+func _on_orbit_requested(delta_yaw: float, delta_pitch: float) -> void:
+	if camera:
+		camera.orbit(delta_yaw, delta_pitch)
+
+func _on_zoom_requested(delta: float) -> void:
+	if camera:
+		camera.zoom(delta)
+
+## A tap on a recognised world target. Routed to the app-level world-interaction handler
+## when present; the controller only announces the target id (presentation/flow live above).
+func _on_world_tapped(target_id: String) -> void:
+	world_tapped.emit(target_id)
 
 func restart_level() -> void:
 	if is_animating():

@@ -226,3 +226,9 @@ func nox_visible() -> bool:
 ## prove Nox is a recognisable multi-part figure rather than a single decorative sphere.
 func nox_part_count() -> int:
 	return _nox_parts.size()
+
+## Interactive world targets currently registered with the input arbiter. Each entry is
+## {id, position, radius}; only targets that are actually visible/available are returned, so
+## a tap can never interact with a veiled target. Base implementation: none yet.
+func interactive_targets() -> Array:
+	return []

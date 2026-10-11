@@ -44,12 +44,18 @@ func bind(ctrl: Node3D) -> void:
 	controller = ctrl
 	_build()
 	_apply_saved_settings()
-	controller.level_loaded.connect(_on_level_loaded)
-	controller.world_reacted.connect(_on_world_reacted)
-	controller.reward_granted.connect(_on_reward)
-	controller.discovery_found.connect(_on_discovery)
-	controller.solved.connect(_on_solved)
-	controller.move_applied.connect(_on_move_applied)
+	# Idempotent: the node can be (re)readied by the headless test harness, and a second
+	# connect would make every gameplay signal fire its HUD handler twice.
+	_connect_once(controller.level_loaded, _on_level_loaded)
+	_connect_once(controller.world_reacted, _on_world_reacted)
+	_connect_once(controller.reward_granted, _on_reward)
+	_connect_once(controller.discovery_found, _on_discovery)
+	_connect_once(controller.solved, _on_solved)
+	_connect_once(controller.move_applied, _on_move_applied)
+
+func _connect_once(sig: Signal, cb: Callable) -> void:
+	if not sig.is_connected(cb):
+		sig.connect(cb)
 
 ## Apply persisted accessibility preferences. Missing/ malformed settings fall back to the
 ## default (normal text); loading must never fail or crash on a bad file.
@@ -80,8 +86,13 @@ func _button(text: String) -> Button:
 
 func _build() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	# The HUD container must not swallow touches aimed at the 3D cube: it ignores mouse
+	# input itself while its child Buttons still consume their own taps. This is what lets
+	# the InteractionRouter raycast the cube through the empty middle of the screen.
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_theme_constant_override("margin_top", 24)
 	margin.add_theme_constant_override("margin_left", 16)
 	margin.add_theme_constant_override("margin_right", 16)

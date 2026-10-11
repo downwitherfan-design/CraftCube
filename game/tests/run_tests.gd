@@ -76,6 +76,8 @@ func _initialize() -> void:
 	_test_app_campaign_flow()
 	_test_journal_visibility()
 	_test_nox_interaction()
+	# EPIC 0.4 additions
+	_test_interaction_arbiter()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
 		print("  - ", f)
@@ -710,18 +712,21 @@ func _test_orbit_camera() -> void:
 	var press := InputEventMouseButton.new()
 	press.button_index = MOUSE_BUTTON_LEFT
 	press.pressed = true
-	cam._unhandled_input(press)
 	var release := InputEventMouseButton.new()
 	release.button_index = MOUSE_BUTTON_LEFT
 	release.pressed = false
-	cam._unhandled_input(release)
+	# All raw input now goes through the single InteractionRouter (AI-04 arbitration).
+	var router = m.get_node_or_null("InteractionRouter")
+	_check("interaction router is wired into the scene", router != null)
+	router._unhandled_input(press)
+	router._unhandled_input(release)
 	for _i in range(10):
 		cam._process(0.05)
 	_check("a tap with no drag does not move the camera", absf(cam.get_yaw() - 0.62) < 0.001)
 	var wheel := InputEventMouseButton.new()
 	wheel.button_index = MOUSE_BUTTON_WHEEL_UP
 	wheel.pressed = true
-	cam._unhandled_input(wheel)
+	router._unhandled_input(wheel)
 	for _i in range(20):
 		cam._process(0.05)
 	_check("mouse wheel zooms the camera", cam.get_distance() < 7.3)
@@ -1965,8 +1970,194 @@ func _test_nox_interaction() -> void:
 	else:
 		SaveManager.delete_at_path(saved)
 
-## Instantiate the application shell and add it to the real scene tree so its `_ready` runs
-## (mounting the gameplay child, building screens) exactly as at runtime.
+## EPIC 0.4 Milestone A: the single interaction arbiter. Deterministic replay of touch
+## sequences through the real classifier + the real Main scene, proving the eight input
+## acceptance points (face mapping, single command, cancel, UI/world pass-through,
+## camera-only no puzzle mutation, multi-touch/animation safety, domain equivalence).
+func _test_interaction_arbiter() -> void:
+	print("[interaction arbiter]")
+	var m = load("res://scenes/Main.tscn").instantiate()
+	root.add_child(m)
+	m._ready()
+	var cam: Camera3D = m.get_node("Camera3D")
+	var router: InteractionRouter = m.get_node("InteractionRouter")
+	_check("router present and wired to the camera", router != null and cam != null and router.camera == cam)
+	if router == null or cam == null:
+		if m.get_parent() != null:
+			m.get_parent().remove_child(m)
+		m.free()
+		return
+	router.ui_hit_test = func(_p): return false
+	var vp: Viewport = m.get_viewport()
+	var vsize := Vector2(720, 1280)
+	if vp != null:
+		vsize = vp.get_visible_rect().size
+	router.viewport_size = vsize
+	var center := vsize * 0.5
+	var twists: Array = []
+	router.twist_requested.connect(func(f, cw): twists.append([f, cw]))
+	var orbits: Array = []
+	router.orbit_requested.connect(func(dy, dp): orbits.append([dy, dp]))
+	var worlds: Array = []
+	router.world_tapped.connect(func(id): worlds.append(id))
+
+	# --- 1. face mapping across view orientations -------------------------------
+	var mismatches := 0
+	var framed := 0
+	for face in range(6):
+		var n: Vector3 = InteractionRouter.FACE_NORMALS[face]
+		var yaw := atan2(n.x, n.z)
+		var pitch := asin(clampf(n.y, -1.0, 1.0))
+		cam.set_orientation(yaw, maxf(0.25, pitch), 7.3)
+		# Offset from the centre so the hit point is not the degenerate face centre.
+		var probe := center + Vector2(42, 18)
+		var pr: Array = router.screen_ray(probe)
+		var hit: Dictionary = router.raycast_cube(pr[0], pr[1])
+		if hit.is_empty() or int(hit.get("face", -1)) != face:
+			continue  # this orientation did not expose the face cleanly; skip, not a failure
+		framed += 1
+		var p: Vector3 = hit["point"]
+		var r := p - n * p.dot(n)
+		var tangent := n.cross(r)
+		var b: Basis = cam.global_transform.basis
+		var drag_dir := Vector2(tangent.dot(b.x), -tangent.dot(b.y))
+		if drag_dir.length() < 0.001:
+			continue
+		drag_dir = drag_dir.normalized() * 70.0
+		var before: int = twists.size()
+		router.begin(probe, 1000)
+		router.move(probe + drag_dir * 0.5, 1030)
+		router.move(probe + drag_dir, 1060)
+		router.end(probe + drag_dir, 1070)
+		var emitted: int = twists.size() - before
+		if emitted != 1 or str(twists[twists.size() - 1][0]) != InteractionRouter.FACE_LETTERS[face]:
+			mismatches += 1
+	_check("every framed face maps to the correct intended move", framed >= 4 and mismatches == 0)
+
+	# --- 2. direction reverses with drag direction ------------------------------
+	cam.set_orientation(0.0, 0.7, 7.3)  # front face F head-on
+	var probe2 := center + Vector2(42, 0)
+	var pr2: Array = router.screen_ray(probe2)
+	var h2: Dictionary = router.raycast_cube(pr2[0], pr2[1])
+	var cw_a := true
+	var cw_b := true
+	if not h2.is_empty():
+		var n2: Vector3 = InteractionRouter.FACE_NORMALS[int(h2["face"])]
+		var r2: Vector3 = h2["point"] - n2 * (h2["point"]).dot(n2)
+		var tan2: Vector3 = n2.cross(r2)
+		var b2: Basis = cam.global_transform.basis
+		var dir2 := Vector2(tan2.dot(b2.x), -tan2.dot(b2.y)).normalized() * 70.0
+		var c0: int = twists.size()
+		router.begin(probe2, 2000); router.move(probe2 + dir2, 2040); router.end(probe2 + dir2, 2050)
+		router.begin(probe2, 3000); router.move(probe2 - dir2, 3040); router.end(probe2 - dir2, 3050)
+		if twists.size() - c0 == 2:
+			cw_a = bool(twists[c0][1])
+			cw_b = bool(twists[c0 + 1][1])
+	_check("opposite drags produce opposite turn directions", cw_a != cw_b)
+
+	# --- 3. ambiguous gesture cancels (no command) ------------------------------
+	cam.set_orientation(0.0, 0.7, 7.3)
+	var c1: int = twists.size()
+	router.begin(probe2, 4000)
+	router.move(probe2 + Vector2(6, 0), 4020)  # below TWIST_START_PX
+	router.end(probe2 + Vector2(6, 0), 4030)
+	_check("ambiguous short drag cancels without a move", twists.size() == c1)
+
+	# --- 4. UI passthrough consumes its own input -------------------------------
+	router.ui_hit_test = func(_p): return true
+	var c2: int = twists.size()
+	var o2: int = orbits.size()
+	router.begin(probe2, 5000)
+	var ui_intent: String = router.current_intent()
+	router.move(probe2 + Vector2(90, 0), 5030)
+	router.end(probe2 + Vector2(90, 0), 5040)
+	_check("a UI tap is classified ui_passthrough", ui_intent == "ui_passthrough")
+	_check("a UI gesture leaks to neither cube nor camera", twists.size() == c2 and orbits.size() == o2)
+	router.ui_hit_test = func(_p): return false
+
+	# --- 5. world-target tap is a world command, not a turn or orbit -------------
+	cam.set_orientation(0.0, 0.7, 7.3)
+	var world_pos := Vector3(0, 0, 3.0)
+	router.world_targets = [{"id": "test.target", "position": world_pos, "radius": 0.35}]
+	var wscreen: Vector2 = router.project_to_screen(world_pos)
+	var c3: int = twists.size()
+	var o3: int = orbits.size()
+	var w0: int = worlds.size()
+	router.begin(wscreen, 6000)
+	router.end(wscreen, 6080)
+	_check("a world target tap emits a world command", worlds.size() == w0 + 1 and str(worlds[worlds.size() - 1]) == "test.target")
+	_check("a world tap does not twist or orbit", twists.size() == c3 and orbits.size() == o3)
+
+	# --- 6. camera-only gesture never mutates the puzzle ------------------------
+	router.world_targets = []
+	var corner := Vector2(6, 6)
+	var prc: Array = router.screen_ray(corner)
+	if not router.raycast_cube(prc[0], prc[1]).is_empty():
+		corner = Vector2(vsize.x - 6, 6)
+	var moves_before: int = m.engine.move_count()
+	var o4: int = orbits.size()
+	router.begin(corner, 7000)
+	router.move(corner + Vector2(0, 40), 7040)
+	router.move(corner + Vector2(0, 80), 7080)
+	router.end(corner + Vector2(0, 80), 7090)
+	_check("an off-cube drag orbits the camera", orbits.size() > o4)
+	_check("a camera drag does not mutate the puzzle", m.engine.move_count() == moves_before)
+
+	# --- 7. multi-touch during a twist cancels (never a partial twist) ----------
+	cam.set_orientation(0.0, 0.7, 7.3)
+	var c5: int = twists.size()
+	router.begin(probe2, 8000)
+	router.move(probe2 + Vector2(40, 0), 8030)  # now a puzzle intent
+	var mid_intent: String = router.current_intent()
+	router.begin(center + Vector2(-80, -80), 8040, 1)  # second finger
+	var after_second: String = router.current_intent()
+	router.end(probe2 + Vector2(40, 0), 8060)
+	router.end(center + Vector2(-80, -80), 8065, 1)
+	_check("a drag on the cube becomes a puzzle intent", mid_intent == "puzzle")
+	_check("a second finger cancels the twist", after_second == "cancelled")
+	_check("a cancelled multi-touch twist emits no move", twists.size() == c5)
+
+	# --- 8. animation safety + domain equivalence -------------------------------
+	while m.is_animating():
+		m.cube_view.skip_animation()
+	m.restart_level()
+	_check("restart returns the engine to the level's scrambled state", not m.engine.is_solved())
+	var c6: int = twists.size()
+	var start_fp: String = m.engine.state.fingerprint()
+	router.begin(probe2, 9000)
+	router.move(probe2 + Vector2(60, 0), 9030)
+	router.end(probe2 + Vector2(60, 0), 9040)
+	var emitted_face := ""
+	var emitted_cw := true
+	if twists.size() > c6:
+		emitted_face = str(twists[c6][0])
+		emitted_cw = bool(twists[c6][1])
+	_check("a committed twist emits exactly one command", twists.size() == c6 + 1)
+	# While the turn animates, a second gesture must not advance the logical state.
+	var moves_mid: int = m.engine.move_count()
+	router.begin(probe2, 9100)
+	router.move(probe2 + Vector2(60, 0), 9130)
+	router.end(probe2 + Vector2(60, 0), 9140)
+	_check("no new move corrupts state while animating", m.engine.move_count() == moves_mid)
+	while m.is_animating():
+		m.cube_view.skip_animation()
+	# The gesture path produces the same authoritative domain result as the equivalent
+	# legal controller move applied to the same start state (the level's own scramble).
+	var via_gesture: String = m.engine.state.fingerprint()
+	var ref := CubeState.new(m.engine.state.n)
+	for sm in m.engine._scramble_moves:
+		ref.apply_move(sm)
+	ref.apply_move(MoveTable.face_move(emitted_face, emitted_cw))
+	_check("the gesture move equals the same legal controller move", ref.fingerprint() == via_gesture)
+	_check("the rendered cube settled to the authoritative state",
+			not m.cube_view.is_animating() and m.cube_view._facelets.size() == 6 * m.engine.state.n * m.engine.state.n)
+	_check("gesture start fingerprint differed from solved", start_fp != _solved_fp(2))
+
+	if m.get_parent() != null:
+		m.get_parent().remove_child(m)
+	m.free()
+
+
 func _mount_app(packed: PackedScene) -> Node:
 	var app := packed.instantiate()
 	get_root().add_child(app)

@@ -45,6 +45,9 @@ func _ready() -> void:
 		return
 	_initialized = true
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	# The app root must not consume input destined for the 3D cube; menu screens toggle their
+	# own visibility and their buttons still consume their own taps.
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if OS.has_feature("mobile"):
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	settings = SaveManager.load_settings(settings_path)
@@ -63,6 +66,8 @@ func _ready() -> void:
 	_screen_layer = Control.new()
 	_screen_layer.name = "ScreenLayer"
 	_screen_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	# Menu screens sit above the 3D view but must not block cube/world input while hidden.
+	_screen_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_screen_layer)
 
 	_build_screens()
@@ -516,10 +521,29 @@ func _show(name: String, keep_game_visible: bool = false) -> void:
 	var show_game := name == "game"
 	if game:
 		game.visible = show_game and keep_game_visible
+		if game.router:
+			# The arbiter only classifies puzzle/world intents while gameplay is on screen, so a
+			# menu tap can never twist the cube behind it.
+			game.router.enabled = show_game
+			if show_game:
+				_refresh_world_targets()
 	if not show_game and _screen_roots.has(name):
 		var s: Control = _screen_roots[name]
 		s.visible = true
 	_active = name
+
+## Register the current interactive world targets with the router so a tap on a target
+## emits a world command (never an orbit or a cube twist). Targets are presentation data
+## owned by WorldView; the router only hit-tests them.
+func _refresh_world_targets() -> void:
+	if game == null or game.router == null or game.world_view == null:
+		return
+	# Keep the router's projection in sync with the real viewport so hit-testing matches what
+	# the player actually sees.
+	var vp := get_viewport()
+	if vp != null:
+		game.router.viewport_size = vp.get_visible_rect().size
+	game.router.world_targets = game.world_view.interactive_targets()
 
 func _open_title() -> void:
 	_refresh_title()

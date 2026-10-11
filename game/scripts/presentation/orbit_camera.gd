@@ -1,13 +1,14 @@
 class_name OrbitCamera
 extends Camera3D
 
-## Interactive inspection camera (Milestone B). Orbits a stable target (the cube centre),
-## zooms within bounds, and resets to a readable default framing. Works with desktop mouse
-## and mobile touch; smoothing keeps motion usable without feeling laggy.
+## Interactive inspection camera. Orbits a stable target (the cube centre), zooms within
+## bounds, and resets to a readable default framing. Smoothing keeps motion usable without
+## feeling laggy.
 ##
-## Input routing: this camera reads only *unhandled* input, so a tap that lands on a HUD
-## Button (which consumes the event) never rotates the camera underneath it. HUD containers
-## are set to ignore mouse input so empty-space drags reach the camera.
+## Input routing: this camera does NOT read raw input. All raw touch/mouse input is owned by
+## the single `InteractionRouter` (AI-04 arbitration model), which emits typed orbit/zoom
+## commands that the controller forwards here. Keeping exactly one raw-input consumer is what
+## prevents a tap from twisting the cube *and* orbiting the camera.
 
 const DEFAULT_YAW := 0.62
 const DEFAULT_PITCH := 0.72
@@ -63,6 +64,19 @@ func reset_view(snap: bool = true) -> void:
 func get_distance() -> float:
         return _distance
 
+## Set an explicit orientation (radians) and optional distance, clamped to the comfort
+## envelope. Presentation/test seam: used to frame a specific face or restore a saved view.
+func set_orientation(yaw: float, pitch: float, distance: float = -1.0, snap: bool = true) -> void:
+        _want_yaw = yaw
+        _want_pitch = clampf(pitch, MIN_PITCH, MAX_PITCH)
+        if distance > 0.0:
+                _want_distance = clampf(distance, MIN_DISTANCE, MAX_DISTANCE)
+        if snap:
+                _yaw = _want_yaw
+                _pitch = _want_pitch
+                _distance = _want_distance
+                _apply(_yaw, _pitch, _distance, target)
+
 func get_yaw() -> float:
         return _yaw
 
@@ -89,35 +103,3 @@ func _apply(yaw: float, pitch: float, distance: float, look_target: Vector3) -> 
         # Set the LOCAL transform (the parent node is at the origin), which is valid even
         # before the node is inside the tree; global_transform would error there.
         transform = Transform3D(Basis(), pos).looking_at(look_target, Vector3.UP)
-
-func _unhandled_input(event: InputEvent) -> void:
-        if event is InputEventMouseButton:
-                if event.button_index == MOUSE_BUTTON_LEFT:
-                        _dragging = event.pressed
-                elif event.pressed and event.button_index == MOUSE_BUTTON_WHEEL_UP:
-                        zoom(-WHEEL_ZOOM_STEP)
-                elif event.pressed and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-                        zoom(WHEEL_ZOOM_STEP)
-        elif event is InputEventMouseMotion and _dragging:
-                orbit(-event.relative.x * ORBIT_SENSITIVITY, -event.relative.y * ORBIT_SENSITIVITY)
-        elif event is InputEventScreenTouch:
-                if event.pressed:
-                        _touches[event.index] = event.position
-                else:
-                        _touches.erase(event.index)
-                        if _touches.size() < 2:
-                                _pinch_prev = -1.0
-        elif event is InputEventScreenDrag:
-                _touches[event.index] = event.position
-                if _touches.size() >= 2:
-                        _pinch()
-                else:
-                        orbit(-event.relative.x * ORBIT_SENSITIVITY, -event.relative.y * ORBIT_SENSITIVITY)
-
-## Two-finger pinch: distance between the first two touches drives the zoom.
-func _pinch() -> void:
-        var pts := _touches.values()
-        var d: float = pts[0].distance_to(pts[1])
-        if _pinch_prev > 0.0:
-                zoom((_pinch_prev - d) * 0.01)
-        _pinch_prev = d
