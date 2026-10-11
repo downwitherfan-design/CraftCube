@@ -1,6 +1,6 @@
 {
-  "app_version": "0.3.1",
-  "version_code": 5,
+  "app_version": "0.4.0",
+  "version_code": 6,
   "android": {
     "package": "com.downwitherfandesign.craftcube",
     "min_sdk": 24,
@@ -42,6 +42,14 @@
       "date": "2026-10-11",
       "type": "development",
       "notes": "Published GitHub pre-release (debug-signed). Application entry flow (title/menu, campaign map, journal, settings, results), six-level Chapter 01, mastery star ratings, save schema v1->v2 migration, Nox companion interaction. APK sha256 7abcd64872cecc9bc1596e501a4df9df5aa81380eb07dac981c0851b90b90f78."
+    },
+    {
+      "version": "0.3.1",
+      "version_code": 5,
+      "tag": null,
+      "date": null,
+      "type": "development",
+      "notes": "Intermediate development version; never published as a GitHub Release. Recorded for monotonic version-code ordering."
     }
   ]
 }
