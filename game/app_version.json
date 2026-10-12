@@ -1,6 +1,6 @@
 {
-  "app_version": "0.6.0",
-  "version_code": 10,
+  "app_version": "0.6.1",
+  "version_code": 11,
   "android": {
     "package": "com.downwitherfandesign.craftcube",
     "min_sdk": 24,
@@ -74,6 +74,14 @@
       "date": null,
       "type": "development",
       "notes": "Intermediate development version; never published as a GitHub Release. Recorded for monotonic version-code ordering."
+    },
+    {
+      "version": "0.6.0",
+      "version_code": 10,
+      "tag": "v0.6.0",
+      "date": "2026-10-12",
+      "type": "development",
+      "notes": "Published GitHub pre-release (debug-signed). CC-PROD-060 runtime recovery: fixed the invisible cube (dark core/edge meshes occluded the facelet shell so every level rendered as a black slab) and reserved a HUD band so guidance text never covers the cube. APK sha256 536b8ed75f8c970ffc66043332c922b276a6a5462c77873f7232d3007f1eba43."
     }
   ]
 }
