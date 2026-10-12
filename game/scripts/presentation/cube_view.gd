@@ -17,7 +17,11 @@ const SOLVE_FLASH := 0.5
 ## Gap between facelets (fraction of the tile) so tile separation is visible; the dark core
 ## shows through the seams instead of the tiles looking like one flat slab.
 const TILE_GAP := 0.16
-const CORE_SCALE := 0.98
+## The core is the dark "slab" the tiles sit on. It MUST be smaller than the facelet shell's
+## outer surface (which is 1 - TILE_GAP/n), otherwise it encloses the tiles, wins the depth
+## test and renders the whole cube as a black block (the reported "black screen" / invisible
+## cube). CORE_INSET keeps it tucked just inside the tiles so only the seams show the core.
+const CORE_INSET := 0.03
 
 ## The visual U face points up on screen because the domain's +Y face is U; the view is
 ## used directly (no flip). A mismatch here was a real defect where the objective face
@@ -78,30 +82,22 @@ func build(state: CubeState) -> void:
 				_facelets[idx] = mi
 	_build_glyphs()
 
-## A dark inner core slightly smaller than the cube, plus a thin edge frame. The facelets
-## sit on the outer shell with a small gap, so the core shows through the seams and the cube
-## reads as separated tiles rather than one flat slab. Two meshes total.
+## A dark inner core the facelets sit on, so the seams between tiles read as depth. The core
+## is deliberately SMALLER than the facelet shell (which reaches 1 - TILE_GAP/n) so it can
+## never occlude the coloured tiles. No separate edge frame is added: a slightly larger frame
+## would enclose the tiles and render the whole cube as a black block.
 func _build_core() -> void:
 	var core := MeshInstance3D.new()
 	var core_mesh := BoxMesh.new()
-	core_mesh.size = Vector3(_half * 2.0 * CORE_SCALE, _half * 2.0 * CORE_SCALE, _half * 2.0 * CORE_SCALE)
+	var outer := 1.0 - TILE_GAP / float(_n)
+	var half: float = maxf(0.1, outer - CORE_INSET)
+	core_mesh.size = Vector3(half * 2.0, half * 2.0, half * 2.0)
 	core.mesh = core_mesh
 	var core_mat := StandardMaterial3D.new()
 	core_mat.albedo_color = CraftPalette.CUBE_BODY
 	core_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	core.material_override = core_mat
 	add_child(core)
-
-	var frame := MeshInstance3D.new()
-	var frame_mesh := BoxMesh.new()
-	frame_mesh.size = Vector3(_half * 2.0 + 0.02, _half * 2.0 + 0.02, _half * 2.0 + 0.02)
-	frame.mesh = frame_mesh
-	var frame_mat := StandardMaterial3D.new()
-	frame_mat.albedo_color = CraftPalette.CUBE_EDGE
-	frame_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	frame_mat.cull_mode = BaseMaterial3D.CULL_FRONT
-	frame.material_override = frame_mat
-	add_child(frame)
 
 ## Small camera-facing letters on each face so the six buttons map to visible faces.
 func _build_glyphs() -> void:

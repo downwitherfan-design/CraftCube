@@ -107,6 +107,8 @@ func _initialize() -> void:
 	_test_app_backdrop_and_world_visibility()
 	_test_world_presentation_layers()
 	_test_palette_contract()
+	# CC-PROD-060 additions (runtime recovery / visual rebuild)
+	_test_cube_core_occlusion()
 	_restore_ambient_save()
 	print("== Summary: %d passed, %d failed ==" % [_passed, _failed])
 	for f in _failures:
@@ -1651,6 +1653,32 @@ func _test_3x3_rendered_sync() -> void:
 	if m.get_parent() != null:
 		m.get_parent().remove_child(m)
 	m.free()
+
+func _test_cube_core_occlusion() -> void:
+	print("[cube core occlusion]")
+	# Regression for the reported "black screen" / invisible cube: the dark core must sit
+	# strictly inside the facelet shell, otherwise it encloses the tiles and the cube
+	# renders as a solid black block at every size. Verified on the real CubeView meshes.
+	for n in [2, 3, 4]:
+		var cv = CubeView.new()
+		root.add_child(cv)
+		cv.build(CubeState.new(n))
+		var outer: float = 1.0 - CubeView.TILE_GAP / float(n)
+		var core_half := -1.0
+		var facelet_outer := 0.0
+		for c in cv.get_children():
+			if not (c is MeshInstance3D):
+				continue
+			var mi: MeshInstance3D = c
+			var col: Color = (mi.material_override as StandardMaterial3D).albedo_color
+			if col.r < 0.2 and col.g < 0.2 and col.b < 0.2:
+				core_half = maxf(core_half, mi.mesh.size.x * 0.5)
+			else:
+				facelet_outer = maxf(facelet_outer, absf(mi.position.x) + mi.mesh.size.x * 0.5)
+		_check("%dx%d cube has a dark core" % [n, n], core_half > 0.0)
+		_check("%dx%d core is inside the facelet shell" % [n, n], core_half < outer)
+		_check("%dx%d core does not reach the rendered tile surface" % [n, n], core_half < facelet_outer)
+		cv.free()
 
 ## The deterministic rating rule: 3 stars at/below par, 2 within 150%, else 1. Integer only.
 func _test_mastery_ratings() -> void:
