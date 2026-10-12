@@ -1,0 +1,16 @@
+# Godot
+game/.godot/
+game/.import/
+game/android/
+*.translation
+
+# Build outputs (produced by CI / local export; not source)
+dist/
+game/build/
+*.apk
+*.aab
+*.idsig
+
+# OS / editor
+.DS_Store
+*.swp

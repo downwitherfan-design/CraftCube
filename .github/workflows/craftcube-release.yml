@@ -1,0 +1,175 @@
+name: CraftCube Android release
+
+# Versioned-APK release pipeline (mandatory policy: 12_RELEASE/ANDROID_RELEASE_POLICY.md).
+# Builds the APK from the exact candidate commit, verifies its real metadata, stages a
+# versioned artifact, and (when permissions and release conditions allow) publishes a
+# GitHub Release with the APK attached. Ordinary CI is not the release deliverable.
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish a GitHub Release for this commit'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: "4.7.2"
+      GODOT_RELEASE: "4.7.2-stable"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache Godot engine and export templates
+        uses: actions/cache@v4
+        with:
+          path: |
+            /opt/godot
+            ~/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_RELEASE }}
+
+      - name: Install Godot engine
+        run: |
+          if [ ! -x /opt/godot/godot ]; then
+            sudo mkdir -p /opt/godot
+            curl -L -o /tmp/godot.zip \
+              "https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip"
+            python3 -c "import zipfile;zipfile.ZipFile('/tmp/godot.zip').extractall('/opt/godot')"
+            sudo chmod +x /opt/godot/Godot_v${GODOT_RELEASE}_linux.x86_64
+            sudo ln -sf /opt/godot/Godot_v${GODOT_RELEASE}_linux.x86_64 /opt/godot/godot
+          fi
+          echo "GODOT_BIN=/opt/godot/godot" >> "$GITHUB_ENV"
+
+      - name: Install export templates
+        run: |
+          DEST="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          if [ ! -f "$DEST/android_debug.apk" ]; then
+            curl -L -o /tmp/templates.tpz \
+              "https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz"
+            mkdir -p /tmp/tpl && python3 -c "import zipfile;zipfile.ZipFile('/tmp/templates.tpz').extractall('/tmp/tpl')"
+            mkdir -p "$DEST" && cp -r /tmp/tpl/templates/* "$DEST/"
+          fi
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+
+      - name: Configure Godot Android paths
+        run: |
+          SETTINGS="$HOME/.config/godot/editor_settings-4.7.tres"
+          mkdir -p "$(dirname "$SETTINGS")"
+          /opt/godot/godot --headless --editor --quit --path game || true
+          # Godot writes a full settings file; set the keys, appending them if absent.
+          set_kv() {
+            key="$1"; val="$2"
+            if grep -q "^${key} = " "$SETTINGS"; then
+              sed -i "s|^${key} = .*|${key} = \"${val}\"|" "$SETTINGS"
+            else
+              echo "${key} = \"${val}\"" >> "$SETTINGS"
+            fi
+          }
+          set_kv export/android/java_sdk_path "$JAVA_HOME"
+          set_kv export/android/android_sdk_path "$ANDROID_SDK_ROOT"
+          grep -E "export/android/(java|android)_sdk_path" "$SETTINGS"
+
+      - name: Create debug keystore
+        run: |
+          KS="$HOME/.local/share/godot/keystores/debug.keystore"
+          mkdir -p "$(dirname "$KS")"
+          if [ ! -f "$KS" ]; then
+            keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android \
+              -keystore "$KS" -storepass android -dname "CN=Android Debug,O=Android,C=US" \
+              -validity 9999 -deststoretype pkcs12
+          fi
+
+      - name: Validate version, test, build and verify the versioned APK
+        run: bash game/ci/build_android.sh
+
+      - name: Read release metadata
+        id: meta
+        run: |
+          APK=$(ls dist/release/CraftCube-v*-android-*-debug.apk | head -1)
+          echo "apk=$APK" >> "$GITHUB_OUTPUT"
+          echo "name=$(basename "$APK")" >> "$GITHUB_OUTPUT"
+          echo "version=$(python3 -c "import json;print(json.load(open('game/app_version.json'))['app_version'])")" >> "$GITHUB_OUTPUT"
+          echo "code=$(python3 -c "import json;print(json.load(open('game/app_version.json'))['version_code'])")" >> "$GITHUB_OUTPUT"
+          echo "sha256=$(sha256sum "$APK" | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+          echo "size=$(stat -c%s "$APK")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload versioned APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CraftCube-${{ steps.meta.outputs.name }}
+          path: |
+            dist/release/${{ steps.meta.outputs.name }}
+            dist/release/${{ steps.meta.outputs.name }}.sha256
+            dist/release/${{ steps.meta.outputs.name }}.json
+          if-no-files-found: error
+
+      - name: Render release notes
+        id: notes
+        env:
+          APK_NAME: ${{ steps.meta.outputs.name }}
+          SHA256: ${{ steps.meta.outputs.sha256 }}
+          SIZE: ${{ steps.meta.outputs.size }}
+        run: |
+          python3 - <<'PY'
+          import json, os, pathlib, re
+          meta = json.load(open("game/app_version.json"))
+          tpl = pathlib.Path("12_RELEASE/release_notes/RELEASE_NOTES_TEMPLATE.md").read_text()
+          vals = {
+              "{{APP_VERSION}}": meta["app_version"],
+              "{{VERSION_CODE}}": str(meta["version_code"]),
+              "{{APK_NAME}}": os.environ["APK_NAME"],
+              "{{SHA256}}": os.environ["SHA256"],
+              "{{SIZE}}": os.environ["SIZE"],
+              "{{COMMIT}}": os.environ["GITHUB_SHA"],
+              "{{TAG}}": "v" + meta["app_version"],
+              "{{SIGNING}}": meta["android"]["signing"],
+              "{{ARCH}}": ",".join(meta["android"]["architectures"]),
+          }
+          for k, v in vals.items():
+              tpl = tpl.replace(k, v)
+          pathlib.Path("dist/release/RELEASE_NOTES.md").write_text(tpl)
+          PY
+          echo "rendered dist/release/RELEASE_NOTES.md"
+
+      - name: Publish GitHub Release
+        # Only when a tag was pushed, or a manual run requested publish, and only if a
+        # GITHUB_TOKEN with contents:write is available. A denial fails this step visibly.
+        if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APK_NAME: ${{ steps.meta.outputs.name }}
+          SHA256: ${{ steps.meta.outputs.sha256 }}
+          SIZE: ${{ steps.meta.outputs.size }}
+        run: |
+          set -euo pipefail
+          TAG="v${{ steps.meta.outputs.version }}"
+          echo "Publishing release $TAG from ${{ github.sha }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "CraftCube $TAG" --notes-file dist/release/RELEASE_NOTES.md || true
+            gh release upload "$TAG" "${{ steps.meta.outputs.apk }}" --clobber
+          else
+            gh release create "$TAG" "${{ steps.meta.outputs.apk }}" \
+              --title "CraftCube $TAG" \
+              --notes-file dist/release/RELEASE_NOTES.md \
+              --target "${{ github.sha }}" \
+              --prerelease
+          fi
+          gh release view "$TAG" --json url,tagName,assets

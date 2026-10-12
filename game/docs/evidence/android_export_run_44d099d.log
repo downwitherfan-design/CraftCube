@@ -1,0 +1,256 @@
+
+=== engine version ===
+4.7.2.stable.official.ed1daf0bf
+
+=== import (populate .godot cache) ===
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Could not find version of build tools that matches Target SDK, using 35.0.0
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Loading editor layout...[39m[0m
+[  16% ] [90m[1mloading_editor_layout[22m | Loading docks...[39m[0m
+[92m[ DONE ][39m [1mloading_editor_layout[22m
+[0m
+cannot connect to daemon at tcp:5037: Cannot assign requested address
+
+=== domain unit tests ===
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+== CraftCube domain tests ==
+[geometry]
+[moves]
+[scramble]
+[legal moves]
+[objectives]
+[game state]
+[save/load]
+WARNING: SaveManager: save version 9999 is newer than supported 1
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_from_path (res://scripts/game/save_manager.gd:56)
+         [1] _test_save_load (res://tests/run_tests.gd:169)
+         [2] _initialize (res://tests/run_tests.gd:30)
+[level catalog]
+[end-to-end solve]
+[geometry properties]
+[save hardening]
+ERROR: Parse JSON failed. Error at line 0: Expected key
+   at: parse_string (core/io/json.cpp:629)
+   GDScript backtrace (most recent call first):
+       [0] load_from_path (res://scripts/game/save_manager.gd:45)
+       [1] _test_save_hardening (res://tests/run_tests.gd:261)
+       [2] _initialize (res://tests/run_tests.gd:34)
+WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_from_path (res://scripts/game/save_manager.gd:47)
+         [1] _test_save_hardening (res://tests/run_tests.gd:261)
+         [2] _initialize (res://tests/run_tests.gd:34)
+[completion idempotency]
+[level advancement]
+[content id consistency]
+[level rule semantics]
+WARNING: generate_scramble: no non-solved scramble found; returning last attempt
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] generate_scramble (res://scripts/domain/puzzle_engine.gd:138)
+         [1] setup (res://scripts/domain/puzzle_engine.gd:21)
+         [2] _test_level_rule_semantics (res://tests/run_tests.gd:357)
+         [3] _initialize (res://tests/run_tests.gd:38)
+[hud layout and wiring]
+[save corruption variants]
+ERROR: Parse JSON failed. Error at line 0: Unknown error getting token
+   at: parse_string (core/io/json.cpp:629)
+   GDScript backtrace (most recent call first):
+       [0] load_from_path (res://scripts/game/save_manager.gd:45)
+       [1] _test_save_corruption_variants (res://tests/run_tests.gd:444)
+       [2] _initialize (res://tests/run_tests.gd:40)
+WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_from_path (res://scripts/game/save_manager.gd:47)
+         [1] _test_save_corruption_variants (res://tests/run_tests.gd:444)
+         [2] _initialize (res://tests/run_tests.gd:40)
+ERROR: Parse JSON failed. Error at line 0: Expected ']'
+   at: parse_string (core/io/json.cpp:629)
+   GDScript backtrace (most recent call first):
+       [0] load_from_path (res://scripts/game/save_manager.gd:45)
+       [1] _test_save_corruption_variants (res://tests/run_tests.gd:452)
+       [2] _initialize (res://tests/run_tests.gd:40)
+WARNING: SaveManager: save file is not valid JSON; quarantined, starting fresh
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_from_path (res://scripts/game/save_manager.gd:47)
+         [1] _test_save_corruption_variants (res://tests/run_tests.gd:452)
+         [2] _initialize (res://tests/run_tests.gd:40)
+WARNING: SaveManager: save file has no usable version; quarantined, starting fresh
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_from_path (res://scripts/game/save_manager.gd:52)
+         [1] _test_save_corruption_variants (res://tests/run_tests.gd:459)
+         [2] _initialize (res://tests/run_tests.gd:40)
+[scene integration]
+[completion feedback]
+[camera framing]
+[resume selection]
+[chapter playthrough]
+[face orientation]
+[layer selection]
+[animation lock and sync]
+[world state and resume]
+[objective progress]
+[animated chapter end-to-end]
+[scramble fuzz]
+== Summary: 234 passed, 0 failed ==
+
+=== main scene smoke boot ===
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+
+=== android export (debug) ===
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Could not find version of build tools that matches Target SDK, using 35.0.0
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+Could not find version of build tools that matches Target SDK, using 35.0.0
+[   0% ] [90m[1mexport[22m | Started Exporting for Android (105 steps)[39m[0m
+0 param: --xr_mode_regular
+1 param: --xr-mode
+2 param: off
+3 param: --fullscreen
+4 param: --background_color
+5 param: #000000
+[   0% ] [90m[1mexport[22m | Creating APK...[39m[0m
+ADDING: classes.dex
+ADDING: classes10.dex
+ADDING: classes11.dex
+ADDING: classes12.dex
+ADDING: classes13.dex
+ADDING: classes2.dex
+ADDING: classes3.dex
+ADDING: classes4.dex
+ADDING: classes5.dex
+ADDING: classes6.dex
+ADDING: classes7.dex
+ADDING: classes8.dex
+ADDING: classes9.dex
+ADDING: lib/arm64-v8a/libc++_shared.so
+ADDING: lib/arm64-v8a/libgodot_android.so
+Adding application metadata org.godotengine.rendering.method
+Adding application metadata org.godotengine.editor.version
+Adding feature android.hardware.vulkan.level
+Adding feature android.hardware.vulkan.version
+ADDING: AndroidManifest.xml
+ADDING: res/anim-v21/fragment_fast_out_extra_slow_in.xml
+ADDING: res/animator/fragment_close_enter.xml
+ADDING: res/animator/fragment_close_exit.xml
+ADDING: res/animator/fragment_fade_enter.xml
+ADDING: res/animator/fragment_fade_exit.xml
+ADDING: res/animator/fragment_open_enter.xml
+ADDING: res/animator/fragment_open_exit.xml
+ADDING: res/drawable-hdpi-v4/notification_bg_low_normal.9.png
+ADDING: res/drawable-hdpi-v4/notification_bg_low_pressed.9.png
+ADDING: res/drawable-hdpi-v4/notification_bg_normal.9.png
+ADDING: res/drawable-hdpi-v4/notification_bg_normal_pressed.9.png
+ADDING: res/drawable-hdpi-v4/notify_panel_notification_icon_bg.png
+ADDING: res/drawable-mdpi-v4/notification_bg_low_normal.9.png
+ADDING: res/drawable-mdpi-v4/notification_bg_low_pressed.9.png
+ADDING: res/drawable-mdpi-v4/notification_bg_normal.9.png
+ADDING: res/drawable-mdpi-v4/notification_bg_normal_pressed.9.png
+ADDING: res/drawable-mdpi-v4/notify_panel_notification_icon_bg.png
+ADDING: res/drawable-v21/notification_action_background.xml
+ADDING: res/drawable-v23/compat_splash_screen.xml
+ADDING: res/drawable-v23/compat_splash_screen_no_icon_background.xml
+ADDING: res/drawable-xhdpi-v4/notification_bg_low_normal.9.png
+ADDING: res/drawable-xhdpi-v4/notification_bg_low_pressed.9.png
+ADDING: res/drawable-xhdpi-v4/notification_bg_normal.9.png
+ADDING: res/drawable-xhdpi-v4/notification_bg_normal_pressed.9.png
+ADDING: res/drawable-xhdpi-v4/notify_panel_notification_icon_bg.png
+ADDING: res/drawable/icon_background.xml
+ADDING: res/drawable/notification_bg.xml
+ADDING: res/drawable/notification_bg_low.xml
+ADDING: res/drawable/notification_icon_background.xml
+ADDING: res/drawable/notification_tile_bg.xml
+ADDING: res/drawable/splash_branding_image.webp
+ADDING: res/drawable/splash_icon.webp
+ADDING: res/layout-v21/notification_action.xml
+ADDING: res/layout-v21/notification_action_tombstone.xml
+ADDING: res/layout-v21/notification_template_custom_big.xml
+ADDING: res/layout-v21/notification_template_icon_group.xml
+ADDING: res/layout/custom_dialog.xml
+ADDING: res/layout/godot_app_layout.xml
+ADDING: res/layout/notification_template_part_chronometer.xml
+ADDING: res/layout/notification_template_part_time.xml
+ADDING: res/layout/remote_godot_fragment_layout.xml
+ADDING: res/layout/snackbar.xml
+ADDING: res/layout/splash_screen_view.xml
+ADDING: res/mipmap-anydpi-v26/icon.xml
+ADDING: res/mipmap-hdpi-v4/icon.webp
+ADDING: res/mipmap-hdpi-v4/icon_background.webp
+ADDING: res/mipmap-hdpi-v4/icon_foreground.webp
+ADDING: res/mipmap-hdpi-v4/icon_monochrome.webp
+ADDING: res/mipmap-mdpi-v4/icon.webp
+ADDING: res/mipmap-mdpi-v4/icon_background.webp
+ADDING: res/mipmap-mdpi-v4/icon_foreground.webp
+ADDING: res/mipmap-mdpi-v4/icon_monochrome.webp
+ADDING: res/mipmap-xhdpi-v4/icon.webp
+ADDING: res/mipmap-xhdpi-v4/icon_background.webp
+ADDING: res/mipmap-xhdpi-v4/icon_foreground.webp
+ADDING: res/mipmap-xhdpi-v4/icon_monochrome.webp
+ADDING: res/mipmap-xxhdpi-v4/icon.webp
+ADDING: res/mipmap-xxhdpi-v4/icon_background.webp
+ADDING: res/mipmap-xxhdpi-v4/icon_foreground.webp
+ADDING: res/mipmap-xxhdpi-v4/icon_monochrome.webp
+ADDING: res/mipmap-xxxhdpi-v4/icon.webp
+ADDING: res/mipmap-xxxhdpi-v4/icon_background.webp
+ADDING: res/mipmap-xxxhdpi-v4/icon_foreground.webp
+ADDING: res/mipmap-xxxhdpi-v4/icon_monochrome.webp
+ADDING: res/mipmap/icon.webp
+ADDING: res/mipmap/icon_background.webp
+ADDING: res/mipmap/icon_foreground.webp
+ADDING: res/mipmap/icon_monochrome.webp
+ADDING: res/xml/godot_provider_paths.xml
+ADDING: resources.arsc
+ADDING: DebugProbesKt.bin
+ADDING: kotlin/annotation/annotation.kotlin_builtins
+ADDING: kotlin/collections/collections.kotlin_builtins
+ADDING: kotlin/concurrent/atomics/atomics.kotlin_builtins
+ADDING: kotlin/coroutines/coroutines.kotlin_builtins
+ADDING: kotlin/internal/internal.kotlin_builtins
+ADDING: kotlin/kotlin.kotlin_builtins
+ADDING: kotlin/ranges/ranges.kotlin_builtins
+ADDING: kotlin/reflect/reflect.kotlin_builtins
+[   0% ] [90m[1mexport[22m | Adding files...[39m[0m
+[  97% ] [90m[1mexport[22m | Aligning APK...[39m[0m
+[  98% ] [90m[1mexport[22m | Signing debug APK...[39m[0m
+Could not find version of build tools that matches Target SDK, using 35.0.0
+Signing binary using: 
+/opt/android-sdk/build-tools/35.0.0/apksigner sign --verbose --ks <REDACTED> --ks-pass pass:<REDACTED> --ks-key-alias <REDACTED> /workspace/project/CraftCube/dist/CraftCube.apk
+Signed
+
+[  99% ] [90m[1mexport[22m | Verifying APK...[39m[0m
+[92m[ DONE ][39m [1mexport[22m
+[0m
+cannot connect to daemon at tcp:5037: Cannot assign requested address
+APK produced:
+-rw-r--r-- 1 openhands openhands 28346849 Oct 10 20:55 /workspace/project/CraftCube/dist/CraftCube.apk
+0cb3d712bd517734ca1425dc2a540c6bc0a3acef226e38940b9ae91b4d7b2a03  /workspace/project/CraftCube/dist/CraftCube.apk
+
+CI: PASS
