@@ -1,6 +1,6 @@
 {
-  "app_version": "0.5.1",
-  "version_code": 9,
+  "app_version": "0.6.0",
+  "version_code": 10,
   "android": {
     "package": "com.downwitherfandesign.craftcube",
     "min_sdk": 24,
@@ -66,6 +66,14 @@
       "date": "2026-10-11",
       "type": "development",
       "notes": "Published GitHub pre-release (debug-signed). EPIC 0.5 Chapter One Gold Slice: coherent 'Living Mineral Garden' art direction (shared CraftPalette), layered world presentation with a healing path and improved Nox companion, upgraded cube presentation, shell visual identity, and a fix for the defect where the application shell covered the 3D world (near-black gameplay). APK sha256 6f282788abc1a418f5634ce1b365d78865c8d686aa84e29fd0a2e46656ac882e."
+    },
+    {
+      "version": "0.5.1",
+      "version_code": 9,
+      "tag": null,
+      "date": null,
+      "type": "development",
+      "notes": "Intermediate development version; never published as a GitHub Release. Recorded for monotonic version-code ordering."
     }
   ]
 }
