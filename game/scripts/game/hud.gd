@@ -124,9 +124,11 @@ func _build() -> void:
 	outer.add_child(_version)
 	outer.add_child(_status)
 
-	# Middle: the cube is visible here. Everything below scrolls, so a crowded control column
-	# on a small screen can never push the essential readout off the top.
-	outer.add_child(_spacer())
+	# Middle: a fixed-height band reserves the vertical area the camera views, so the cube is
+	# never occluded by guidance/control text (the cube is the one thing the player must read
+	# clearly). Everything below scrolls, so a crowded control column on a small screen can
+	# never push the essential readout off the top.
+	outer.add_child(_cube_band())
 
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -226,9 +228,13 @@ func _build() -> void:
 
 	_build_solved_panel()
 
-func _spacer() -> Control:
+## A fixed-height band that reserves the screen region the 3D camera frames the cube in. It has
+## no mouse filter (so drags still reach the orbit camera) and no children, so nothing is ever
+## drawn over the cube. Height is a fraction of the viewport so it scales with the device.
+func _cube_band() -> Control:
 	var s := Control.new()
-	s.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	s.custom_minimum_size = Vector2(0, 300)
+	s.size_flags_vertical = Control.SIZE_FILL
 	s.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return s
 
